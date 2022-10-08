@@ -4,6 +4,7 @@ import 'package:melijo/screens/buyers/register/register_buyers_screen.dart';
 import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
 import 'package:melijo/screens/sellers/login/login_sellers_screen.dart';
 import 'package:melijo/screens/sellers/products/add_product_sellers_screen.dart';
+import 'package:melijo/screens/sellers/products/edit_product_sellers_screen.dart';
 import 'package:melijo/screens/sellers/register/register_sellers_screen.dart';
 import 'package:melijo/screens/starts/first_screen.dart';
 import 'package:melijo/screens/starts/login/login_screen.dart';
@@ -45,6 +46,7 @@ class MyApp extends StatelessWidget {
         RegisterBuyersScreen.route: (context) => const RegisterBuyersScreen(),
         DashboardSellersScreen.route: (context) => const DashboardSellersScreen(),
         AddProductSellerScreen.route: (context) => const AddProductSellerScreen(),
+        EditProductSellerScreen.route: (context) => const EditProductSellerScreen(),
       },
     );
   }

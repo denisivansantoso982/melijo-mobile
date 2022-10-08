@@ -4,19 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 
-class AddProductSellerScreen extends StatefulWidget {
-  const AddProductSellerScreen({Key? key}) : super(key: key);
+class EditProductSellerScreen extends StatefulWidget {
+  const EditProductSellerScreen({Key? key}) : super(key: key);
 
-  static const String route = '/add_product_sellers_screen';
+  static const String route = '/edit_product_sellers_screen';
 
   @override
-  _AddProductSellerScreenState createState() => _AddProductSellerScreenState();
+  _EditProductSellerScreenState createState() =>
+      _EditProductSellerScreenState();
 }
 
-class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
+class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _categoryController = TextEditingController(text: 'Sayur');
-  final TextEditingController _priceController = TextEditingController(text: '0');
+  final TextEditingController _categoryController =
+      TextEditingController(text: 'Sayur');
+  final TextEditingController _priceController =
+      TextEditingController(text: '0');
   final TextEditingController _descriptionController = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _categoryFocus = FocusNode();
@@ -24,30 +27,12 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
   final FocusNode _descriptionFocus = FocusNode();
   final List<dynamic> _listOfPicture = [];
   final List<Map<String, String>> _listOfCategory = [
-    {
-      'value': 'Sayur',
-      'image': 'vegetables.png'
-    },
-    {
-      'value': 'Daging',
-      'image': 'meats.png'
-    },
-    {
-      'value': 'Unggas',
-      'image': 'poultries.png'
-    },
-    {
-      'value': 'Seafood',
-      'image': 'seafoods.png'
-    },
-    {
-      'value': 'Protein',
-      'image': 'eggs.png'
-    },
-    {
-      'value': 'Bumbu',
-      'image': 'spices.png'
-    },
+    {'value': 'Sayur', 'image': 'vegetables.png'},
+    {'value': 'Daging', 'image': 'meats.png'},
+    {'value': 'Unggas', 'image': 'poultries.png'},
+    {'value': 'Seafood', 'image': 'seafoods.png'},
+    {'value': 'Protein', 'image': 'eggs.png'},
+    {'value': 'Bumbu', 'image': 'spices.png'},
   ];
 
   @override
@@ -61,6 +46,14 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
     _priceFocus.dispose();
     _descriptionFocus.dispose();
     super.dispose();
+  }
+
+  void initial(Map<String, dynamic> argue) {
+    _listOfPicture.addAll(argue['pictures']);
+    _nameController.text = argue['name'];
+    _categoryController.text = argue['category'];
+    _priceController.text = argue['price'];
+    _descriptionController.text = argue['description'];
   }
 
   Widget generatePictures(BuildContext context, index) {
@@ -146,11 +139,14 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, dynamic> argue =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    initial(argue);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colours.deepGreen,
         title: const Text(
-          'Tambah Produk',
+          'Ubah Produk',
           style: TextStyle(
             color: Colours.white,
             fontSize: 20,
@@ -190,13 +186,13 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
             const SizedBox(height: 4),
             SizedBox(
               child: GridView.builder(
-                shrinkWrap: true,
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3,
                   childAspectRatio: _listOfPicture.isEmpty ? 2 / 1 : 1,
                   crossAxisSpacing: 4,
                   mainAxisSpacing: 4,
                 ),
+                shrinkWrap: true,
                 itemCount: _listOfPicture.isEmpty
                     ? 1
                     : (_listOfPicture.length < 6
@@ -283,37 +279,48 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
               decoration: InputDecoration(
                 enabledBorder: outlineInputBorder(Colours.gray),
                 focusedBorder: outlineInputBorder(Colours.deepGreen),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12,),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 12,
+                ),
               ),
               isExpanded: true,
-              items: _listOfCategory.map<DropdownMenuItem<String>>(
-                (item) => DropdownMenuItem<String>(
-                  value: item['value'],
-                  child: SizedBox(
-                    height: 32,
-                    // decoration: BoxDecoration(
-                    //   border: Border(
-                    //     bottom: item == _listOfCategory.last ? BorderSide.none : const BorderSide(color: Colours.deepGreen, width: 2,),
-                    //   ),
-                    // ),
-                    child: Row(
-                      children: [
-                        Image(image: AssetImage('lib/assets/images/category/${item['image']}'), fit: BoxFit.cover, height: 30, width: 30,),
-                        const SizedBox(width: 8),
-                        Text(
-                          item['value']!,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontStyles.regular,
-                            color: Colours.deepGreen,
-                            fontFamily: FontStyles.leagueSpartan,
-                          ),
+              items: _listOfCategory
+                  .map<DropdownMenuItem<String>>(
+                    (item) => DropdownMenuItem<String>(
+                      value: item['value'],
+                      child: SizedBox(
+                        height: 32,
+                        // decoration: BoxDecoration(
+                        //   border: Border(
+                        //     bottom: item == _listOfCategory.last ? BorderSide.none : const BorderSide(color: Colours.deepGreen, width: 2,),
+                        //   ),
+                        // ),
+                        child: Row(
+                          children: [
+                            Image(
+                              image: AssetImage(
+                                  'lib/assets/images/category/${item['image']}'),
+                              fit: BoxFit.cover,
+                              height: 30,
+                              width: 30,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              item['value']!,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontStyles.regular,
+                                color: Colours.deepGreen,
+                                fontFamily: FontStyles.leagueSpartan,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ).toList(),
+                  )
+                  .toList(),
               onChanged: (value) {
                 setState(() {
                   _categoryController.text = value!;
@@ -443,7 +450,7 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
         child: ElevatedButton(
           onPressed: () {},
           child: const Text(
-            'Tambahkan Produk',
+            'Simpan',
             style: TextStyle(
                 fontWeight: FontStyles.medium,
                 fontFamily: FontStyles.leagueSpartan,
