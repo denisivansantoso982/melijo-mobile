@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:melijo/screens/buyers/dashboard/dashboard_buyers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 
 class LoginBuyersScreen extends StatefulWidget {
@@ -179,7 +180,7 @@ class _LoginBuyersScreenState extends State<LoginBuyersScreen> {
                     elevation: 8,
                     shadowColor: Colours.deepGreen,
                   ),
-                  onPressed: () {},
+                  onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil(DashboardBuyersScreen.route, (route) => false),
                   child: const Text(
                     'Masuk',
                     style: TextStyle(

@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:melijo/screens/buyers/dashboard/dashboard_buyers_screen.dart';
 import 'package:melijo/screens/buyers/login/login_buyers_screen.dart';
+import 'package:melijo/screens/buyers/products/cart_product_buyers_screen.dart';
+import 'package:melijo/screens/buyers/products/detail_product_buyers_screen.dart';
 import 'package:melijo/screens/buyers/register/register_buyers_screen.dart';
+import 'package:melijo/screens/buyers/transactions/detail_transactions_screen.dart';
 import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
 import 'package:melijo/screens/sellers/login/login_sellers_screen.dart';
 import 'package:melijo/screens/sellers/products/add_product_sellers_screen.dart';
@@ -47,6 +51,10 @@ class MyApp extends StatelessWidget {
         DashboardSellersScreen.route: (context) => const DashboardSellersScreen(),
         AddProductSellerScreen.route: (context) => const AddProductSellerScreen(),
         EditProductSellerScreen.route: (context) => const EditProductSellerScreen(),
+        DashboardBuyersScreen.route: (context) => const DashboardBuyersScreen(),
+        DetailTransactionScreen.route: (context) => const DetailTransactionScreen(),
+        DetailProductBuyersScreen.route: (context) => const DetailProductBuyersScreen(),
+        CartProductBuyersScreen.route: (context) => const CartProductBuyersScreen(),
       },
     );
   }

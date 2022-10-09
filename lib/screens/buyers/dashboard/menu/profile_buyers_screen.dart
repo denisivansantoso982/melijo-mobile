@@ -5,14 +5,14 @@ import 'package:melijo/screens/starts/first_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 
-class ProfileSellersScreen extends StatefulWidget {
-  const ProfileSellersScreen({Key? key}) : super(key: key);
+class ProfileBuyersScreen extends StatefulWidget {
+  const ProfileBuyersScreen({Key? key}) : super(key: key);
 
   @override
-  _ProfileSellersScreenState createState() => _ProfileSellersScreenState();
+  _ProfileBuyersScreenState createState() => _ProfileBuyersScreenState();
 }
 
-class _ProfileSellersScreenState extends State<ProfileSellersScreen> {
+class _ProfileBuyersScreenState extends State<ProfileBuyersScreen> {
   final TextEditingController _nameController = TextEditingController(text: 'Rudi Budiman Arif Yudistira Wawan');
   final TextEditingController _usernameController = TextEditingController(text: 'rdayw_1');
   final TextEditingController _emailController = TextEditingController(text: 'gataugue123@gmail.com');
