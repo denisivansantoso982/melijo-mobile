@@ -1,6 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
+import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/detail_product_buyers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
@@ -125,13 +127,13 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).pushNamed(NotificationBuyersScreen.route),
             color: Colours.white,
             iconSize: 28,
             icon: const Icon(Icons.notifications_outlined),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).pushNamed(ChatBuyersScreen.route),
             color: Colours.white,
             iconSize: 28,
             icon: const Icon(Icons.mail_outline_sharp),

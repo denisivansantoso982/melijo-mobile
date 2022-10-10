@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
+import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/screens/buyers/dashboard/dashboard_buyers_screen.dart';
 import 'package:melijo/screens/buyers/login/login_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/cart_product_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/detail_product_buyers_screen.dart';
+import 'package:melijo/screens/buyers/recipes/detail_recipe_buyers_screen.dart';
+import 'package:melijo/screens/buyers/recipes/favourite_recipes_buyers_screen.dart';
 import 'package:melijo/screens/buyers/register/register_buyers_screen.dart';
 import 'package:melijo/screens/buyers/transactions/detail_transactions_screen.dart';
 import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
@@ -55,6 +59,10 @@ class MyApp extends StatelessWidget {
         DetailTransactionScreen.route: (context) => const DetailTransactionScreen(),
         DetailProductBuyersScreen.route: (context) => const DetailProductBuyersScreen(),
         CartProductBuyersScreen.route: (context) => const CartProductBuyersScreen(),
+        DetailRecipeBuyersScreen.route: (context) => const DetailRecipeBuyersScreen(),
+        FavouriteRecipesBuyersScreen.route: (context) => const FavouriteRecipesBuyersScreen(),
+        NotificationBuyersScreen.route: (context) => const NotificationBuyersScreen(),
+        ChatBuyersScreen.route: (context) => const ChatBuyersScreen(),
       },
     );
   }

@@ -1,6 +1,9 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
+import 'package:melijo/screens/buyers/recipes/detail_recipe_buyers_screen.dart';
+import 'package:melijo/screens/buyers/recipes/favourite_recipes_buyers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 
@@ -133,13 +136,13 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).pushNamed(NotificationBuyersScreen.route),
             color: Colours.white,
             iconSize: 28,
             icon: const Icon(Icons.notifications_outlined),
           ),
           IconButton(
-            onPressed: () {},
+            onPressed: () => Navigator.of(context).pushNamed(FavouriteRecipesBuyersScreen.route),
             color: Colours.white,
             iconSize: 28,
             icon: const Icon(Icons.favorite_border_outlined),
@@ -224,90 +227,96 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
               mainAxisSpacing: 12,
               childAspectRatio: 4 / 5,
             ),
-            itemBuilder: (context, index) => Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadius.all(Radius.circular(8)),
-                boxShadow: [
-                  BoxShadow(
-                    blurRadius: 4,
-                    color: Colours.black.withOpacity(.25),
-                    offset: const Offset(2, 4),
-                  ),
-                ],
+            itemBuilder: (context, index) => GestureDetector(
+              onTap: () => Navigator.of(context).pushNamed(
+                DetailRecipeBuyersScreen.route,
+                arguments: _listRecipes[index],
               ),
-              child: Stack(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // *Images
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          topRight: Radius.circular(8),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 4,
+                      color: Colours.black.withOpacity(.25),
+                      offset: const Offset(2, 4),
+                    ),
+                  ],
+                ),
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // *Images
+                        ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(8),
+                            topRight: Radius.circular(8),
+                          ),
+                          child: Image(
+                            image: AssetImage(
+                                'lib/assets/images/recipes/${_listRecipes[index]['image']}'),
+                            fit: BoxFit.cover,
+                            height: screenSize.height / 6,
+                          ),
                         ),
-                        child: Image(
-                          image: AssetImage(
-                              'lib/assets/images/recipes/${_listRecipes[index]['image']}'),
-                          fit: BoxFit.cover,
-                          height: screenSize.height / 6,
+                        // *Title
+                        Flexible(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              _listRecipes[index]['name'],
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: Colours.black,
+                                fontFamily: FontStyles.leagueSpartan,
+                                fontWeight: FontStyles.regular,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
                         ),
-                      ),
-                      // *Title
-                      Flexible(
-                        child: Padding(
+                        // *Difficulty
+                        Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
-                            _listRecipes[index]['name'],
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
+                            '${_listRecipes[index]['difficulty']}',
                             style: const TextStyle(
-                              color: Colours.black,
+                              color: Colours.deepGreen,
                               fontFamily: FontStyles.leagueSpartan,
-                              fontWeight: FontStyles.regular,
+                              fontWeight: FontStyles.medium,
                               fontSize: 16,
                             ),
                           ),
                         ),
-                      ),
-                      // *Difficulty
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          '${_listRecipes[index]['difficulty']}',
-                          style: const TextStyle(
-                            color: Colours.deepGreen,
-                            fontFamily: FontStyles.leagueSpartan,
-                            fontWeight: FontStyles.medium,
-                            fontSize: 16,
-                          ),
+                        const SizedBox(),
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.topRight,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(6),
+                          shape: const CircleBorder(),
+                          backgroundColor: Colours.white,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _listRecipes[index]['favourite'] = !_listRecipes[index]['favourite'];
+                          });
+                        },
+                        child: Icon(
+                          _listRecipes[index]['favourite'] ? Icons.favorite : Icons.favorite_border,
+                          color: _listRecipes[index]['favourite'] ? Colors.red : Colours.black,
                         ),
                       ),
-                      const SizedBox(),
-                    ],
-                  ),
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.all(6),
-                        shape: const CircleBorder(),
-                        backgroundColor: Colours.white,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _listRecipes[index]['favourite'] = !_listRecipes[index]['favourite'];
-                        });
-                      },
-                      child: Icon(
-                        _listRecipes[index]['favourite'] ? Icons.favorite : Icons.favorite_border,
-                        color: _listRecipes[index]['favourite'] ? Colors.red : Colours.black,
-                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
