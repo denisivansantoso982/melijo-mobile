@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
+import 'package:melijo/screens/buyers/communications/detail_chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/screens/buyers/dashboard/dashboard_buyers_screen.dart';
 import 'package:melijo/screens/buyers/login/login_buyers_screen.dart';
@@ -63,6 +64,7 @@ class MyApp extends StatelessWidget {
         FavouriteRecipesBuyersScreen.route: (context) => const FavouriteRecipesBuyersScreen(),
         NotificationBuyersScreen.route: (context) => const NotificationBuyersScreen(),
         ChatBuyersScreen.route: (context) => const ChatBuyersScreen(),
+        DetailChatBuyersScreen.route: (context) => const DetailChatBuyersScreen(),
       },
     );
   }

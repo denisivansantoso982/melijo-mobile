@@ -348,6 +348,9 @@ class _ProfileSellersScreenState extends State<ProfileSellersScreen> {
                     controller: _addressController,
                     focusNode: _addressFocus,
                     readOnly: !_isEditable,
+                    textInputAction: TextInputAction.newline,
+                    maxLength: null,
+                    maxLines: null,
                     style: const TextStyle(
                       color: Colours.black,
                       fontSize: 18,

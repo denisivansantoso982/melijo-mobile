@@ -189,9 +189,12 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
               ],
             ),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 48),
+              ),
               onPressed: () {},
               child: Text(
-                'Batalkan Pesanan (${_listOfCart.where((element) => element['checked'] == true).length})',
+                'Beli (${_listOfCart.where((element) => element['checked'] == true).length})',
                 style: const TextStyle(
                   color: Colours.white,
                   fontSize: 14,
