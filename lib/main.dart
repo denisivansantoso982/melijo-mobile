@@ -10,6 +10,9 @@ import 'package:melijo/screens/buyers/recipes/detail_recipe_buyers_screen.dart';
 import 'package:melijo/screens/buyers/recipes/favourite_recipes_buyers_screen.dart';
 import 'package:melijo/screens/buyers/register/register_buyers_screen.dart';
 import 'package:melijo/screens/buyers/transactions/detail_transactions_screen.dart';
+import 'package:melijo/screens/buyers/transactions/distribution_address_screen.dart';
+import 'package:melijo/screens/buyers/transactions/distribution_date_screen.dart';
+import 'package:melijo/screens/buyers/transactions/payment_screen.dart';
 import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
 import 'package:melijo/screens/sellers/login/login_sellers_screen.dart';
 import 'package:melijo/screens/sellers/products/add_product_sellers_screen.dart';
@@ -65,6 +68,9 @@ class MyApp extends StatelessWidget {
         NotificationBuyersScreen.route: (context) => const NotificationBuyersScreen(),
         ChatBuyersScreen.route: (context) => const ChatBuyersScreen(),
         DetailChatBuyersScreen.route: (context) => const DetailChatBuyersScreen(),
+        DistributionDateScreen.route: (context) => const DistributionDateScreen(),
+        DistributionAddressScreen.route: (context) => const DistributionAddressScreen(),
+        PaymentScreen.route: (context) => const PaymentScreen(),
       },
     );
   }

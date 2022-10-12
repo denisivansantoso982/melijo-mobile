@@ -1,27 +1,35 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:melijo/screens/buyers/transactions/distribution_date_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:intl/intl.dart';
 
 class CartProductBuyersScreen extends StatefulWidget {
-  const CartProductBuyersScreen({ Key? key }) : super(key: key);
+  const CartProductBuyersScreen({Key? key}) : super(key: key);
 
   static const String route = '/cart_product_buyers_screen';
 
   @override
-  _CartProductBuyersScreenState createState() => _CartProductBuyersScreenState();
+  _CartProductBuyersScreenState createState() =>
+      _CartProductBuyersScreenState();
 }
 
 class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
   final List<Map<String, dynamic>> _listOfCart = [
     {
-      'name': 'Buah Naga',
+      'name': 'Bawang Daun',
       'price': 14000,
       'quantity': 2,
-      'image': 'buah_naga.jpg',
-      'status': 'Menunggu Konfirmasi',
+      'image': 'bawang_daun.jpg',
+      'checked': false,
+    },
+    {
+      'name': 'Bawang Merah',
+      'price': 16000,
+      'quantity': 2,
+      'image': 'bawang_merah.jpg',
       'checked': false,
     },
   ];
@@ -32,6 +40,11 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
       if (element['checked']) total += element['price'] * element['quantity'];
     }
     return total;
+  }
+
+  String productTotal(int index) {
+    final int total = _listOfCart[index]['price'] * _listOfCart[index]['quantity'];
+    return NumberFormat('###,###').format(total).replaceAll(',', '.');
   }
 
   @override
@@ -71,6 +84,7 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              // *Product Image
               Expanded(
                 flex: 2,
                 child: Stack(
@@ -81,7 +95,8 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
                         bottomLeft: Radius.circular(12),
                       ),
                       child: Image(
-                        image: AssetImage('lib/assets/images/${_listOfCart[index]['image']}'),
+                        image: AssetImage(
+                            'lib/assets/images/products/${_listOfCart[index]['image']}'),
                         fit: BoxFit.cover,
                         height: 80,
                       ),
@@ -90,10 +105,14 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
                       value: _listOfCart[index]['checked'],
                       checkColor: Colours.white,
                       activeColor: Colours.deepGreen,
-                      side: const BorderSide(color: Colours.deepGreen, width: 2,),
+                      side: const BorderSide(
+                        color: Colours.deepGreen,
+                        width: 2,
+                      ),
                       onChanged: (value) {
                         setState(() {
-                          _listOfCart[index]['checked'] = !_listOfCart[index]['checked'];
+                          _listOfCart[index]['checked'] =
+                              !_listOfCart[index]['checked'];
                         });
                       },
                     ),
@@ -101,6 +120,7 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
                 ),
               ),
               const SizedBox(width: 8),
+              // *Product Information
               Expanded(
                 flex: 4,
                 child: Padding(
@@ -110,7 +130,7 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
                     children: [
                       // *Total Price
                       Text(
-                        'Rp${NumberFormat('###,###').format(_listOfCart[index]['price']).replaceAll(',', '.')}',
+                        'Rp${productTotal(index)}',
                         style: const TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
@@ -121,7 +141,7 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
                       const SizedBox(height: 12),
                       // *Product Name
                       Text(
-                        _listOfCart[index]['name'],
+                        '${_listOfCart[index]['name']} (x${_listOfCart[index]['quantity']})',
                         softWrap: true,
                         style: TextStyle(
                           fontSize: 18,
@@ -164,6 +184,7 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            // *Total Price
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -188,11 +209,15 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
                 ),
               ],
             ),
+            // *Buy Button
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 48),
               ),
-              onPressed: () {},
+              onPressed: () => Navigator.of(context).pushNamed(
+                DistributionDateScreen.route,
+                arguments: _listOfCart.where((element) => element['checked'] == true).toList(),
+              ),
               child: Text(
                 'Beli (${_listOfCart.where((element) => element['checked'] == true).length})',
                 style: const TextStyle(
