@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:melijo/firebase_options.dart';
 import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/detail_chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
@@ -24,7 +26,11 @@ import 'package:melijo/screens/starts/register/register_screen.dart';
 import 'package:melijo/screens/starts/splash_screen.dart';
 import 'package:melijo/utils/colours.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
@@ -56,20 +62,32 @@ class MyApp extends StatelessWidget {
         LoginBuyersScreen.route: (context) => const LoginBuyersScreen(),
         RegisterSellersScreen.route: (context) => const RegisterSellersScreen(),
         RegisterBuyersScreen.route: (context) => const RegisterBuyersScreen(),
-        DashboardSellersScreen.route: (context) => const DashboardSellersScreen(),
-        AddProductSellerScreen.route: (context) => const AddProductSellerScreen(),
-        EditProductSellerScreen.route: (context) => const EditProductSellerScreen(),
+        DashboardSellersScreen.route: (context) =>
+            const DashboardSellersScreen(),
+        AddProductSellerScreen.route: (context) =>
+            const AddProductSellerScreen(),
+        EditProductSellerScreen.route: (context) =>
+            const EditProductSellerScreen(),
         DashboardBuyersScreen.route: (context) => const DashboardBuyersScreen(),
-        DetailTransactionScreen.route: (context) => const DetailTransactionScreen(),
-        DetailProductBuyersScreen.route: (context) => const DetailProductBuyersScreen(),
-        CartProductBuyersScreen.route: (context) => const CartProductBuyersScreen(),
-        DetailRecipeBuyersScreen.route: (context) => const DetailRecipeBuyersScreen(),
-        FavouriteRecipesBuyersScreen.route: (context) => const FavouriteRecipesBuyersScreen(),
-        NotificationBuyersScreen.route: (context) => const NotificationBuyersScreen(),
+        DetailTransactionScreen.route: (context) =>
+            const DetailTransactionScreen(),
+        DetailProductBuyersScreen.route: (context) =>
+            const DetailProductBuyersScreen(),
+        CartProductBuyersScreen.route: (context) =>
+            const CartProductBuyersScreen(),
+        DetailRecipeBuyersScreen.route: (context) =>
+            const DetailRecipeBuyersScreen(),
+        FavouriteRecipesBuyersScreen.route: (context) =>
+            const FavouriteRecipesBuyersScreen(),
+        NotificationBuyersScreen.route: (context) =>
+            const NotificationBuyersScreen(),
         ChatBuyersScreen.route: (context) => const ChatBuyersScreen(),
-        DetailChatBuyersScreen.route: (context) => const DetailChatBuyersScreen(),
-        DistributionDateScreen.route: (context) => const DistributionDateScreen(),
-        DistributionAddressScreen.route: (context) => const DistributionAddressScreen(),
+        DetailChatBuyersScreen.route: (context) =>
+            const DetailChatBuyersScreen(),
+        DistributionDateScreen.route: (context) =>
+            const DistributionDateScreen(),
+        DistributionAddressScreen.route: (context) =>
+            const DistributionAddressScreen(),
         PaymentScreen.route: (context) => const PaymentScreen(),
       },
     );

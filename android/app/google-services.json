@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "42376472132",
+    "project_id": "melijo-id",
+    "storage_bucket": "melijo-id.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:42376472132:android:94b507ed3f7ff29f923e11",
+        "android_client_info": {
+          "package_name": "com.example.melijo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "42376472132-749c9giu5ulp19r68i1s7fr649cag067.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBErFLponN1KFAVlySNIVF0AoNIkmnsKao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "42376472132-749c9giu5ulp19r68i1s7fr649cag067.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -8,6 +8,7 @@ import 'package:melijo/screens/buyers/dashboard/menu/transaction_buyers_screen.d
 import 'package:melijo/screens/buyers/products/cart_product_buyers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class DashboardBuyersScreen extends StatefulWidget {
   const DashboardBuyersScreen({Key? key}) : super(key: key);
@@ -24,21 +25,26 @@ class _DashboardBuyersScreenState extends State<DashboardBuyersScreen> {
   Widget generatePage() {
     if (_navIndex == 0) {
       return const HomeBuyersScreen();
-    }
-    else if (_navIndex == 1) {
+    } else if (_navIndex == 1) {
       return const RecipeBuyersScreen();
-    }
-    else if (_navIndex == 3) {
+    } else if (_navIndex == 3) {
       return const TransactionBuyersScreen();
-    }
-    else if (_navIndex == 4) {
+    } else if (_navIndex == 4) {
       return const ProfileBuyersScreen();
     }
     return Container();
   }
 
+  void subscribeTopic() async {
+    final token = await FirebaseMessaging.instance
+        .getToken(vapidKey: 'AIzaSyBErFLponN1KFAVlySNIVF0AoNIkmnsKao');
+    print(token);
+    await FirebaseMessaging.instance.subscribeToTopic('subscribe');
+  }
+
   @override
   Widget build(BuildContext context) {
+    subscribeTopic();
     return Scaffold(
       body: generatePage(),
       bottomNavigationBar: BottomNavigationBar(
@@ -86,12 +92,14 @@ class _DashboardBuyersScreenState extends State<DashboardBuyersScreen> {
           ),
         ],
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.miniCenterDocked,
+      floatingActionButtonLocation:
+          FloatingActionButtonLocation.miniCenterDocked,
       floatingActionButton: SizedBox(
         width: 80,
         height: 80,
         child: RawMaterialButton(
-          onPressed: () => Navigator.of(context).pushNamed(CartProductBuyersScreen.route),
+          onPressed: () =>
+              Navigator.of(context).pushNamed(CartProductBuyersScreen.route),
           shape: const CircleBorder(),
           elevation: 0,
           fillColor: Colours.deepGreen,
