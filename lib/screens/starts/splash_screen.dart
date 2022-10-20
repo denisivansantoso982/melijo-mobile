@@ -1,4 +1,9 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:melijo/configs/preferences/preferences.dart';
+import 'package:melijo/screens/buyers/dashboard/dashboard_buyers_screen.dart';
+import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
 import 'package:melijo/screens/starts/first_screen.dart';
 
 class SplashScreen extends StatelessWidget {
@@ -6,11 +11,23 @@ class SplashScreen extends StatelessWidget {
 
   static const String route = '/splash_screen';
 
+  static Preferences preferences = Preferences();
+
+  Future<void> initUser(BuildContext context) async {
+    final int? role = await preferences.checkUserRole();
+    await Future.delayed(const Duration(milliseconds: 1500));
+    if (role == null) {
+      Navigator.of(context).pushReplacementNamed(FirstScreen.route);
+    } else if (role == 3) {
+      Navigator.of(context).pushReplacementNamed(DashboardBuyersScreen.route);
+    } else {
+      Navigator.of(context).pushReplacementNamed(DashboardSellersScreen.route);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(seconds: 2), () {
-      Navigator.of(context).pushReplacementNamed(FirstScreen.route);
-    });
+    initUser(context);
 
     return const Scaffold(
       body: Padding(

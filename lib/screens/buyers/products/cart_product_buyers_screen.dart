@@ -213,11 +213,16 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 48),
+                backgroundColor: totalPrice() > 0 ? Colours.deepGreen : Colours.gray,
               ),
-              onPressed: () => Navigator.of(context).pushNamed(
-                DistributionDateScreen.route,
-                arguments: _listOfCart.where((element) => element['checked'] == true).toList(),
-              ),
+              onPressed: () {
+                if (totalPrice() > 0) {
+                  Navigator.of(context).pushNamed(
+                    DistributionDateScreen.route,
+                    arguments: _listOfCart.where((element) => element['checked'] == true).toList(),
+                  );
+                }
+              },
               child: Text(
                 'Beli (${_listOfCart.where((element) => element['checked'] == true).length})',
                 style: const TextStyle(

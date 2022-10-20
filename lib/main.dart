@@ -14,7 +14,9 @@ import 'package:melijo/screens/buyers/register/register_buyers_screen.dart';
 import 'package:melijo/screens/buyers/transactions/detail_transactions_screen.dart';
 import 'package:melijo/screens/buyers/transactions/distribution_address_screen.dart';
 import 'package:melijo/screens/buyers/transactions/distribution_date_screen.dart';
+import 'package:melijo/screens/buyers/transactions/payment_method_screen.dart';
 import 'package:melijo/screens/buyers/transactions/payment_screen.dart';
+import 'package:melijo/screens/buyers/transactions/promo_screen.dart';
 import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
 import 'package:melijo/screens/sellers/login/login_sellers_screen.dart';
 import 'package:melijo/screens/sellers/products/add_product_sellers_screen.dart';
@@ -89,6 +91,8 @@ class MyApp extends StatelessWidget {
         DistributionAddressScreen.route: (context) =>
             const DistributionAddressScreen(),
         PaymentScreen.route: (context) => const PaymentScreen(),
+        PaymentMethodScreen.route: (context) => const PaymentMethodScreen(),
+        PromoScreen.route: (context) => const PromoScreen(),
       },
     );
   }

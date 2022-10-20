@@ -1,6 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:melijo/configs/firebase/database.dart';
 import 'package:melijo/screens/buyers/dashboard/menu/home_buyers_screen.dart';
 import 'package:melijo/screens/buyers/dashboard/menu/profile_buyers_screen.dart';
 import 'package:melijo/screens/buyers/dashboard/menu/recipe_buyers_screen.dart';
@@ -21,6 +22,7 @@ class DashboardBuyersScreen extends StatefulWidget {
 
 class _DashboardBuyersScreenState extends State<DashboardBuyersScreen> {
   int _navIndex = 0;
+  FDatabase database = FDatabase();
 
   Widget generatePage() {
     if (_navIndex == 0) {
@@ -37,8 +39,7 @@ class _DashboardBuyersScreenState extends State<DashboardBuyersScreen> {
 
   void subscribeTopic() async {
     final token = await FirebaseMessaging.instance
-        .getToken(vapidKey: 'AIzaSyBErFLponN1KFAVlySNIVF0AoNIkmnsKao');
-    print(token);
+        .getToken(vapidKey: FDatabase.firebaseApiKey);
     await FirebaseMessaging.instance.subscribeToTopic('subscribe');
   }
 
