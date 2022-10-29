@@ -7,23 +7,21 @@ class Preferences {
 
   Future<void> setUserLogin({
     required int id,
-    required String name,
     required int role,
     required String username,
     required String email,
     required String fcm_token,
-    required String uid_firebase,
-    required String address,
+    required String auth_token,
+    required String token_type
   }) async {
     prefs = await SharedPreferences.getInstance();
     prefs.setInt('id', id);
-    prefs.setString('name', name);
     prefs.setInt('role', role);
     prefs.setString('username', username);
     prefs.setString('email', email);
     prefs.setString('fcm_token', fcm_token);
-    prefs.setString('uid_firebase', uid_firebase);
-    prefs.setString('address', address);
+    prefs.setString('auth_token', auth_token);
+    prefs.setString('token_type', token_type);
   }
 
   Future<int?> checkUserRole() async {
@@ -31,7 +29,7 @@ class Preferences {
     return prefs.getInt('role');
   }
 
-  Future<Map> getUser() async {
+  Future<Map<String, dynamic>> getUser() async {
     prefs = await SharedPreferences.getInstance();
     return {
       'id': prefs.getInt('id'),
@@ -42,6 +40,13 @@ class Preferences {
       'fcm_token': prefs.getString('fcm_token'),
       'uid_firebase': prefs.getString('uid_firebase'),
       'address': prefs.getString('address'),
+      'auth_token': prefs.getString('auth_token'),
+      'token_type': prefs.getString('token_type'),
     };
+  }
+
+  Future<void> deleteUser() async {
+    prefs = await SharedPreferences.getInstance();
+    prefs.clear();
   }
 }

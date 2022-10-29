@@ -57,6 +57,7 @@ class DefaultFirebaseOptions {
     appId: '1:42376472132:android:94b507ed3f7ff29f923e11',
     messagingSenderId: '42376472132',
     projectId: 'melijo-id',
+    databaseURL: 'https://melijo-id-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'melijo-id.appspot.com',
   );
 }

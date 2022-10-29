@@ -4,18 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/detail_product_buyers_screen.dart';
-import 'package:melijo/screens/buyers/products/products_buyers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 
-class HomeBuyersScreen extends StatefulWidget {
-  const HomeBuyersScreen({Key? key}) : super(key: key);
+class ProductsBuyersScreen extends StatefulWidget {
+  const ProductsBuyersScreen({Key? key}) : super(key: key);
+
+  static const String route = '/products_buyers_screen';
 
   @override
-  _HomeBuyersScreenState createState() => _HomeBuyersScreenState();
+  _ProductsBuyersScreenState createState() => _ProductsBuyersScreenState();
 }
 
-class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
+class _ProductsBuyersScreenState extends State<ProductsBuyersScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
   final List<Map<String, String>> _listCategory = [
@@ -44,30 +45,30 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
       'image': 'spices.png',
     },
   ];
-  final List<Map<String, dynamic>> _listMlijo = [
+  final List<Map<String, dynamic>> _listProduct = [
     {
-      'name': 'Rudi Brox',
-      'phone': '08513242352',
+      'name': 'Bawang Daun',
+      'price': 16000,
       'image': 'bawang_daun.jpg',
     },
     {
-      'name': 'Sofie',
-      'phone': '08313242352',
+      'name': 'Bawang Merah',
+      'price': 21000,
       'image': 'bawang_merah.jpg',
     },
     {
-      'name': 'Arman Huft',
-      'phone': '08513240052',
+      'name': 'Bawang Putih',
+      'price': 27000,
       'image': 'bawang_putih.jpg',
     },
     {
-      'name': 'Pejuang Gun',
-      'phone': '08513242300',
+      'name': 'Beras',
+      'price': 13000,
       'image': 'beras.jpg',
     },
     {
-      'name': 'Ikhsan Bro',
-      'phone': '08513112352',
+      'name': 'Kangkung',
+      'price': 8000,
       'image': 'kangkung.jpg',
     },
   ];
@@ -300,7 +301,7 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
           GridView.builder(
             padding: const EdgeInsets.all(20),
             shrinkWrap: true,
-            itemCount: _listMlijo.length,
+            itemCount: _listProduct.length,
             physics: const ScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
@@ -310,8 +311,8 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
             ),
             itemBuilder: (context, index) => GestureDetector(
               onTap: () => Navigator.of(context).pushNamed(
-                ProductsBuyersScreen.route,
-                arguments: _listMlijo[index],
+                DetailProductBuyersScreen.route,
+                arguments: _listProduct[index],
               ),
               child: Container(
                 decoration: BoxDecoration(
@@ -337,7 +338,7 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                       ),
                       child: Image(
                         image: AssetImage(
-                            'lib/assets/images/products/${_listMlijo[index]['image']}'),
+                            'lib/assets/images/products/${_listProduct[index]['image']}'),
                         fit: BoxFit.cover,
                         height: screenSize.height / 6,
                       ),
@@ -346,7 +347,7 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text(
-                        _listMlijo[index]['name'],
+                        _listProduct[index]['name'],
                         style: const TextStyle(
                           color: Colours.black,
                           fontFamily: FontStyles.leagueSpartan,
@@ -355,16 +356,16 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                         ),
                       ),
                     ),
-                    // *Phone
+                    // *Price
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Text(
-                        '${_listMlijo[index]['phone']}',
+                        'Rp${_listProduct[index]['price']}',
                         style: const TextStyle(
-                          color: Colours.gray,
+                          color: Colours.deepGreen,
                           fontFamily: FontStyles.leagueSpartan,
-                          fontWeight: FontStyles.regular,
-                          fontSize: 14,
+                          fontWeight: FontStyles.medium,
+                          fontSize: 16,
                         ),
                       ),
                     ),

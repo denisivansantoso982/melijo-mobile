@@ -1,6 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/configs/preferences/preferences.dart';
 import 'package:melijo/screens/sellers/dashboard/menu/menu_sellers_screen.dart';
 import 'package:melijo/screens/sellers/dashboard/menu/product_sellers_screen.dart';
 import 'package:melijo/screens/sellers/dashboard/menu/profile_sellers_screen.dart';
@@ -18,6 +20,7 @@ class DashboardSellersScreen extends StatefulWidget {
 
 class _DashboardSellersScreenState extends State<DashboardSellersScreen> {
   int _navIndex = 0;
+
   Widget generatePage() {
     if (_navIndex == 0) {
       return const MenuSellersScreen();

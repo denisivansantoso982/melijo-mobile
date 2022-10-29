@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "42376472132",
+    "firebase_url": "https://melijo-id-default-rtdb.asia-southeast1.firebasedatabase.app",
     "project_id": "melijo-id",
     "storage_bucket": "melijo-id.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "42376472132-l5hqqakkslti3a9fbhlve9rj44bhliqo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.melijo",
+            "certificate_hash": "c47fc63788f866e208cbe5304538cdaa96133c42"
+          }
+        },
         {
           "client_id": "42376472132-749c9giu5ulp19r68i1s7fr649cag067.apps.googleusercontent.com",
           "client_type": 3

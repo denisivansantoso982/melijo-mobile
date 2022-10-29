@@ -1,5 +1,10 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/screens/buyers/dashboard/dashboard_buyers_screen.dart';
 import 'package:melijo/screens/buyers/register/register_buyers_screen.dart';
+import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
 import 'package:melijo/screens/sellers/register/register_sellers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 
@@ -8,8 +13,20 @@ class RegisterScreen extends StatelessWidget {
 
   static const String route = '/register_screen';
 
+  // ! check user auth
+  Future<void> initUser(BuildContext context) async {
+    final int? role = await checkUserRole();
+    await Future.delayed(const Duration(milliseconds: 1500));
+    if (role == 3) {
+      Navigator.of(context).pushReplacementNamed(DashboardBuyersScreen.route);
+    } else if (role == 4) {
+      Navigator.of(context).pushReplacementNamed(DashboardSellersScreen.route);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    initUser(context);
     return Scaffold(
       // *Appbar
       appBar: AppBar(
@@ -84,7 +101,8 @@ class RegisterScreen extends StatelessWidget {
           elevation: 8,
           shadowColor: Colours.deepGreen,
         ),
-        onPressed: () => Navigator.of(context).pushNamed(RegisterBuyersScreen.route),
+        onPressed: () =>
+            Navigator.of(context).pushNamed(RegisterBuyersScreen.route),
         child: const Text(
           'Daftar Sebagai Pembeli',
           style: TextStyle(
@@ -112,7 +130,8 @@ class RegisterScreen extends StatelessWidget {
           shadowColor: MaterialStateProperty.all(Colors.transparent),
           overlayColor: MaterialStateProperty.all(Colors.transparent),
         ),
-        onPressed: () => Navigator.of(context).pushNamed(RegisterSellersScreen.route),
+        onPressed: () =>
+            Navigator.of(context).pushNamed(RegisterSellersScreen.route),
         child: const Text(
           'Daftar Sebagai Penjual',
           style: TextStyle(

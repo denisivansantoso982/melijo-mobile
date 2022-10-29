@@ -1,15 +1,33 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/screens/buyers/dashboard/dashboard_buyers_screen.dart';
+import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
 import 'package:melijo/screens/starts/login/login_screen.dart';
 import 'package:melijo/screens/starts/register/register_screen.dart';
 import 'package:melijo/utils/colours.dart';
+import 'package:melijo/widgets/loading_widget.dart';
 
 class FirstScreen extends StatelessWidget {
   const FirstScreen({Key? key}) : super(key: key);
 
   static const String route = '/first_screen';
 
+  // ! check user auth
+  Future<void> initUser(BuildContext context) async {
+    final int? role = await checkUserRole();
+    await Future.delayed(const Duration(milliseconds: 1500));
+    if (role == 3) {
+      Navigator.of(context).pushReplacementNamed(DashboardBuyersScreen.route);
+    } else if (role == 4) {
+      Navigator.of(context).pushReplacementNamed(DashboardSellersScreen.route);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    initUser(context);
     return Scaffold(
       // *Appbar
       appBar: AppBar(

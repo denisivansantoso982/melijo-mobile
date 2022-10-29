@@ -8,6 +8,7 @@ import 'package:melijo/screens/buyers/dashboard/dashboard_buyers_screen.dart';
 import 'package:melijo/screens/buyers/login/login_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/cart_product_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/detail_product_buyers_screen.dart';
+import 'package:melijo/screens/buyers/products/products_buyers_screen.dart';
 import 'package:melijo/screens/buyers/recipes/detail_recipe_buyers_screen.dart';
 import 'package:melijo/screens/buyers/recipes/favourite_recipes_buyers_screen.dart';
 import 'package:melijo/screens/buyers/register/register_buyers_screen.dart';
@@ -30,9 +31,7 @@ import 'package:melijo/utils/colours.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -93,6 +92,7 @@ class MyApp extends StatelessWidget {
         PaymentScreen.route: (context) => const PaymentScreen(),
         PaymentMethodScreen.route: (context) => const PaymentMethodScreen(),
         PromoScreen.route: (context) => const PromoScreen(),
+        ProductsBuyersScreen.route: (context) => const ProductsBuyersScreen(),
       },
     );
   }

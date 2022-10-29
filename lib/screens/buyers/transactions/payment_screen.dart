@@ -27,15 +27,14 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   int totalProduct() {
     int total = 0;
-    for (var element in products) {
-      total = element['price'] * element['quantity'];
+    for (Map element in products) {
+      total += (element['price'] * element['quantity']) as int;
     }
     return total;
   }
 
   @override
   Widget build(BuildContext context) {
-    final Size screenSize = MediaQuery.of(context).size;
     final Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
     products = arguments['products'];
     return Scaffold(

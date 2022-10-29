@@ -1,9 +1,12 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
 import 'package:melijo/utils/colours.dart';
+import 'package:melijo/utils/font_styles.dart';
+import 'package:melijo/widgets/modal_bottom.dart';
 
 class LoginSellersScreen extends StatefulWidget {
   const LoginSellersScreen({Key? key}) : super(key: key);
@@ -20,6 +23,7 @@ class _LoginSellersScreenState extends State<LoginSellersScreen> {
   final FocusNode _userFocus = FocusNode();
   final FocusNode _passwordFocus = FocusNode();
   bool _isVisible = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -28,6 +32,75 @@ class _LoginSellersScreenState extends State<LoginSellersScreen> {
     _userFocus.dispose();
     _passwordFocus.dispose();
     super.dispose();
+  }
+
+  // ! Login Process
+  Future<void> doLoginProcess(BuildContext context) async {
+    try {
+      if (validation()) {
+        setState(() {
+          _isLoading = true;
+        });
+        await login(_userController.text, _passwordController.text, true);
+        Navigator.of(context).pushNamedAndRemoveUntil(DashboardSellersScreen.route, (route) => false);
+      }
+    } catch (error) {
+      setState(() {
+        _isLoading = false;
+      });
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+            padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+              color: Colours.white,
+            ),
+            child: ModalBottom(
+              title: 'Terjadi Kesalahan!',
+              message: '$error',
+              widgets: [
+                OutlinedButton(
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colours.deepGreen, width: 1),
+                    fixedSize: const Size.fromWidth(80),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text(
+                    'Oke',
+                    style: TextStyle(
+                      color: Colours.deepGreen,
+                      fontSize: 18,
+                      fontWeight: FontStyles.regular,
+                      fontFamily: FontStyles.leagueSpartan,
+                    ),
+                  ),
+                )
+              ],
+            )),
+      );
+    }
+  }
+
+  // ! Validation
+  bool validation() {
+    if (_userController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Username atau Email tidak boleh kosong!'),
+      ));
+      _userFocus.requestFocus();
+      return false;
+    } else if (_passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Kata Sandi tidak boleh kosong!'),
+      ));
+      _passwordFocus.requestFocus();
+      return false;
+    }
+    return true;
   }
 
   @override
@@ -61,15 +134,15 @@ class _LoginSellersScreenState extends State<LoginSellersScreen> {
               const Text(
                 'Selangkah lagi menjadi Penjual',
                 style: TextStyle(
-                  fontFamily: 'Lora',
+                  fontFamily: FontStyles.lora,
                   fontSize: 28,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontStyles.bold,
                   color: Colours.black,
                 ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 56),
-              // *Email or Username Field
+              // *Email Field
               Container(
                 decoration: const BoxDecoration(
                   color: Colours.lightGray,
@@ -82,17 +155,18 @@ class _LoginSellersScreenState extends State<LoginSellersScreen> {
                   style: const TextStyle(
                     color: Colours.black,
                     fontSize: 18,
-                    fontFamily: 'League Spartan',
-                    fontWeight: FontWeight.w400,
+                    fontFamily: FontStyles.leagueSpartan,
+                    fontWeight: FontStyles.regular,
                   ),
                   inputFormatters: [
                     FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                    LengthLimitingTextInputFormatter(50),
                   ],
                   decoration: const InputDecoration(
                     border: OutlineInputBorder(
                       borderSide: BorderSide.none,
                     ),
-                    hintText: 'Email atau Username',
+                    hintText: 'Email',
                     contentPadding: EdgeInsets.symmetric(
                       vertical: 20,
                       horizontal: 16,
@@ -113,13 +187,13 @@ class _LoginSellersScreenState extends State<LoginSellersScreen> {
                       child: TextFormField(
                         controller: _passwordController,
                         focusNode: _passwordFocus,
-                        keyboardType: TextInputType.emailAddress,
-                        obscureText: _isVisible,
+                        keyboardType: TextInputType.name,
+                        obscureText: !_isVisible,
                         style: const TextStyle(
                           color: Colours.black,
                           fontSize: 18,
-                          fontFamily: 'League Spartan',
-                          fontWeight: FontWeight.w400,
+                          fontFamily: FontStyles.leagueSpartan,
+                          fontWeight: FontStyles.regular,
                         ),
                         inputFormatters: [
                           FilteringTextInputFormatter.deny(RegExp(r'\\s')),
@@ -161,10 +235,10 @@ class _LoginSellersScreenState extends State<LoginSellersScreen> {
                 child: Text(
                   'Lupa Kata Sandi?',
                   style: TextStyle(
-                    fontFamily: 'League Spartan',
+                    fontFamily: FontStyles.leagueSpartan,
                     fontSize: 18,
                     color: Colours.gray,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontStyles.regular,
                   ),
                 ),
               ),
@@ -180,19 +254,24 @@ class _LoginSellersScreenState extends State<LoginSellersScreen> {
                     elevation: 8,
                     shadowColor: Colours.deepGreen,
                   ),
-                  onPressed: () => Navigator.of(context).pushNamedAndRemoveUntil(
-                    DashboardSellersScreen.route,
-                    (route) => false,
-                  ),
-                  child: const Text(
-                    'Masuk',
-                    style: TextStyle(
-                      fontFamily: 'Lora',
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colours.white,
-                    ),
-                  ),
+                  onPressed: () {
+                    if (!_isLoading) doLoginProcess(context);
+                  },
+                  child: !_isLoading
+                      ? const Text(
+                          'Masuk',
+                          style: TextStyle(
+                            fontFamily: FontStyles.lora,
+                            fontSize: 20,
+                            fontWeight: FontStyles.medium,
+                            color: Colours.white,
+                          ),
+                        )
+                      : const SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: CircularProgressIndicator(color: Colours.white, strokeWidth: 2),
+                      ),
                 ),
               ),
             ],
