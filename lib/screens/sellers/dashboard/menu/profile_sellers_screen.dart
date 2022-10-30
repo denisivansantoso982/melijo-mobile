@@ -56,6 +56,7 @@ class _ProfileSellersScreenState extends State<ProfileSellersScreen> {
       Navigator.of(context)
           .pushNamedAndRemoveUntil(FirstScreen.route, (route) => false);
     } catch (error) {
+      LoadingWidget.close(context);
       showModalBottomSheet(
         backgroundColor: Colors.transparent,
         context: context,

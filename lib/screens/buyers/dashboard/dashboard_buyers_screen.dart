@@ -38,7 +38,7 @@ class _DashboardBuyersScreenState extends State<DashboardBuyersScreen> {
   }
 
   void subscribeTopic() async {
-    final token = await FirebaseMessaging.instance
+    await FirebaseMessaging.instance
         .getToken(vapidKey: FDatabase.firebaseApiKey);
     await FirebaseMessaging.instance.subscribeToTopic('subscribe');
   }

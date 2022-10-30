@@ -111,7 +111,6 @@ class FDatabase {
           .equalTo(user_uid)
           .onChildAdded
           .listen((event) {
-        print(event.snapshot.value);
       });
     } catch (error) {
       Exception(error);

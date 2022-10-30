@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 
 class ApiRequest {
   // final String baseUrl = 'http://192.168.43.59:8000/api';
@@ -29,7 +30,11 @@ class ApiRequest {
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 30));
-      final Map<String, dynamic> data = jsonDecode(response.body)['data'];
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${decodedResponse['message']}';
+      }
+      final Map<String, dynamic> data = decodedResponse['data'];
       return Future.value(data);
     } catch (error) {
       return Future.error(error);
@@ -71,7 +76,11 @@ class ApiRequest {
             body: jsonEncode(body),
           )
           .timeout(const Duration(seconds: 30));
-      final Map<String, dynamic> data = jsonDecode(response.body)['data'];
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${decodedResponse['message']}';
+      }
+      final Map<String, dynamic> data = decodedResponse['data'];
       return Future.value(data);
     } catch (error) {
       return Future.error(error);
@@ -86,8 +95,37 @@ class ApiRequest {
         Uri.parse('$baseUrl/auth/logout'),
         headers: {
           'Authorization': '$token_type $token',
-        }
-      );
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 30));
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Set FCM Token
+  Future<void> setFCMToken(int id_user, String? fcm_token) async {
+    try {
+      client = http.Client();
+      final Map body = {
+        'id': id_user,
+        'fcm_token': fcm_token,
+      };
+      http.Response response = await client
+          .put(
+            Uri.parse('$baseUrl/auth/fcm_token'),
+            headers: {
+              'accept': 'application/json',
+              'content-type': 'application/json',
+            },
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 30));
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${decodedResponse['message']}';
+      }
     } catch (error) {
       return Future.error(error);
     }
@@ -160,6 +198,98 @@ class ApiRequest {
       );
       List<dynamic> data = jsonDecode(response.body)['kelurahan'];
       return Future.value(data);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Get Transaction and Product Count
+  Future<Map<String, dynamic>> getCount(
+      int id_seller, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+        Uri.parse('$baseUrl/transaction/$id_seller/seller'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      ).timeout(const Duration(seconds: 30));
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${decodedResponse['message']}';
+      }
+      final Map<String, dynamic> data = decodedResponse['data'];
+      return Future.value(data);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Post Product Information
+  Future<Map<String, dynamic>> uploadProduct({
+    required int seller_id,
+    required int category,
+    required int unit,
+    required int price,
+    required String name,
+    required String description,
+    required String token_type,
+    required String token,
+  }) async {
+    try {
+      client = http.Client();
+      final Map<String, dynamic> body = {
+        'user_seller_id': seller_id,
+        'category_id': category,
+        'unit_id': unit,
+        'price': price,
+        'product_name': name,
+        'description': description,
+        'stock': 0,
+      };
+      final http.Response response = await client
+          .post(
+            Uri.parse('$baseUrl/product'),
+            headers: {
+              'Authorization': '$token_type $token',
+              'accept': 'application/json',
+              'content-type': 'application/json',
+            },
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 30));
+      final Map<String, dynamic> decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${decodedResponse['message']}';
+      }
+      return Future.value(decodedResponse['data']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Upload Picture
+  Future<void> uploadPicture(XFile file, int product_id, String token_type, String token) async {
+    try {
+      final List<int> imageBytes = await file.readAsBytes();
+      final http.MultipartRequest request =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/product_image'));
+      request.headers.addAll({'Authorization': '$token_type $token'});
+      request.fields.addAll({'product_id': '$product_id'});
+      request.files.add(http.MultipartFile.fromBytes(
+        'image',
+        imageBytes,
+        filename: file.name,
+      ));
+      final http.StreamedResponse response = await request.send();
+      // final responseByteArray = await response.stream.toBytes();
+      // final jsonDecoded = jsonDecode(utf8.decode(responseByteArray));
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      // return Future.error(jsonDecoded);
     } catch (error) {
       return Future.error(error);
     }

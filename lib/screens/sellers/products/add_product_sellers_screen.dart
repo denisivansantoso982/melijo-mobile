@@ -1,8 +1,15 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, non_constant_identifier_names, use_build_context_synchronously
+
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
+import 'package:melijo/widgets/loading_widget.dart';
+import 'package:melijo/widgets/modal_bottom.dart';
 
 class AddProductSellerScreen extends StatefulWidget {
   const AddProductSellerScreen({Key? key}) : super(key: key);
@@ -14,46 +21,37 @@ class AddProductSellerScreen extends StatefulWidget {
 }
 
 class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
+  final ImagePicker _picker = ImagePicker();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _categoryController = TextEditingController(text: 'Sayur');
-  final TextEditingController _priceController = TextEditingController(text: '0');
+  int _categoryValue = 1;
+  int _unitValue = 1;
+  final TextEditingController _priceController =
+      TextEditingController(text: '0');
   final TextEditingController _descriptionController = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _categoryFocus = FocusNode();
+  final FocusNode _unitFocus = FocusNode();
   final FocusNode _priceFocus = FocusNode();
   final FocusNode _descriptionFocus = FocusNode();
-  final List<dynamic> _listOfPicture = [];
-  final List<Map<String, String>> _listOfCategory = [
-    {
-      'value': 'Sayur',
-      'image': 'vegetables.png'
-    },
-    {
-      'value': 'Daging',
-      'image': 'meats.png'
-    },
-    {
-      'value': 'Unggas',
-      'image': 'poultries.png'
-    },
-    {
-      'value': 'Seafood',
-      'image': 'seafoods.png'
-    },
-    {
-      'value': 'Protein',
-      'image': 'eggs.png'
-    },
-    {
-      'value': 'Bumbu',
-      'image': 'spices.png'
-    },
+  final List<XFile> _listOfPicture = [];
+  final List<Map<String, dynamic>> _listOfCategory = [
+    {'id': 1, 'value': 'Sayur'},
+    {'id': 2, 'value': 'Daging'},
+    {'id': 3, 'value': 'Unggas'},
+    {'id': 4, 'value': 'Seafood'},
+    {'id': 5, 'value': 'Protein'},
+    {'id': 6, 'value': 'Bumbu'},
+  ];
+  final List<Map<String, dynamic>> _listOfUnit = [
+    {'id': 1, 'value': 'PCS'},
+    {'id': 2, 'value': 'KG'},
+    {'id': 3, 'value': 'GR'},
+    {'id': 4, 'value': 'IKAT'},
   ];
 
   @override
   void dispose() {
     _nameController.dispose();
-    _categoryController.dispose();
     _priceController.dispose();
     _descriptionController.dispose();
     _nameFocus.dispose();
@@ -68,13 +66,14 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
       return Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
         child: OutlinedButton(
-          onPressed: () {},
+          onPressed: () => pickImages(),
           style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.all(4),
-              side: const BorderSide(
-                color: Colours.deepGreen,
-                width: 1,
-              )),
+            padding: const EdgeInsets.all(4),
+            side: const BorderSide(
+              color: Colours.deepGreen,
+              width: 1,
+            ),
+          ),
           child: const Text(
             'Tambah Foto',
             style: TextStyle(
@@ -86,26 +85,44 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
           ),
         ),
       );
-    }
-    else if (_listOfPicture.length < 6) {
+    } else if (_listOfPicture.length < 3) {
       if (index <= _listOfPicture.length - 1) {
         return Container(
           padding: const EdgeInsets.all(4),
           decoration: const BoxDecoration(
-            color: Colours.oliveGreen,
+            color: Colours.deepGreen,
           ),
-          child: Image(
-            image: AssetImage('lib/assets/images/${_listOfPicture[index]}'),
-            fit: BoxFit.cover,
+          child: Container(
+            alignment: Alignment.topRight,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: FileImage(File(_listOfPicture[index].path)),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  _listOfPicture.removeAt(index);
+                });
+              },
+              child: Container(
+                color: Colours.deepGreen,
+                child: const Icon(
+                  Icons.close,
+                  color: Colours.white,
+                ),
+              ),
+            ),
           ),
         );
       }
       return GestureDetector(
-        onTap: () {},
+        onTap: () => pickImages(),
         child: Center(
           child: Container(
             decoration: const BoxDecoration(
-              color: Colours.oliveGreen,
+              color: Colours.deepGreen,
               borderRadius: BorderRadius.all(Radius.circular(64)),
             ),
             child: const Icon(
@@ -120,11 +137,30 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: const BoxDecoration(
-        color: Colours.oliveGreen,
+        color: Colours.deepGreen,
       ),
-      child: Image(
-        image: AssetImage('lib/assets/images/${_listOfPicture[index]}'),
-        fit: BoxFit.cover,
+      child: Container(
+        alignment: Alignment.topRight,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: FileImage(File(_listOfPicture[index].path)),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: GestureDetector(
+          onTap: () {
+            setState(() {
+              _listOfPicture.removeAt(index);
+            });
+          },
+          child: Container(
+            color: Colours.deepGreen,
+            child: const Icon(
+              Icons.close,
+              color: Colours.white,
+            ),
+          ),
+        ),
       ),
     );
   }
@@ -143,6 +179,169 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
           width: 1,
         ),
       );
+
+  // ! Pick Image Action
+  Future<void> pickImages() async {
+    try {
+      List<XFile>? images = await _picker.pickMultiImage();
+      if ((_listOfPicture.length + images.length) > 3) {
+        // int imageCount = 3 - _listOfPicture.length;
+        List<XFile> images_length = images
+            .getRange(
+                0,
+                (_listOfPicture.isEmpty
+                    ? 3
+                    : images.length - _listOfPicture.length))
+            .toList();
+        setState(() {
+          _listOfPicture.addAll(images_length);
+        });
+      } else {
+        setState(() {
+          _listOfPicture.addAll(images);
+        });
+      }
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  // ! Upload Process
+  Future<void> uploadProcess(BuildContext context) async {
+    try {
+      if (validation()) {
+        LoadingWidget.show(context);
+        await uploadProduct(
+          name: _nameController.text,
+          category: _categoryValue,
+          price: int.parse(_priceController.text),
+          description: _descriptionController.text,
+          unit: _unitValue,
+          pictures: _listOfPicture,
+        );
+        LoadingWidget.close(context);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: Colours.deepGreen,
+          duration: Duration(seconds: 2),
+          content: Text('Produk berhasil ditambahkan!'),
+        ));
+      }
+    } catch (error) {
+      LoadingWidget.close(context);
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  // ! Validation
+  bool validation() {
+    if (_listOfPicture.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Pilih minimal 1 Foto!'),
+      ));
+      return false;
+    } else if (_nameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Nama produk minimal 6 karakter!'),
+      ));
+      _nameFocus.requestFocus();
+      return false;
+    } else if (_categoryValue < 1 || _categoryValue > 6) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Pilih category!'),
+      ));
+      _categoryFocus.requestFocus();
+      return false;
+    } else if (_priceController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Harga harus diisi!'),
+      ));
+      _priceFocus.requestFocus();
+      return false;
+    } else if (int.parse(_priceController.text) < 100) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Harga minimal Rp.100 !'),
+      ));
+      _priceFocus.requestFocus();
+      return false;
+    } else if (_descriptionController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Deskripsi tidak boleh kosong!'),
+      ));
+      _descriptionFocus.requestFocus();
+      return false;
+    }
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -199,10 +398,11 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
                 ),
                 itemCount: _listOfPicture.isEmpty
                     ? 1
-                    : (_listOfPicture.length < 6
+                    : (_listOfPicture.length < 3
                         ? _listOfPicture.length + 1
                         : _listOfPicture.length),
-                itemBuilder: generatePictures,
+                itemBuilder: (context, index) =>
+                    generatePictures(context, index),
               ),
             ),
             const SizedBox(height: 8),
@@ -234,6 +434,9 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
             TextFormField(
               controller: _nameController,
               focusNode: _nameFocus,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(100),
+              ],
               style: const TextStyle(
                 color: Colours.black,
                 fontSize: 16,
@@ -278,45 +481,116 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField(
-              value: _categoryController.text,
+              value: _categoryValue,
               focusNode: _categoryFocus,
               decoration: InputDecoration(
                 enabledBorder: outlineInputBorder(Colours.gray),
                 focusedBorder: outlineInputBorder(Colours.deepGreen),
-                contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12,),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 12,
+                ),
               ),
               isExpanded: true,
-              items: _listOfCategory.map<DropdownMenuItem<String>>(
-                (item) => DropdownMenuItem<String>(
-                  value: item['value'],
-                  child: SizedBox(
-                    height: 32,
-                    // decoration: BoxDecoration(
-                    //   border: Border(
-                    //     bottom: item == _listOfCategory.last ? BorderSide.none : const BorderSide(color: Colours.deepGreen, width: 2,),
-                    //   ),
-                    // ),
-                    child: Row(
-                      children: [
-                        Image(image: AssetImage('lib/assets/images/category/${item['image']}'), fit: BoxFit.cover, height: 30, width: 30,),
-                        const SizedBox(width: 8),
-                        Text(
-                          item['value']!,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontStyles.regular,
-                            color: Colours.deepGreen,
-                            fontFamily: FontStyles.leagueSpartan,
-                          ),
+              items: _listOfCategory
+                  .map<DropdownMenuItem<int>>(
+                    (item) => DropdownMenuItem<int>(
+                      value: item['id'],
+                      child: SizedBox(
+                        height: 32,
+                        // decoration: BoxDecoration(
+                        //   border: Border(
+                        //     bottom: item == _listOfCategory.last ? BorderSide.none : const BorderSide(color: Colours.deepGreen, width: 2,),
+                        //   ),
+                        // ),
+                        child: Row(
+                          children: [
+                            Image(
+                              image: AssetImage(
+                                  'lib/assets/images/category/${item['value']}.png'),
+                              fit: BoxFit.cover,
+                              height: 30,
+                              width: 30,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              item['value']!,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontStyles.regular,
+                                color: Colours.deepGreen,
+                                fontFamily: FontStyles.leagueSpartan,
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
-              ).toList(),
+                  )
+                  .toList(),
               onChanged: (value) {
                 setState(() {
-                  _categoryController.text = value!;
+                  _categoryValue = value!;
+                });
+              },
+            ),
+            const SizedBox(height: 8),
+            // *Product Unit Field
+            Row(
+              children: const [
+                Text(
+                  'Pilih satuan dari produk anda',
+                  style: TextStyle(
+                    color: Colours.black,
+                    fontWeight: FontStyles.medium,
+                    fontFamily: FontStyles.leagueSpartan,
+                    fontSize: 18,
+                  ),
+                ),
+                SizedBox(width: 4),
+                Text(
+                  '*',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.red,
+                    fontWeight: FontStyles.medium,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 8),
+            DropdownButtonFormField(
+              value: _unitValue,
+              focusNode: _unitFocus,
+              decoration: InputDecoration(
+                enabledBorder: outlineInputBorder(Colours.gray),
+                focusedBorder: outlineInputBorder(Colours.deepGreen),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 12,
+                ),
+              ),
+              isExpanded: true,
+              items: _listOfUnit
+                  .map<DropdownMenuItem<int>>(
+                    (item) => DropdownMenuItem<int>(
+                      value: item['id'],
+                      child: Text(
+                        item['value']!,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontStyles.regular,
+                          color: Colours.deepGreen,
+                          fontFamily: FontStyles.leagueSpartan,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  _unitValue = value!;
                 });
               },
             ),
@@ -349,6 +623,9 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
             TextFormField(
               controller: _priceController,
               focusNode: _priceFocus,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(12),
+              ],
               style: const TextStyle(
                 color: Colours.black,
                 fontSize: 16,
@@ -408,6 +685,9 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
               maxLength: null,
               maxLines: null,
               textInputAction: TextInputAction.newline,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(300),
+              ],
               style: const TextStyle(
                 color: Colours.black,
                 fontSize: 16,
@@ -441,7 +721,7 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
           ),
         ),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () => uploadProcess(context),
           child: const Text(
             'Tambahkan Produk',
             style: TextStyle(

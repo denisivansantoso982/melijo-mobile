@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/utils/colours.dart';
 
 class MenuSellersScreen extends StatelessWidget {
@@ -25,70 +26,79 @@ class MenuSellersScreen extends StatelessWidget {
           )
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(12),
-        children: [
-          // *Product Count
-          Card(
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: const [
-                  Text(
-                    'Jumlah Produk',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'League Spartan',
-                      color: Colours.deepGreen,
-                    ),
+      body: FutureBuilder(
+        future: sellerInfoCount(),
+        builder: (context, snapshot) {
+          return ListView(
+            padding: const EdgeInsets.all(12),
+            children: [
+              // *Product Count
+              Card(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Jumlah Produk',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'League Spartan',
+                          color: Colours.deepGreen,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        snapshot.connectionState == ConnectionState.waiting ? 'Memuat...' : (
+                          snapshot.hasError ? 'Terjadi Kesalahan!' : '${snapshot.data?['product_count']}'
+                        ),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'League Spartan',
+                          color: Colours.black,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    '1',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'League Spartan',
-                      color: Colours.black,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-          // *New Order
-          Card(
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            child: Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: const [
-                  Text(
-                    'Pesanan Baru',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'League Spartan',
-                      color: Colours.deepGreen,
-                    ),
+              // *New Order
+              Card(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      const Text(
+                        'Pesanan Baru',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'League Spartan',
+                          color: Colours.deepGreen,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        snapshot.connectionState == ConnectionState.waiting ? 'Memuat...' : (
+                          snapshot.hasError ? 'Terjadi Kesalahan!' : '${snapshot.data?['transaction_count']}'
+                        ),
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'League Spartan',
+                          color: Colours.black,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 8),
-                  Text(
-                    '1',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'League Spartan',
-                      color: Colours.black,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
   }

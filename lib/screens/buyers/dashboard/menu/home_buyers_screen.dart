@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
-import 'package:melijo/screens/buyers/products/detail_product_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/products_buyers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';

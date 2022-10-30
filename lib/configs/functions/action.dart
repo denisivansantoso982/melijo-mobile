@@ -1,5 +1,8 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'dart:convert';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/firebase/database.dart';
 import 'package:melijo/configs/preferences/preferences.dart';
@@ -69,20 +72,25 @@ Future<void> login(String user, String password, bool is_seller) async {
     final Map<String, dynamic> response =
         await api_request.login(user, password);
     final Map<String, dynamic> user_data = response['user'];
-    final String auth_token = response['token'];
-    final String token_type = response['token_type'];
+    final Map<String, dynamic> user_detail = response['detail'];
     if (is_seller && user_data['role_id'] != 4) {
       throw 'Pengguna tidak ditemukan!';
     } else if (!is_seller && user_data['role_id'] != 3) {
       throw 'Pengguna tidak ditemukan!';
     }
+    final String auth_token = response['token'];
+    final String token_type = response['token_type'];
     final String fcm_token = await database.generateFCMToken();
+    await api_request.setFCMToken(user_data['id'], fcm_token);
     await database.setUserWhenLogin(user_data['id'], fcm_token);
     await preferences.setUserLogin(
       id: user_data['id'],
+      id_detail: user_detail['id'],
       role: user_data['role_id'],
       username: user_data['username'] ?? '',
       email: user_data['email'],
+      name: user_detail['name'],
+      phone: user_detail['phone'],
       fcm_token: fcm_token,
       auth_token: auth_token,
       token_type: token_type,
@@ -106,6 +114,51 @@ Future<void> register(
   try {
     await api_request.register(name, email, phone, password, role_id, province,
         city, districts, village);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<Map<String, dynamic>> sellerInfoCount() async {
+  try {
+    final Map<String, dynamic> user = await preferences.getUser();
+    final Map<String, dynamic> response = await api_request.getCount(
+        user['id_detail'], user['token_type'], user['auth_token']);
+    return Future.value(response);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> uploadProduct({
+  required String name,
+  required int category,
+  required int price,
+  required String description,
+  required int unit,
+  required List<XFile> pictures,
+}) async {
+  try {
+    final Map<String, dynamic> user_data = await preferences.getUser();
+    final Map<String, dynamic> response = await api_request.uploadProduct(
+      seller_id: user_data['id_detail'],
+      category: category,
+      unit: unit,
+      price: price,
+      name: name,
+      description: description,
+      token_type: user_data['token_type'],
+      token: user_data['auth_token'],
+    );
+    final int id_product = response['id'];
+    for (XFile element in pictures) {
+      await api_request.uploadPicture(
+        element,
+        id_product,
+        user_data['token_type'],
+        user_data['auth_token'],
+      );
+    }
   } catch (error) {
     return Future.error(error);
   }
