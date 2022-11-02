@@ -251,12 +251,14 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
           unit: _unitValue,
           pictures: _listOfPicture,
         );
+        await getProductsSeller(context);
         LoadingWidget.close(context);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           backgroundColor: Colours.deepGreen,
           duration: Duration(seconds: 2),
           content: Text('Produk berhasil ditambahkan!'),
         ));
+        Navigator.of(context).pop();
       }
     } catch (error) {
       LoadingWidget.close(context);

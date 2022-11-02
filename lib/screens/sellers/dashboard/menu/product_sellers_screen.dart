@@ -1,8 +1,17 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
+import 'package:melijo/configs/api/api_request.dart';
+import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/models/sellers/product_seller_model.dart';
 import 'package:melijo/screens/sellers/products/add_product_sellers_screen.dart';
 import 'package:melijo/screens/sellers/products/edit_product_sellers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
+import 'package:melijo/widgets/loading_widget.dart';
+import 'package:melijo/widgets/modal_bottom.dart';
 
 class ProductSellersScreen extends StatelessWidget {
   const ProductSellersScreen({Key? key}) : super(key: key);
@@ -57,128 +66,206 @@ class ProductSellersScreen extends StatelessWidget {
     );
   }
 
-  static Widget productIsExist(BuildContext context) {
+  Widget productIsExist(
+      BuildContext context, List<ProductSellerModel> listProduct) {
     final Size screenSize = MediaQuery.of(context).size;
-    return ListView(
+    return ListView.builder(
       padding: const EdgeInsets.all(12),
-      children: [
-        // *Product Count
-        Card(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12))),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(12),
-                  bottomLeft: Radius.circular(12),
-                ),
-                child: Image(
-                  image: const AssetImage('lib/assets/images/jambu.jpg'),
-                  fit: BoxFit.cover,
-                  height: screenSize.height / 4,
-                  width: screenSize.width / 4,
+      itemCount: listProduct.length,
+      itemBuilder: (context, index) => Card(
+        margin: const EdgeInsets.symmetric(vertical: 4),
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(12))),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(12),
+                bottomLeft: Radius.circular(12),
+              ),
+              child: Image(
+                image: NetworkImage(
+                    '${ApiRequest.baseStorageUrl}/${listProduct[index].image_uri}'),
+                fit: BoxFit.cover,
+                height: screenSize.height / 4,
+                width: screenSize.width / 4,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              fit: FlexFit.tight,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // *Total
+                    Text(
+                      'Rp. ${thousandFormat(listProduct[index].price)}',
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: 'Lora',
+                        color: Colours.deepGreen,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    // *Product Name
+                    Text(
+                      listProduct[index].product_name,
+                      style: TextStyle(
+                        fontSize: 18,
+                        overflow: TextOverflow.ellipsis,
+                        fontWeight: FontWeight.w500,
+                        fontFamily: 'League Spartan',
+                        color: Colours.black.withOpacity(.8),
+                      ),
+                    ),
+                    // *Edit Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pushNamed(
+                          EditProductSellerScreen.route,
+                          arguments: listProduct[index],
+                        ),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colours.deepGreen),
+                        ),
+                        child: const Text(
+                          'Ubah Harga',
+                          style: TextStyle(
+                            fontFamily: 'League Spartan',
+                            fontWeight: FontStyles.regular,
+                            fontSize: 18,
+                            color: Colours.deepGreen,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // *Delete Button
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => deleteProduct(context, listProduct[index].id),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Colours.deepGreen),
+                        ),
+                        child: const Text(
+                          'Hapus Produk',
+                          style: TextStyle(
+                            fontFamily: 'League Spartan',
+                            fontWeight: FontStyles.regular,
+                            fontSize: 18,
+                            color: Colours.deepGreen,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(width: 8),
-              Flexible(
-                fit: FlexFit.tight,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // *Total
-                      const Text(
-                        'Rp. 28.000',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: 'Lora',
-                          color: Colours.deepGreen,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      // *Product Name
-                      Text(
-                        'Jambu Crystal',
-                        style: TextStyle(
-                          fontSize: 18,
-                          overflow: TextOverflow.ellipsis,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'League Spartan',
-                          color: Colours.black.withOpacity(.8),
-                        ),
-                      ),
-                      // *Edit Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.of(context).pushNamed(
-                            EditProductSellerScreen.route,
-                            arguments: {
-                              'pictures': [
-                                'jambu.jpg',
-                                'buah_naga.jpg',
-                              ],
-                              'name': 'Jambu Crystal',
-                              'category': 'Sayur',
-                              'price': '28000',
-                              'description': 'gatau!!!',
-                            },
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colours.deepGreen),
-                          ),
-                          child: const Text(
-                            'Ubah Harga',
-                            style: TextStyle(
-                              fontFamily: 'League Spartan',
-                              fontWeight: FontStyles.regular,
-                              fontSize: 18,
-                              color: Colours.deepGreen,
-                            ),
-                          ),
-                        ),
-                      ),
-                      // *Delete Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: OutlinedButton(
-                          onPressed: () {},
-                          style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colours.deepGreen),
-                          ),
-                          child: const Text(
-                            'Hapus Produk',
-                            style: TextStyle(
-                              fontFamily: 'League Spartan',
-                              fontWeight: FontStyles.regular,
-                              fontSize: 18,
-                              color: Colours.deepGreen,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> retrieveProducts(BuildContext context) async {
+    try {
+      await getProductsSeller(context);
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
                   ),
                 ),
-              ),
+              )
             ],
           ),
         ),
-      ],
-    );
+      );
+    }
+  }
+
+  Future<void> deleteProduct(BuildContext context, int id) async {
+    try {
+      LoadingWidget.show(context);
+      await deleteProductSeller(id);
+      await getProductsSeller(context);
+      LoadingWidget.close(context);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.deepGreen,
+        duration: Duration(seconds: 2),
+        content: Text('Produk dihapus!'),
+      ));
+    } catch (error) {
+      LoadingWidget.close(context);
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    // final List<dynamic>? argu =
-    //     ModalRoute.of(context)?.settings.arguments as List<dynamic>?;
-
+    retrieveProducts(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colours.deepGreen,
@@ -203,10 +290,33 @@ class ProductSellersScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: productIsExist(context),
-      // body: argu == null || argu.isEmpty
-      //     ? productIsEmpty(context)
-      //     : productIsExist(context),
+      body: RefreshIndicator(
+        onRefresh: () => retrieveProducts(context),
+        child: BlocBuilder<ProductSellerBloc, ProductSellerState>(
+          builder: (context, state) {
+            if (state is ProductSellerLoading) {
+              return const Center(
+                child: SizedBox(
+                  width: 80,
+                  height: 80,
+                  child: CircularProgressIndicator(
+                    color: Colours.deepGreen,
+                    strokeWidth: 4,
+                  ),
+                ),
+              );
+            }
+            if (state is ProductSellerInit) {
+              if (state.productsSeller.isEmpty) {
+                return productIsEmpty(context);
+              }
+              return productIsExist(context, state.productsSeller);
+            } else {
+              return const Center(child: Text('Terjadi Kesalahan'));
+            }
+          },
+        ),
+      ),
     );
   }
 }

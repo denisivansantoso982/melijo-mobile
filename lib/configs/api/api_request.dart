@@ -4,11 +4,14 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:melijo/models/sellers/product_seller_model.dart';
 
 class ApiRequest {
-  // final String baseUrl = 'http://192.168.43.59:8000/api';
-  final String baseUrl = 'http://192.168.100.191:8000/api';
-  final String locationBaseUrl =
+  static const String baseUrl = 'http://192.168.43.59:8000/api';
+  static const String baseStorageUrl = 'http://192.168.43.59:8000/storage';
+  // static const String baseUrl = 'http://192.168.100.191:8000/api';
+  // static const String baseStorageUrl = 'http://192.168.100.191:8000/storage';
+  static const String locationBaseUrl =
       'https://dev.farizdotid.com/api/daerahindonesia';
   late http.Client client;
 
@@ -32,7 +35,7 @@ class ApiRequest {
           .timeout(const Duration(seconds: 30));
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${response.reasonPhrase}';
       }
       final Map<String, dynamic> data = decodedResponse['data'];
       return Future.value(data);
@@ -290,6 +293,100 @@ class ApiRequest {
         throw '${response.statusCode} ${response.reasonPhrase}';
       }
       // return Future.error(jsonDecoded);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Retrieve Products
+  Future<List<dynamic>> retrieveProductSeller(int seller_id, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+        Uri.parse('$baseUrl/user_seller/$seller_id/product'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        }
+      );
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(decodedResponse['data']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Retrieve Detail Products
+  Future<Map> retrieveDetailProductSeller(String token_type, String token, int product_id) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+        Uri.parse('$baseUrl/product/$product_id'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        }
+      );
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(decodedResponse['data']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Delete Product
+  Future<void> deleteProductSeller(String token_type, String token, int id) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.delete(
+        Uri.parse('$baseUrl/product/$id'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        }
+      );
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Retrieve Detail Products
+  Future<void> editProductSeller(String token_type, String token, int seller_id, ProductSellerModel product) async {
+    try {
+      client = http.Client();
+      final Map<String, dynamic> body = {
+        'user_seller_id': seller_id,
+        'category_id': product.category_id,
+        'unit_id': product.unit_id,
+        'price': product.price,
+        'product_name': product.product_name,
+        'description': product.description,
+        'stock': '0',
+      };
+      final http.Response response = await client.put(
+        Uri.parse('$baseUrl/product/${product.id}'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
     } catch (error) {
       return Future.error(error);
     }

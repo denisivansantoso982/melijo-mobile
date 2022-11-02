@@ -1,15 +1,23 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
 
-import 'dart:convert';
-
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/firebase/database.dart';
 import 'package:melijo/configs/preferences/preferences.dart';
+import 'package:melijo/models/sellers/product_seller_model.dart';
 
 Preferences preferences = Preferences();
 FDatabase database = FDatabase();
 ApiRequest api_request = ApiRequest();
+
+String thousandFormat(int val) {
+  String result = NumberFormat('#,##,000').format(val).replaceAll(',', '.');
+  return result;
+}
 
 Future<int?> checkUserRole() async {
   final int? role = await preferences.checkUserRole();
@@ -159,6 +167,77 @@ Future<void> uploadProduct({
         user_data['auth_token'],
       );
     }
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> getProductsSeller(BuildContext context) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List<ProductSellerModel> listProduct = [];
+    final List<dynamic> response = await api_request.retrieveProductSeller(
+      user_data['id_detail'],
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    for (var element in response) {
+      listProduct.add(ProductSellerModel(
+        id: element['id'],
+        price: element['price'],
+        category_id: element['category_id'],
+        unit_id: element['unit_id'],
+        product_name: element['product_name'],
+        image_uri: element['image'],
+        description: element['description'],
+      ));
+    }
+    context.read<ProductSellerBloc>().add(const DeleteProductSeller());
+    context
+        .read<ProductSellerBloc>()
+        .add(AddProductSeller(productSellerModel: listProduct));
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<Map> getDetailProductSeller(BuildContext context, int product_id) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final Map response =
+        await api_request.retrieveDetailProductSeller(
+      user_data['token_type'],
+      user_data['auth_token'],
+      product_id,
+    );
+    return Future.value(response);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> deleteProductSeller(int id) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    await api_request.deleteProductSeller(
+      user_data['token_type'],
+      user_data['auth_token'],
+      id,
+    );
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> editProduct(ProductSellerModel product) async {
+  try {
+    final Map<String, dynamic> user_data = await preferences.getUser();
+    await api_request.editProductSeller(
+      user_data['token_type'],
+      user_data['auth_token'],
+      user_data['id_detail'],
+      product,
+    );
   } catch (error) {
     return Future.error(error);
   }

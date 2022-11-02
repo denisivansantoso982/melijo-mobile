@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
 import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/detail_chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
@@ -39,60 +41,65 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Melijo.id',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData().copyWith(
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: Colours.deepGreen,
-          secondary: Colours.deepGreen,
-          background: Colours.white,
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider<ProductSellerBloc>(create: (context) => ProductSellerBloc()),
+      ],
+      child: MaterialApp(
+        title: 'Melijo.id',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData().copyWith(
+          colorScheme: ColorScheme.fromSwatch().copyWith(
+            primary: Colours.deepGreen,
+            secondary: Colours.deepGreen,
+            background: Colours.white,
+          ),
+          scaffoldBackgroundColor: Colours.white,
+          backgroundColor: Colours.white,
+          appBarTheme: const AppBarTheme().copyWith(elevation: 2),
         ),
-        scaffoldBackgroundColor: Colours.white,
-        backgroundColor: Colours.white,
-        appBarTheme: const AppBarTheme().copyWith(elevation: 2),
+        initialRoute: SplashScreen.route,
+        routes: {
+          SplashScreen.route: (context) => const SplashScreen(),
+          FirstScreen.route: (context) => const FirstScreen(),
+          LoginScreen.route: (context) => const LoginScreen(),
+          RegisterScreen.route: (context) => const RegisterScreen(),
+          LoginSellersScreen.route: (context) => const LoginSellersScreen(),
+          LoginBuyersScreen.route: (context) => const LoginBuyersScreen(),
+          RegisterSellersScreen.route: (context) => const RegisterSellersScreen(),
+          RegisterBuyersScreen.route: (context) => const RegisterBuyersScreen(),
+          DashboardSellersScreen.route: (context) =>
+              const DashboardSellersScreen(),
+          AddProductSellerScreen.route: (context) =>
+              const AddProductSellerScreen(),
+          EditProductSellerScreen.route: (context) =>
+              const EditProductSellerScreen(),
+          DashboardBuyersScreen.route: (context) => const DashboardBuyersScreen(),
+          DetailTransactionScreen.route: (context) =>
+              const DetailTransactionScreen(),
+          DetailProductBuyersScreen.route: (context) =>
+              const DetailProductBuyersScreen(),
+          CartProductBuyersScreen.route: (context) =>
+              const CartProductBuyersScreen(),
+          DetailRecipeBuyersScreen.route: (context) =>
+              const DetailRecipeBuyersScreen(),
+          FavouriteRecipesBuyersScreen.route: (context) =>
+              const FavouriteRecipesBuyersScreen(),
+          NotificationBuyersScreen.route: (context) =>
+              const NotificationBuyersScreen(),
+          ChatBuyersScreen.route: (context) => const ChatBuyersScreen(),
+          DetailChatBuyersScreen.route: (context) =>
+              const DetailChatBuyersScreen(),
+          DistributionDateScreen.route: (context) =>
+              const DistributionDateScreen(),
+          DistributionAddressScreen.route: (context) =>
+              const DistributionAddressScreen(),
+          PaymentScreen.route: (context) => const PaymentScreen(),
+          PaymentMethodScreen.route: (context) => const PaymentMethodScreen(),
+          PromoScreen.route: (context) => const PromoScreen(),
+          ProductsBuyersScreen.route: (context) => const ProductsBuyersScreen(),
+        },
       ),
-      initialRoute: SplashScreen.route,
-      routes: {
-        SplashScreen.route: (context) => const SplashScreen(),
-        FirstScreen.route: (context) => const FirstScreen(),
-        LoginScreen.route: (context) => const LoginScreen(),
-        RegisterScreen.route: (context) => const RegisterScreen(),
-        LoginSellersScreen.route: (context) => const LoginSellersScreen(),
-        LoginBuyersScreen.route: (context) => const LoginBuyersScreen(),
-        RegisterSellersScreen.route: (context) => const RegisterSellersScreen(),
-        RegisterBuyersScreen.route: (context) => const RegisterBuyersScreen(),
-        DashboardSellersScreen.route: (context) =>
-            const DashboardSellersScreen(),
-        AddProductSellerScreen.route: (context) =>
-            const AddProductSellerScreen(),
-        EditProductSellerScreen.route: (context) =>
-            const EditProductSellerScreen(),
-        DashboardBuyersScreen.route: (context) => const DashboardBuyersScreen(),
-        DetailTransactionScreen.route: (context) =>
-            const DetailTransactionScreen(),
-        DetailProductBuyersScreen.route: (context) =>
-            const DetailProductBuyersScreen(),
-        CartProductBuyersScreen.route: (context) =>
-            const CartProductBuyersScreen(),
-        DetailRecipeBuyersScreen.route: (context) =>
-            const DetailRecipeBuyersScreen(),
-        FavouriteRecipesBuyersScreen.route: (context) =>
-            const FavouriteRecipesBuyersScreen(),
-        NotificationBuyersScreen.route: (context) =>
-            const NotificationBuyersScreen(),
-        ChatBuyersScreen.route: (context) => const ChatBuyersScreen(),
-        DetailChatBuyersScreen.route: (context) =>
-            const DetailChatBuyersScreen(),
-        DistributionDateScreen.route: (context) =>
-            const DistributionDateScreen(),
-        DistributionAddressScreen.route: (context) =>
-            const DistributionAddressScreen(),
-        PaymentScreen.route: (context) => const PaymentScreen(),
-        PaymentMethodScreen.route: (context) => const PaymentMethodScreen(),
-        PromoScreen.route: (context) => const PromoScreen(),
-        ProductsBuyersScreen.route: (context) => const ProductsBuyersScreen(),
-      },
     );
   }
 }

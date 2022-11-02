@@ -1,8 +1,14 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:melijo/configs/api/api_request.dart';
+import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/models/sellers/product_seller_model.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
+import 'package:melijo/widgets/loading_widget.dart';
+import 'package:melijo/widgets/modal_bottom.dart';
 
 class EditProductSellerScreen extends StatefulWidget {
   const EditProductSellerScreen({Key? key}) : super(key: key);
@@ -15,9 +21,10 @@ class EditProductSellerScreen extends StatefulWidget {
 }
 
 class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
+  late int id;
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _categoryController =
-      TextEditingController(text: 'Sayur');
+  int _categoryValue = 1;
+  int _unitValue = 1;
   final TextEditingController _priceController =
       TextEditingController(text: '0');
   final TextEditingController _descriptionController = TextEditingController();
@@ -25,98 +32,88 @@ class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
   final FocusNode _categoryFocus = FocusNode();
   final FocusNode _priceFocus = FocusNode();
   final FocusNode _descriptionFocus = FocusNode();
+  final FocusNode _unitFocus = FocusNode();
   final List<dynamic> _listOfPicture = [];
-  final List<Map<String, String>> _listOfCategory = [
-    {'value': 'Sayur', 'image': 'vegetables.png'},
-    {'value': 'Daging', 'image': 'meats.png'},
-    {'value': 'Unggas', 'image': 'poultries.png'},
-    {'value': 'Seafood', 'image': 'seafoods.png'},
-    {'value': 'Protein', 'image': 'eggs.png'},
-    {'value': 'Bumbu', 'image': 'spices.png'},
+  final List<Map<String, dynamic>> _listOfCategory = [
+    {'id': 1, 'value': 'Sayur'},
+    {'id': 2, 'value': 'Daging'},
+    {'id': 3, 'value': 'Unggas'},
+    {'id': 4, 'value': 'Seafood'},
+    {'id': 5, 'value': 'Protein'},
+    {'id': 6, 'value': 'Bumbu'},
+  ];
+  final List<Map<String, dynamic>> _listOfUnit = [
+    {'id': 1, 'value': 'PCS'},
+    {'id': 2, 'value': 'KG'},
+    {'id': 3, 'value': 'GR'},
+    {'id': 4, 'value': 'IKAT'},
   ];
 
   @override
   void dispose() {
     _nameController.dispose();
-    _categoryController.dispose();
     _priceController.dispose();
     _descriptionController.dispose();
     _nameFocus.dispose();
     _categoryFocus.dispose();
     _priceFocus.dispose();
     _descriptionFocus.dispose();
+    _unitFocus.dispose();
     super.dispose();
   }
 
-  void initial(Map<String, dynamic> argue) {
-    _listOfPicture.addAll(argue['pictures']);
-    _nameController.text = argue['name'];
-    _categoryController.text = argue['category'];
-    _priceController.text = argue['price'];
-    _descriptionController.text = argue['description'];
+  // ! init detail product
+  void initial(ProductSellerModel argue) {
+    id = argue.id;
+    _nameController.text = argue.product_name;
+    _categoryValue = argue.category_id;
+    _unitValue = argue.unit_id;
+    _priceController.text = argue.price.toString();
+    _descriptionController.text = argue.description;
   }
 
-  Widget generatePictures(BuildContext context, index) {
-    if (_listOfPicture.isEmpty) {
-      return Container(
-        margin: const EdgeInsets.symmetric(vertical: 4),
-        child: OutlinedButton(
-          onPressed: () {},
-          style: OutlinedButton.styleFrom(
-              padding: const EdgeInsets.all(4),
-              side: const BorderSide(
-                color: Colours.deepGreen,
-                width: 1,
-              )),
-          child: const Text(
-            'Tambah Foto',
-            style: TextStyle(
-              color: Colours.deepGreen,
-              fontFamily: FontStyles.leagueSpartan,
-              fontSize: 16,
-              fontWeight: FontStyles.regular,
-            ),
-          ),
-        ),
-      );
-    }
-    else if (_listOfPicture.length < 6) {
+  // ! Generate picture
+  Widget generatePictures(BuildContext context, int index) {
+    if (_listOfPicture.length < 3) {
       if (index <= _listOfPicture.length - 1) {
         return Container(
           padding: const EdgeInsets.all(4),
           decoration: const BoxDecoration(
-            color: Colours.oliveGreen,
+            color: Colours.deepGreen,
           ),
           child: Image(
-            image: AssetImage('lib/assets/images/${_listOfPicture[index]}'),
+            image: NetworkImage(
+                '${ApiRequest.baseStorageUrl}/${_listOfPicture[index]}'),
             fit: BoxFit.cover,
           ),
         );
       }
-      return GestureDetector(
-        onTap: () {},
-        child: Center(
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Colours.oliveGreen,
-              borderRadius: BorderRadius.all(Radius.circular(64)),
-            ),
-            child: const Icon(
-              Icons.add,
-              color: Colours.white,
-              size: 28,
-            ),
-          ),
-        ),
-      );
+      return const SizedBox();
+      // return GestureDetector(
+      //   onTap: () {},
+      //   child: Center(
+      //     child: Container(
+      //       decoration: const BoxDecoration(
+      //         color: Colours.deepGreen,
+      //         borderRadius: BorderRadius.all(Radius.circular(64)),
+      //       ),
+      //       child: const Icon(
+      //         Icons.add,
+      //         color: Colours.white,
+      //         size: 28,
+      //       ),
+      //     ),
+      //   ),
+      // );
     }
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: const BoxDecoration(
-        color: Colours.oliveGreen,
+        color: Colours.deepGreen,
       ),
       child: Image(
-        image: AssetImage('lib/assets/images/${_listOfPicture[index]}'),
+        image: NetworkImage(
+            '${ApiRequest.baseStorageUrl}/${_listOfPicture[index]}'),
         fit: BoxFit.cover,
       ),
     );
@@ -137,10 +134,159 @@ class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
         ),
       );
 
+  // ! Get Product Images
+  Future<List> getImage(context) async {
+    try {
+      final Map productDetail = await getDetailProductSeller(context, id);
+      final List productImages = productDetail['images'];
+      for (Map image in productImages) {
+        _listOfPicture.add(image['image']);
+      }
+      return Future.error(productImages);
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+      return [];
+    }
+  }
+
+  // ! Edit Process
+  Future<void> editProcess(BuildContext context) async {
+    try {
+      if (validation()) {
+        LoadingWidget.show(context);
+        await editProduct(ProductSellerModel(
+          id: id,
+          price: int.parse(_priceController.text),
+          category_id: _categoryValue,
+          unit_id: _unitValue,
+          product_name: _nameController.text,
+          image_uri: '',
+          description: _descriptionController.text,
+        ));
+        await getProductsSeller(context);
+        LoadingWidget.close(context);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          backgroundColor: Colours.deepGreen,
+          duration: Duration(seconds: 2),
+          content: Text('Produk berhasil diubah!'),
+        ));
+        Navigator.of(context).pop();
+      }
+    } catch (error) {
+      LoadingWidget.close(context);
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  // ! Validation
+  bool validation() {
+    if (_nameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Nama produk minimal 6 karakter!'),
+      ));
+      _nameFocus.requestFocus();
+      return false;
+    } else if (_categoryValue < 1 || _categoryValue > 6) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Pilih category!'),
+      ));
+      _categoryFocus.requestFocus();
+      return false;
+    } else if (_priceController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Harga harus diisi!'),
+      ));
+      _priceFocus.requestFocus();
+      return false;
+    } else if (int.parse(_priceController.text) < 100) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Harga minimal Rp.100 !'),
+      ));
+      _priceFocus.requestFocus();
+      return false;
+    } else if (_descriptionController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.red,
+        content: Text('Deskripsi tidak boleh kosong!'),
+      ));
+      _descriptionFocus.requestFocus();
+      return false;
+    }
+    return true;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> argue =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final ProductSellerModel argue =
+        ModalRoute.of(context)!.settings.arguments as ProductSellerModel;
     initial(argue);
     return Scaffold(
       appBar: AppBar(
@@ -171,35 +317,43 @@ class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
                     fontSize: 18,
                   ),
                 ),
-                SizedBox(width: 4),
-                Text(
-                  '*',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: Colors.red,
-                    fontWeight: FontStyles.medium,
-                    fontFamily: FontStyles.leagueSpartan,
-                  ),
-                )
               ],
             ),
             const SizedBox(height: 4),
             SizedBox(
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  childAspectRatio: _listOfPicture.isEmpty ? 2 / 1 : 1,
-                  crossAxisSpacing: 4,
-                  mainAxisSpacing: 4,
-                ),
-                shrinkWrap: true,
-                itemCount: _listOfPicture.isEmpty
-                    ? 1
-                    : (_listOfPicture.length < 6
-                        ? _listOfPicture.length + 1
-                        : _listOfPicture.length),
-                itemBuilder: generatePictures,
-              ),
+              child: FutureBuilder(
+                  future: getImage(context),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const SizedBox(
+                        height: 80,
+                        child: Text(
+                          'Memuat Foto Produk...',
+                          style: TextStyle(
+                            color: Colours.gray,
+                            fontSize: 16,
+                            fontWeight: FontStyles.medium,
+                          ),
+                        ),
+                      );
+                    }
+                    return GridView.builder(
+                      shrinkWrap: true,
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        childAspectRatio: _listOfPicture.isEmpty ? 2 / 1 : 1,
+                        crossAxisSpacing: 4,
+                        mainAxisSpacing: 4,
+                      ),
+                      itemCount: _listOfPicture.isEmpty
+                          ? 1
+                          : (_listOfPicture.length < 3
+                              ? _listOfPicture.length + 1
+                              : _listOfPicture.length),
+                      itemBuilder: (context, index) =>
+                          generatePictures(context, index),
+                    );
+                  }),
             ),
             const SizedBox(height: 8),
             // *Product Name Field
@@ -230,6 +384,9 @@ class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
             TextFormField(
               controller: _nameController,
               focusNode: _nameFocus,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(100),
+              ],
               style: const TextStyle(
                 color: Colours.black,
                 fontSize: 16,
@@ -274,7 +431,7 @@ class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
             ),
             const SizedBox(height: 8),
             DropdownButtonFormField(
-              value: _categoryController.text,
+              value: _categoryValue,
               focusNode: _categoryFocus,
               decoration: InputDecoration(
                 enabledBorder: outlineInputBorder(Colours.gray),
@@ -286,9 +443,9 @@ class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
               ),
               isExpanded: true,
               items: _listOfCategory
-                  .map<DropdownMenuItem<String>>(
-                    (item) => DropdownMenuItem<String>(
-                      value: item['value'],
+                  .map<DropdownMenuItem<int>>(
+                    (item) => DropdownMenuItem<int>(
+                      value: item['id'],
                       child: SizedBox(
                         height: 32,
                         // decoration: BoxDecoration(
@@ -300,7 +457,7 @@ class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
                           children: [
                             Image(
                               image: AssetImage(
-                                  'lib/assets/images/category/${item['image']}'),
+                                  'lib/assets/images/category/${item['value']}.png'),
                               fit: BoxFit.cover,
                               height: 30,
                               width: 30,
@@ -323,7 +480,67 @@ class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
                   .toList(),
               onChanged: (value) {
                 setState(() {
-                  _categoryController.text = value!;
+                  _categoryValue = value!;
+                });
+              },
+            ),
+            const SizedBox(height: 8),
+            // *Product Unit Field
+            Row(
+              children: const [
+                Text(
+                  'Pilih satuan dari produk anda',
+                  style: TextStyle(
+                    color: Colours.black,
+                    fontWeight: FontStyles.medium,
+                    fontFamily: FontStyles.leagueSpartan,
+                    fontSize: 18,
+                  ),
+                ),
+                SizedBox(width: 4),
+                Text(
+                  '*',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.red,
+                    fontWeight: FontStyles.medium,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                )
+              ],
+            ),
+            const SizedBox(height: 8),
+            DropdownButtonFormField(
+              value: _unitValue,
+              focusNode: _unitFocus,
+              decoration: InputDecoration(
+                enabledBorder: outlineInputBorder(Colours.gray),
+                focusedBorder: outlineInputBorder(Colours.deepGreen),
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 12,
+                  horizontal: 12,
+                ),
+              ),
+              isExpanded: true,
+              items: _listOfUnit
+                  .map<DropdownMenuItem<int>>(
+                    (item) => DropdownMenuItem<int>(
+                      value: item['id'],
+                      child: Text(
+                        item['value']!,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontStyles.regular,
+                          color: Colours.deepGreen,
+                          fontFamily: FontStyles.leagueSpartan,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+              onChanged: (value) {
+                setState(() {
+                  _unitValue = value!;
                 });
               },
             ),
@@ -356,6 +573,9 @@ class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
             TextFormField(
               controller: _priceController,
               focusNode: _priceFocus,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(12),
+              ],
               style: const TextStyle(
                 color: Colours.black,
                 fontSize: 16,
@@ -415,6 +635,9 @@ class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
               maxLength: null,
               maxLines: null,
               textInputAction: TextInputAction.newline,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(300),
+              ],
               style: const TextStyle(
                 color: Colours.black,
                 fontSize: 16,
@@ -448,7 +671,7 @@ class _EditProductSellerScreenState extends State<EditProductSellerScreen> {
           ),
         ),
         child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () => editProcess(context),
           child: const Text(
             'Simpan',
             style: TextStyle(

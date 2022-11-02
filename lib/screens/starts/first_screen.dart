@@ -7,7 +7,6 @@ import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
 import 'package:melijo/screens/starts/login/login_screen.dart';
 import 'package:melijo/screens/starts/register/register_screen.dart';
 import 'package:melijo/utils/colours.dart';
-import 'package:melijo/widgets/loading_widget.dart';
 
 class FirstScreen extends StatelessWidget {
   const FirstScreen({Key? key}) : super(key: key);
