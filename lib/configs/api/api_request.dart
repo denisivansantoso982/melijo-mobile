@@ -206,6 +206,78 @@ class ApiRequest {
     }
   }
 
+  // ? Get Province by ID
+  Future<String> getProvinceById(String id) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+        Uri.parse('$locationBaseUrl/provinsi/$id'),
+        headers: {
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      );
+      final String data = jsonDecode(response.body)['nama'];
+      return Future.value(data);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Get City by ID
+  Future<String> getCityById(String id) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+        Uri.parse('$locationBaseUrl/kota/$id'),
+        headers: {
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      );
+      final String data = jsonDecode(response.body)['nama'];
+      return Future.value(data);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Get District by ID
+  Future<String> getDistrictById(String id) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+        Uri.parse('$locationBaseUrl/kecamatan/$id'),
+        headers: {
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      );
+      final String data = jsonDecode(response.body)['nama'];
+      return Future.value(data);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Get Ward by ID
+  Future<String> getWardById(String id) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+        Uri.parse('$locationBaseUrl/kelurahan/$id'),
+        headers: {
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      );
+      final String data = jsonDecode(response.body)['nama'];
+      return Future.value(data);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
   // ? Get Transaction and Product Count
   Future<Map<String, dynamic>> getCount(
       int id_seller, String token_type, String token) async {
@@ -273,8 +345,9 @@ class ApiRequest {
     }
   }
 
-  // ? Upload Picture
-  Future<void> uploadPicture(XFile file, int product_id, String token_type, String token) async {
+  // ? Upload Product Picture
+  Future<void> uploadPicture(
+      XFile file, int product_id, String token_type, String token) async {
     try {
       final List<int> imageBytes = await file.readAsBytes();
       final http.MultipartRequest request =
@@ -299,17 +372,16 @@ class ApiRequest {
   }
 
   // ? Retrieve Products
-  Future<List<dynamic>> retrieveProductSeller(int seller_id, String token_type, String token) async {
+  Future<List<dynamic>> retrieveProductSeller(
+      int seller_id, String token_type, String token) async {
     try {
       client = http.Client();
-      final http.Response response = await client.get(
-        Uri.parse('$baseUrl/user_seller/$seller_id/product'),
-        headers: {
-          'Authorization': '$token_type $token',
-          'accept': 'application/json',
-          'content-type': 'application/json',
-        }
-      );
+      final http.Response response = await client
+          .get(Uri.parse('$baseUrl/user_seller/$seller_id/product'), headers: {
+        'Authorization': '$token_type $token',
+        'accept': 'application/json',
+        'content-type': 'application/json',
+      });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
         throw '${response.statusCode} ${response.reasonPhrase}';
@@ -321,17 +393,16 @@ class ApiRequest {
   }
 
   // ? Retrieve Detail Products
-  Future<Map> retrieveDetailProductSeller(String token_type, String token, int product_id) async {
+  Future<Map> retrieveDetailProductSeller(
+      String token_type, String token, int product_id) async {
     try {
       client = http.Client();
-      final http.Response response = await client.get(
-        Uri.parse('$baseUrl/product/$product_id'),
-        headers: {
-          'Authorization': '$token_type $token',
-          'accept': 'application/json',
-          'content-type': 'application/json',
-        }
-      );
+      final http.Response response =
+          await client.get(Uri.parse('$baseUrl/product/$product_id'), headers: {
+        'Authorization': '$token_type $token',
+        'accept': 'application/json',
+        'content-type': 'application/json',
+      });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
         throw '${response.statusCode} ${response.reasonPhrase}';
@@ -343,17 +414,16 @@ class ApiRequest {
   }
 
   // ? Delete Product
-  Future<void> deleteProductSeller(String token_type, String token, int id) async {
+  Future<void> deleteProductSeller(
+      String token_type, String token, int id) async {
     try {
       client = http.Client();
-      final http.Response response = await client.delete(
-        Uri.parse('$baseUrl/product/$id'),
-        headers: {
-          'Authorization': '$token_type $token',
-          'accept': 'application/json',
-          'content-type': 'application/json',
-        }
-      );
+      final http.Response response =
+          await client.delete(Uri.parse('$baseUrl/product/$id'), headers: {
+        'Authorization': '$token_type $token',
+        'accept': 'application/json',
+        'content-type': 'application/json',
+      });
       if (response.statusCode != 200) {
         throw '${response.statusCode} ${response.reasonPhrase}';
       }
@@ -363,7 +433,8 @@ class ApiRequest {
   }
 
   // ? Retrieve Detail Products
-  Future<void> editProductSeller(String token_type, String token, int seller_id, ProductSellerModel product) async {
+  Future<void> editProductSeller(String token_type, String token, int seller_id,
+      ProductSellerModel product) async {
     try {
       client = http.Client();
       final Map<String, dynamic> body = {
@@ -387,6 +458,146 @@ class ApiRequest {
       if (response.statusCode != 200) {
         throw '${response.statusCode} ${response.reasonPhrase}';
       }
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Post Avatar
+  Future<void> uploadAvatar(
+      XFile file, int id, String token_type, String token) async {
+    try {
+      final List<int> imageBytes = await file.readAsBytes();
+      final http.MultipartRequest request =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/user/$id/image'));
+      request.headers.addAll({'Authorization': '$token_type $token'});
+      request.files.add(http.MultipartFile.fromBytes(
+        'image',
+        imageBytes,
+        filename: file.name,
+      ));
+      final http.StreamedResponse response = await request.send();
+      // final responseByteArray = await response.stream.toBytes();
+      // final jsonDecoded = jsonDecode(utf8.decode(responseByteArray));
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      // return Future.error(jsonDecoded);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Get Profile
+  Future<Map> getProfile(int id, String token_type, String auth_token) async {
+    try {
+      client = http.Client();
+      final http.Response response =
+          await client.get(Uri.parse('$baseUrl/user/$id/profile'), headers: {
+        'Authorization': '$token_type $auth_token',
+        'accept': 'application/json',
+        'content-type': 'application/json',
+      });
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(jsonDecode(response.body)['data']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Retrieve Transactions
+  Future<List<dynamic>> retrieveTransactionSeller(
+      int seller_id, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+          Uri.parse('$baseUrl/user_seller/$seller_id/transaction'),
+          headers: {
+            'Authorization': '$token_type $token',
+            'accept': 'application/json',
+            'content-type': 'application/json',
+          });
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(decodedResponse['data']['transaction']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Confirm Transaction
+  Future<void> confirmTransactionSeller(
+      String txid,
+      String? promo_code,
+      int seller_id,
+      int customer_id,
+      int total,
+      int? operator_id,
+      String token_type,
+      String token) async {
+    try {
+      client = http.Client();
+      final Map body = {
+        'user_customer_id': customer_id,
+        'user_seller_id': seller_id,
+        'user_operator_id': operator_id,
+        'promo_code': promo_code,
+        'total': total,
+      };
+      final http.Response response = await client.put(
+        Uri.parse('$baseUrl/transaction/$txid/confirmation'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+      // final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      // return Future.value(decodedResponse['data']['transaction']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Edit Profile
+  Future<Map> editProfile(
+    int user_id,
+    String username,
+    String email,
+    String name,
+    String phone,
+    String token_type,
+    String token,
+  ) async {
+    try {
+      client = http.Client();
+      final Map<String, dynamic> body = {
+        'username': username,
+        'email': email,
+        'name': name,
+        'phone': phone,
+      };
+      final http.Response response = await client.put(
+        Uri.parse('$baseUrl/user/$user_id/profile'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(jsonDecode(response.body)['data']);
     } catch (error) {
       return Future.error(error);
     }

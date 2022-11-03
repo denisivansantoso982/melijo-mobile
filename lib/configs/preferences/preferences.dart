@@ -16,6 +16,11 @@ class Preferences {
     required String fcm_token,
     required String auth_token,
     required String token_type,
+    required String? avatar,
+    required String province,
+    required String city,
+    required String district,
+    required String ward,
   }) async {
     prefs = await SharedPreferences.getInstance();
     prefs.setInt('id', id);
@@ -28,6 +33,28 @@ class Preferences {
     prefs.setString('fcm_token', fcm_token);
     prefs.setString('auth_token', auth_token);
     prefs.setString('token_type', token_type);
+    prefs.setString('avatar', avatar ?? '');
+    prefs.setString('province', province);
+    prefs.setString('city', city);
+    prefs.setString('district', district);
+    prefs.setString('ward', ward);
+  }
+
+  Future<void> setUserProfile({
+    required int role,
+    required String name,
+    required String username,
+    required String email,
+    required String phone,
+    required String? avatar,
+  }) async {
+    prefs = await SharedPreferences.getInstance();
+    prefs.setString('name', name);
+    prefs.setInt('role', role);
+    prefs.setString('username', username);
+    prefs.setString('email', email);
+    prefs.setString('phone', phone);
+    prefs.setString('avatar', avatar ?? '');
   }
 
   Future<int?> checkUserRole() async {
@@ -47,9 +74,13 @@ class Preferences {
       'phone': prefs.getString('phone'),
       'fcm_token': prefs.getString('fcm_token'),
       'uid_firebase': prefs.getString('uid_firebase'),
-      'address': prefs.getString('address'),
       'auth_token': prefs.getString('auth_token'),
       'token_type': prefs.getString('token_type'),
+      'avatar': prefs.getString('avatar'),
+      'province': prefs.getString('province'),
+      'city': prefs.getString('city'),
+      'district': prefs.getString('district'),
+      'ward': prefs.getString('ward'),
     };
   }
 
