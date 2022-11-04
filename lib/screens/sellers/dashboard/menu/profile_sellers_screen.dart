@@ -94,6 +94,8 @@ class _ProfileSellersScreenState extends State<ProfileSellersScreen> {
               ],
             )),
       );
+      Navigator.of(context)
+          .pushNamedAndRemoveUntil(FirstScreen.route, (route) => false);
     }
   }
 

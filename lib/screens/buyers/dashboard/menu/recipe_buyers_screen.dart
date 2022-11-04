@@ -1,11 +1,17 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:melijo/bloc/buyers/recipe/recipe_buyers_bloc.dart';
+import 'package:melijo/configs/api/api_request.dart';
+import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/models/buyers/recipe_buyers_model.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/screens/buyers/recipes/detail_recipe_buyers_screen.dart';
 import 'package:melijo/screens/buyers/recipes/favourite_recipes_buyers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
+import 'package:melijo/widgets/modal_bottom.dart';
 
 class RecipeBuyersScreen extends StatefulWidget {
   const RecipeBuyersScreen({Key? key}) : super(key: key);
@@ -87,9 +93,59 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
     super.dispose();
   }
 
+  // ! Retrieve Melijo
+  Future<void> getRecipes(context) async {
+    try {
+      await getRecipe(context);
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  // ! render recipe picture
+  ImageProvider<Object> renderImage(RecipeBuyersModel recipe) {
+    if (recipe.image == null || recipe.image == '') {
+      return const AssetImage('lib/assets/images/recipe.png');
+    }
+    return NetworkImage('${ApiRequest.baseStorageUrl}/${recipe.image}');
+  }
+
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
+    getRecipes(context);
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
@@ -136,13 +192,15 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () => Navigator.of(context).pushNamed(NotificationBuyersScreen.route),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(NotificationBuyersScreen.route),
             color: Colours.white,
             iconSize: 28,
             icon: const Icon(Icons.notifications_outlined),
           ),
           IconButton(
-            onPressed: () => Navigator.of(context).pushNamed(FavouriteRecipesBuyersScreen.route),
+            onPressed: () => Navigator.of(context)
+                .pushNamed(FavouriteRecipesBuyersScreen.route),
             color: Colours.white,
             iconSize: 28,
             icon: const Icon(Icons.favorite_border_outlined),
@@ -216,109 +274,132 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
           ),
           const SizedBox(height: 12),
           // *Recipes Panel
-          GridView.builder(
-            padding: const EdgeInsets.all(20),
-            shrinkWrap: true,
-            itemCount: _listRecipes.length,
-            physics: const ScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              childAspectRatio: 4 / 5,
-            ),
-            itemBuilder: (context, index) => GestureDetector(
-              onTap: () => Navigator.of(context).pushNamed(
-                DetailRecipeBuyersScreen.route,
-                arguments: _listRecipes[index],
-              ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  boxShadow: [
-                    BoxShadow(
-                      blurRadius: 4,
-                      color: Colours.black.withOpacity(.25),
-                      offset: const Offset(2, 4),
+          BlocBuilder<RecipeBuyersBloc, RecipeBuyersState>(
+            builder: (context, state) {
+              if (state is RecipeBuyersLoading) {
+                return const Center(
+                  child: SizedBox(
+                    width: 56,
+                    height: 56,
+                    child: CircularProgressIndicator(
+                      color: Colours.deepGreen,
+                      strokeWidth: 4,
                     ),
-                  ],
-                ),
-                child: Stack(
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        // *Images
-                        ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(8),
-                            topRight: Radius.circular(8),
+                  ),
+                );
+              }
+              if (state is RecipeBuyersInit) {
+                return GridView.builder(
+                  padding: const EdgeInsets.all(20),
+                  shrinkWrap: true,
+                  itemCount: state.recipes.length,
+                  physics: const ScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    childAspectRatio: 4 / 5,
+                  ),
+                  itemBuilder: (context, index) => GestureDetector(
+                    onTap: () => Navigator.of(context).pushNamed(
+                      DetailRecipeBuyersScreen.route,
+                      arguments: _listRecipes[index],
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(8)),
+                        boxShadow: [
+                          BoxShadow(
+                            blurRadius: 4,
+                            color: Colours.black.withOpacity(.25),
+                            offset: const Offset(2, 4),
                           ),
-                          child: Image(
-                            image: AssetImage(
-                                'lib/assets/images/recipes/${_listRecipes[index]['image']}'),
-                            fit: BoxFit.cover,
-                            height: screenSize.height / 6,
-                          ),
-                        ),
-                        // *Title
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text(
-                              _listRecipes[index]['name'],
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: Colours.black,
-                                fontFamily: FontStyles.leagueSpartan,
-                                fontWeight: FontStyles.regular,
-                                fontSize: 16,
+                        ],
+                      ),
+                      child: Stack(
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              // *Images
+                              ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(8),
+                                  topRight: Radius.circular(8),
+                                ),
+                                child: Image(
+                                  image: renderImage(state.recipes[index]),
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  height: screenSize.height / 6,
+                                ),
                               ),
-                            ),
+                              // *Title
+                              Flexible(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: Text(
+                                    state.recipes[index].recipe_title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colours.black,
+                                      fontFamily: FontStyles.leagueSpartan,
+                                      fontWeight: FontStyles.regular,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // *Difficulty
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8.0),
+                                child: Text(
+                                  state.recipes[index].recipe_level,
+                                  style: const TextStyle(
+                                    color: Colours.deepGreen,
+                                    fontFamily: FontStyles.leagueSpartan,
+                                    fontWeight: FontStyles.medium,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(),
+                            ],
                           ),
-                        ),
-                        // *Difficulty
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: Text(
-                            '${_listRecipes[index]['difficulty']}',
-                            style: const TextStyle(
-                              color: Colours.deepGreen,
-                              fontFamily: FontStyles.leagueSpartan,
-                              fontWeight: FontStyles.medium,
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(),
-                      ],
-                    ),
-                    Align(
-                      alignment: Alignment.topRight,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(6),
-                          shape: const CircleBorder(),
-                          backgroundColor: Colours.white,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _listRecipes[index]['favourite'] = !_listRecipes[index]['favourite'];
-                          });
-                        },
-                        child: Icon(
-                          _listRecipes[index]['favourite'] ? Icons.favorite : Icons.favorite_border,
-                          color: _listRecipes[index]['favourite'] ? Colors.red : Colours.black,
-                        ),
+                          // Align(
+                          //   alignment: Alignment.topRight,
+                          //   child: ElevatedButton(
+                          //     style: ElevatedButton.styleFrom(
+                          //       padding: const EdgeInsets.all(6),
+                          //       shape: const CircleBorder(),
+                          //       backgroundColor: Colours.white,
+                          //     ),
+                          //     onPressed: () {
+                          //       setState(() {
+                          //         _listRecipes[index]['favourite'] = !_listRecipes[index]['favourite'];
+                          //       });
+                          //     },
+                          //     child: Icon(
+                          //       _listRecipes[index]['favourite'] ? Icons.favorite : Icons.favorite_border,
+                          //       color: _listRecipes[index]['favourite'] ? Colors.red : Colours.black,
+                          //     ),
+                          //   ),
+                          // ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  ),
+                );
+              } else {
+                return const Center(child: Text('Terjadi Kesalahan'));
+              }
+            },
           ),
         ],
       ),

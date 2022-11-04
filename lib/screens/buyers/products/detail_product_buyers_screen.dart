@@ -4,13 +4,20 @@ import 'package:melijo/screens/buyers/communications/notification_buyers_screen.
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 
-class DetailProductBuyersScreen extends StatelessWidget {
+class DetailProductBuyersScreen extends StatefulWidget {
   const DetailProductBuyersScreen({Key? key}) : super(key: key);
 
   static const String route = '/detail_product_screen';
 
-  static final TextEditingController _searchController = TextEditingController();
-  static final FocusNode _searchFocus = FocusNode();
+  @override
+  State<DetailProductBuyersScreen> createState() => _DetailProductBuyersScreenState();
+}
+
+class _DetailProductBuyersScreenState extends State<DetailProductBuyersScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  final FocusNode _searchFocus = FocusNode();
+  final PageController _pageController = PageController(initialPage: 0);
+
 
   void doAddToCart(BuildContext context, Map<String, dynamic> arguments) {
     showModalBottomSheet(
@@ -240,10 +247,26 @@ class DetailProductBuyersScreen extends StatelessWidget {
       body: ListView(
         children: [
           // *Images
-          Image(
-            image: AssetImage('lib/assets/images/products/${arguments['image']}'),
-            fit: BoxFit.cover,
-            height: screenSize.height * 0.4,
+          SizedBox(
+            width: screenSize.width,
+            height: screenSize.width,
+            child: PageView(
+              controller: _pageController,
+              children: [
+                Image(
+                  image: AssetImage('lib/assets/images/products/${arguments['image']}'),
+                  fit: BoxFit.cover,
+                  width: screenSize.width,
+                  height: screenSize.width,
+                ),
+                Image(
+                  image: AssetImage('lib/assets/images/products/${arguments['image']}'),
+                  fit: BoxFit.cover,
+                  width: screenSize.width,
+                  height: screenSize.width,
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 12),
           // *Price

@@ -602,4 +602,47 @@ class ApiRequest {
       return Future.error(error);
     }
   }
+
+  // ? Retrieve Products
+  Future<List<dynamic>> retrieveMelijoByWard(
+      String ward, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client
+          .get(Uri.parse('$baseUrl/user_seller/$ward'), headers: {
+        'Authorization': '$token_type $token',
+        'accept': 'application/json',
+        'content-type': 'application/json',
+      });
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(decodedResponse['data']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Retrieve Recipe
+  Future<List<dynamic>> retrieveRecipes(String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client
+          .get(Uri.parse('$baseUrl/recipe'), headers: {
+        'Authorization': '$token_type $token',
+        'accept': 'application/json',
+        'content-type': 'application/json',
+      });
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(decodedResponse['data']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+
 }

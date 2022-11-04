@@ -4,11 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:melijo/bloc/buyers/melijo/melijo_buyer_bloc.dart';
+import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
+import 'package:melijo/bloc/buyers/recipe/recipe_buyers_bloc.dart';
 import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
 import 'package:melijo/bloc/sellers/transactions/transaction_seller_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/firebase/database.dart';
 import 'package:melijo/configs/preferences/preferences.dart';
+import 'package:melijo/models/buyers/melijo_buyers_model.dart';
+import 'package:melijo/models/buyers/product_buyers_model.dart';
+import 'package:melijo/models/buyers/recipe_buyers_model.dart';
 import 'package:melijo/models/sellers/product_seller_model.dart';
 import 'package:melijo/models/sellers/transaction_seller_model.dart';
 
@@ -382,6 +388,93 @@ Future<void> editProfile(
       phone: response['user_detail']['phone'],
       avatar: response['user']['image'],
     );
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> getMelijoByWard(BuildContext context) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    List<MelijoBuyersModel> listOfMelijo = [];
+    final List response = await api_request.retrieveMelijoByWard(
+      user_data['ward'],
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    for (Map element in response) {
+      listOfMelijo.add(MelijoBuyersModel(
+        seller_id: element['seller_id'],
+        user_id: element['user_id'],
+        name: element['name'],
+        phone: element['phone'],
+        email: element['email'],
+        fcm_token: element['fcm_token'],
+        province: element['province'],
+        city: element['city'],
+        districts: element['districts'],
+        ward: element['ward'],
+        image: element['image'],
+        username: element['username'],
+      ));
+    }
+    context.read<MelijoBuyerBloc>().add(const DeleteMelijo());
+    context.read<MelijoBuyerBloc>().add(FillMelijo(melijoBuyers: listOfMelijo));
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> getProductsBuyers(BuildContext context, int seller_id) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List<ProductBuyersModel> listProduct = [];
+    final List<dynamic> response = await api_request.retrieveProductSeller(
+      seller_id,
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    for (var element in response) {
+      listProduct.add(ProductBuyersModel(
+        id: element['id'],
+        price: element['price'],
+        category_id: element['category_id'],
+        unit_id: element['unit_id'],
+        product_name: element['product_name'],
+        image_uri: element['image'],
+        description: element['description'],
+      ));
+    }
+    context.read<ProductBuyersBloc>().add(const DeleteProductBuyer());
+    context
+        .read<ProductBuyersBloc>()
+        .add(FillProductBuyer(productBuyerModel: listProduct));
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> getRecipe(BuildContext context) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List<RecipeBuyersModel> listRecipe = [];
+    final List<dynamic> response = await api_request.retrieveRecipes(
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    for (var element in response) {
+      listRecipe.add(RecipeBuyersModel(
+        id: element['id'],
+        recipe_title: element['recipe_title'],
+        recipe_level: element['recipe_level'],
+        step: element['step'],
+        image: element['image'],
+      ));
+    }
+    context.read<RecipeBuyersBloc>().add(DeleteRecipe());
+    context
+        .read<RecipeBuyersBloc>()
+        .add(FillRecipe(listRecipe: listRecipe));
   } catch (error) {
     return Future.error(error);
   }

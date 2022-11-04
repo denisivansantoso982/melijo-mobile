@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:melijo/bloc/buyers/cart/cart_buyers_bloc.dart';
+import 'package:melijo/bloc/buyers/melijo/melijo_buyer_bloc.dart';
+import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
+import 'package:melijo/bloc/buyers/recipe/recipe_buyers_bloc.dart';
 import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
 import 'package:melijo/bloc/sellers/transactions/transaction_seller_bloc.dart';
 import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
@@ -46,6 +50,10 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider<ProductSellerBloc>(create: (context) => ProductSellerBloc()),
         BlocProvider<TransactionSellerBloc>(create: (context) => TransactionSellerBloc()),
+        BlocProvider<MelijoBuyerBloc>(create: (context) => MelijoBuyerBloc()),
+        BlocProvider<ProductBuyersBloc>(create: (context) => ProductBuyersBloc()),
+        BlocProvider<RecipeBuyersBloc>(create: (context) => RecipeBuyersBloc()),
+        BlocProvider<CartBuyersBloc>(create: (context) => CartBuyersBloc()),
       ],
       child: MaterialApp(
         title: 'Melijo.id',
