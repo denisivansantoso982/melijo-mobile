@@ -61,7 +61,7 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
     super.dispose();
   }
 
-  // ! Retrieve Melijo
+  // ! Retrieve Recipe
   Future<void> getRecipes(context) async {
     try {
       await getRecipe(context);

@@ -15,6 +15,7 @@ class TransactionSellerModel extends Equatable {
     required this.seller_id,
     required this.customer_id,
     this.operator_id,
+    required this.information,
   });
 
   final String txid;
@@ -28,6 +29,7 @@ class TransactionSellerModel extends Equatable {
   final int? operator_id;
   final int seller_id;
   final int customer_id;
+  final String information;
 
   @override
   List<Object?> get props => [

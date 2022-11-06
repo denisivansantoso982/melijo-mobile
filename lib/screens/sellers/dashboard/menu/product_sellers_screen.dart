@@ -21,13 +21,6 @@ class ProductSellersScreen extends StatefulWidget {
 }
 
 class _ProductSellersScreenState extends State<ProductSellersScreen> {
-  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   Widget productIsEmpty(BuildContext context) {
     return Center(
       child: Column(

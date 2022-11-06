@@ -64,7 +64,7 @@ class _ProductsBuyersScreenState extends State<ProductsBuyersScreen> {
   // ! Retrieve Melijo
   Future<void> getProducts(context) async {
     try {
-      await getProductsBuyers(context, melijo.seller_id);
+      await getProductsBuyers(context);
     } catch (error) {
       showModalBottomSheet(
         backgroundColor: Colors.transparent,
@@ -394,44 +394,44 @@ class _ProductsBuyersScreenState extends State<ProductsBuyersScreen> {
                   ),
                 ),
                 // *Promo or Ads Panel
-                // Container(
-                //   margin: const EdgeInsets.symmetric(horizontal: 20),
-                //   alignment: Alignment.center,
-                //   decoration: const BoxDecoration(
-                //     borderRadius: BorderRadius.all(Radius.circular(8)),
-                //     image: DecorationImage(
-                //       image: AssetImage('lib/assets/images/recipes/nasgor.jpg'),
-                //       fit: BoxFit.fitHeight,
-                //     ),
-                //   ),
-                //   child: Container(
-                //     padding: const EdgeInsets.symmetric(
-                //       horizontal: 24,
-                //       vertical: 20,
-                //     ),
-                //     decoration: BoxDecoration(
-                //       borderRadius: const BorderRadius.all(Radius.circular(8)),
-                //       gradient: LinearGradient(
-                //         begin: const Alignment(-1, -1),
-                //         end: const Alignment(0.2, 0.8),
-                //         colors: [
-                //           Colours.oliveGreen.withOpacity(.8),
-                //           Colours.deepGreen.withOpacity(.8),
-                //         ],
-                //       ),
-                //     ),
-                //     child: const Text(
-                //       'Temukan berbagai resep sehat di sini 🤩',
-                //       textAlign: TextAlign.center,
-                //       style: TextStyle(
-                //         color: Colours.white,
-                //         fontSize: 20,
-                //         fontWeight: FontStyles.bold,
-                //         fontFamily: FontStyles.lora,
-                //       ),
-                //     ),
-                //   ),
-                // ),
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(8)),
+                    image: DecorationImage(
+                      image: AssetImage('lib/assets/images/recipes/nasgor.jpg'),
+                      fit: BoxFit.fitHeight,
+                    ),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 20,
+                    ),
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.all(Radius.circular(8)),
+                      gradient: LinearGradient(
+                        begin: const Alignment(-1, -1),
+                        end: const Alignment(0.2, 0.8),
+                        colors: [
+                          Colours.oliveGreen.withOpacity(.8),
+                          Colours.deepGreen.withOpacity(.8),
+                        ],
+                      ),
+                    ),
+                    child: const Text(
+                      'Temukan berbagai resep sehat di sini 🤩',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colours.white,
+                        fontSize: 20,
+                        fontWeight: FontStyles.bold,
+                        fontFamily: FontStyles.lora,
+                      ),
+                    ),
+                  ),
+                ),
                 // *Products Panel
                 renderGridProducts(context, state, screenSize),
               ],

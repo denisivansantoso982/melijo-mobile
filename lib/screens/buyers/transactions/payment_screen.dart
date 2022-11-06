@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/models/buyers/cart_buyers_model.dart';
 import 'package:melijo/models/buyers/promo_buyers_model.dart';
+import 'package:melijo/screens/buyers/dashboard/dashboard_buyers_screen.dart';
 import 'package:melijo/screens/buyers/transactions/payment_method_screen.dart';
 import 'package:melijo/screens/buyers/transactions/payment_proof_screen.dart';
 import 'package:melijo/screens/buyers/transactions/promo_screen.dart';
@@ -32,6 +33,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   bool paid = false;
   bool isExpandedPaymentMethod = false;
   bool isExpandedPromo = false;
+  bool result = false;
 
   @override
   void initState() {
@@ -101,16 +103,23 @@ class _PaymentScreenState extends State<PaymentScreen> {
   Future<void> newTransaction() async {
     try {
       LoadingWidget.show(context);
-      PromoBuyersModel? promo = _promoList.where((element) => element.checked).isEmpty ? null : _promoList.firstWhere((element) => element.checked);
-      final Map transaction = await addTransaction(carts, promo, date_distribution, totalProduct(), distribution_info);
+      PromoBuyersModel? promo =
+          _promoList.where((element) => element.checked).isEmpty
+              ? null
+              : _promoList.firstWhere((element) => element.checked);
+      final Map transaction = await addTransaction(
+          carts, promo, date_distribution, totalProduct(), distribution_info);
       LoadingWidget.close(context);
-      Navigator.of(context).pushNamed(
+      bool result = await Navigator.of(context).pushNamed(
         PaymentProofScreen.route,
         arguments: {
           'transactions': transaction,
           'total': totalProduct(),
         },
-      );
+      ) as bool;
+      setState(() {
+        this.result = result;
+      });
     } catch (error) {
       LoadingWidget.close(context);
       showModalBottomSheet(
@@ -564,6 +573,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                       activeColor: Colours.deepGreen,
                       onChanged: (value) {
                         setState(() {
+                          for (PromoBuyersModel promo in _promoList) {
+                            promo.checked = false;
+                          }
                           _promoList[index].checked =
                               !_promoList[index].checked;
                         });
@@ -617,10 +629,16 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
             // *Buy Button
             ElevatedButton(
-              onPressed: () => newTransaction(),
-              child: const Text(
-                'Kirim Bukti Bayar',
-                style: TextStyle(
+              onPressed: () {
+                if (result) {
+                  Navigator.of(context).pushNamedAndRemoveUntil(DashboardBuyersScreen.route, (route) => false);
+                } else {
+                  newTransaction();
+                }
+              },
+              child: Text(
+                result ? 'Kembali ke Dashboard!' : 'Kirim Bukti Bayar',
+                style: const TextStyle(
                   color: Colours.white,
                   fontSize: 14,
                   fontWeight: FontStyles.medium,

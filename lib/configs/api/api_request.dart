@@ -2,10 +2,11 @@
 
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:melijo/models/buyers/cart_buyers_model.dart';
+import 'package:melijo/models/buyers/product_buyers_model.dart';
+import 'package:melijo/models/buyers/product_recom_model.dart';
 import 'package:melijo/models/sellers/product_seller_model.dart';
 
 class ApiRequest {
@@ -74,6 +75,52 @@ class ApiRequest {
       final http.Response response = await http
           .post(
             Uri.parse('$baseUrl/auth/register'),
+            headers: {
+              'accept': 'application/json',
+              'content-type': 'application/json',
+            },
+            body: jsonEncode(body),
+          )
+          .timeout(const Duration(seconds: 30));
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${decodedResponse['message']}';
+      }
+      final Map<String, dynamic> data = decodedResponse['data'];
+      return Future.value(data);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Register
+  Future<Map<String, dynamic>> registerSeller(
+    String name,
+    String email,
+    String phone,
+    String password,
+    int role_id,
+    int province,
+    int city,
+    int districts,
+    int village,
+  ) async {
+    try {
+      client = http.Client();
+      final Map body = {
+        'name': name,
+        'email': email,
+        'phone': phone,
+        'password': password,
+        'role_id': '$role_id',
+        'province': '$province',
+        'city': '$city',
+        'districts': '$districts',
+        'ward': '$village',
+      };
+      final http.Response response = await http
+          .post(
+            Uri.parse('$baseUrl/auth/register/seller'),
             headers: {
               'accept': 'application/json',
               'content-type': 'application/json',
@@ -799,7 +846,10 @@ class ApiRequest {
   ) async {
     try {
       final List<int> imageBytes = await file.readAsBytes();
-      final http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse('$baseUrl/payment'),);
+      final http.MultipartRequest request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$baseUrl/payment'),
+      );
       request.headers.addAll({'Authorization': '$token_type $token'});
       request.fields.addAll({'txid': txid, 'pay': '$pay'});
       request.files.add(http.MultipartFile.fromBytes(
@@ -815,4 +865,96 @@ class ApiRequest {
       return Future.error(error);
     }
   }
+
+  // ? Get Detail Recipe
+  Future<List<ProductRecomModel>> retrieveProductRecom(
+      int recipe_id, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final List<ProductRecomModel> _recom = [];
+      final http.Response response = await client.get(
+        Uri.parse('$baseUrl/recipe/$recipe_id'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      );
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      for (var element in decodedResponse['data']['recoms']) {
+        _recom.add(ProductRecomModel(
+          id: element['id'],
+          keyword: element['keyword'],
+          image: element['image'],
+        ));
+      }
+      return Future.value(_recom);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Search Product
+  Future<List<ProductBuyersModel>> searchProduct(
+      String keyword, int seller_id, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final List<ProductBuyersModel> _products = [];
+      final Map body = {'product_name': keyword};
+      final http.Response response = await client.post(
+        Uri.parse('$baseUrl/product/$seller_id/search'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      for (var element in decodedResponse['data']) {
+        _products.add(ProductBuyersModel(
+          id: element['id'],
+          user_seller_id: element['user_seller_id'],
+          category_id: element['category_id'],
+          unit_id: element['unit_id'],
+          product_name: element['product_name'],
+          price: element['price'],
+          description: element['description'],
+          image_uri: element['image'],
+        ));
+      }
+      return Future.value(_products);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Get Detail Transaction Seller
+  Future<List> getDetailTransactionSeller(String txid, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+        Uri.parse('$baseUrl/transaction/$txid/detail'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      );
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(decodedResponse['data']['detail_transaction']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
 }

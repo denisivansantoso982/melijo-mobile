@@ -4,10 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/models/buyers/product_recom_model.dart';
 import 'package:melijo/models/buyers/recipe_buyers_model.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
+import 'package:melijo/screens/buyers/products/search_product_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
+import 'package:melijo/widgets/modal_bottom.dart';
 
 class DetailRecipeBuyersScreen extends StatefulWidget {
   const DetailRecipeBuyersScreen({Key? key}) : super(key: key);
@@ -23,29 +26,7 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
   late RecipeBuyersModel recipe;
-  final List<Map<String, dynamic>> _listOfProducts = [
-    {
-      'name': 'Bawang Daun',
-      'price': 16000,
-      'image': 'bawang_daun.jpg',
-      'quantity': 2,
-      'checked': true,
-    },
-    {
-      'name': 'Bawang Merah',
-      'price': 21000,
-      'image': 'bawang_merah.jpg',
-      'quantity': 2,
-      'checked': true,
-    },
-    {
-      'name': 'Bawang Putih',
-      'price': 27000,
-      'image': 'bawang_putih.jpg',
-      'quantity': 2,
-      'checked': true,
-    },
-  ];
+  final List<Map> _listOfProducts = [];
   late String htmlData;
 
   @override
@@ -64,6 +45,52 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
     return total;
   }
 
+  // ! Get Recipe Recommendation
+  Future<List<ProductRecomModel>> getRecipeRecom(BuildContext context) async {
+    try {
+      final List<ProductRecomModel> recom = await retrieveProductRecom(recipe.id);
+      return Future.value(recom);
+      // setState(() {
+      //   _listOfProducts.addAll(recom);
+      // });
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+      return [];
+    }
+  }
+
   // ! render recipe picture
   ImageProvider<Object> renderImage(RecipeBuyersModel recipe) {
     if (recipe.image == null || recipe.image == '') {
@@ -71,7 +98,6 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
     }
     return NetworkImage('${ApiRequest.baseStorageUrl}/${recipe.image}');
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -191,157 +217,84 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
               ),
             ),
           ),
-          // const SizedBox(height: 8),
-          // ListView.builder(
-          //   padding: const EdgeInsets.symmetric(horizontal: 12),
-          //   shrinkWrap: true,
-          //   physics: const ScrollPhysics(),
-          //   itemCount: _listOfProducts.length,
-          //   itemBuilder: (context, index) => Card(
-          //     margin: const EdgeInsets.symmetric(vertical: 4),
-          //     elevation: 4,
-          //     shape: const RoundedRectangleBorder(
-          //       borderRadius: BorderRadius.all(Radius.circular(12)),
-          //     ),
-          //     child: Row(
-          //       crossAxisAlignment: CrossAxisAlignment.center,
-          //       children: [
-          //         Expanded(
-          //           flex: 2,
-          //           child: Stack(
-          //             children: [
-          //               ClipRRect(
-          //                 borderRadius: const BorderRadius.only(
-          //                   topLeft: Radius.circular(12),
-          //                   bottomLeft: Radius.circular(12),
-          //                 ),
-          //                 child: Image(
-          //                   image: AssetImage(
-          //                       'lib/assets/images/products/${_listOfProducts[index]['image']}'),
-          //                   fit: BoxFit.cover,
-          //                   height: 80,
-          //                 ),
-          //               ),
-          //               Checkbox(
-          //                 value: _listOfProducts[index]['checked'],
-          //                 checkColor: Colours.white,
-          //                 activeColor: Colours.deepGreen,
-          //                 side: BorderSide(
-          //                   color: _listOfProducts[index]['checked']
-          //                       ? Colours.deepGreen
-          //                       : Colours.white,
-          //                   width: 2,
-          //                 ),
-          //                 onChanged: (value) {
-          //                   setState(() {
-          //                     _listOfProducts[index]['checked'] =
-          //                         !_listOfProducts[index]['checked'];
-          //                   });
-          //                 },
-          //               ),
-          //             ],
-          //           ),
-          //         ),
-          //         const SizedBox(width: 8),
-          //         Expanded(
-          //           flex: 4,
-          //           child: Padding(
-          //             padding: const EdgeInsets.all(8.0),
-          //             child: Column(
-          //               crossAxisAlignment: CrossAxisAlignment.start,
-          //               children: [
-          //                 // *Total Price
-          //                 Text(
-          //                   'Rp. ${thousandFormat(_listOfProducts[index]['price'])}',
-          //                   style: const TextStyle(
-          //                     fontSize: 22,
-          //                     fontWeight: FontWeight.bold,
-          //                     fontFamily: FontStyles.lora,
-          //                     color: Colours.deepGreen,
-          //                   ),
-          //                 ),
-          //                 const SizedBox(height: 12),
-          //                 // *Product Name
-          //                 Text(
-          //                   _listOfProducts[index]['name'],
-          //                   softWrap: true,
-          //                   style: TextStyle(
-          //                     fontSize: 18,
-          //                     fontWeight: FontStyles.regular,
-          //                     fontFamily: FontStyles.leagueSpartan,
-          //                     color: Colours.black.withOpacity(.8),
-          //                   ),
-          //                 ),
-          //               ],
-          //             ),
-          //           ),
-          //         ),
-          //         IconButton(
-          //           onPressed: () {
-          //             setState(() {
-          //               _listOfProducts.removeAt(index);
-          //             });
-          //           },
-          //           icon: const Icon(
-          //             Icons.delete_outline_rounded,
-          //             color: Colours.black,
-          //             size: 36,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ),
-          // ),
-          // const SizedBox(height: 24),
-          // // *Total and Buy Button
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 20),
-          //   child: Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //     children: [
-          //       Column(
-          //         mainAxisAlignment: MainAxisAlignment.center,
-          //         crossAxisAlignment: CrossAxisAlignment.start,
-          //         children: [
-          //           const Text(
-          //             'Total Harga',
-          //             style: TextStyle(
-          //               color: Colours.black,
-          //               fontSize: 14,
-          //               fontWeight: FontStyles.regular,
-          //               fontFamily: FontStyles.leagueSpartan,
-          //             ),
-          //           ),
-          //           const SizedBox(height: 2),
-          //           Text(
-          //             'Rp${totalPrice().round()}',
-          //             style: const TextStyle(
-          //               color: Colours.black,
-          //               fontSize: 16,
-          //               fontWeight: FontStyles.bold,
-          //               fontFamily: FontStyles.leagueSpartan,
-          //             ),
-          //           ),
-          //         ],
-          //       ),
-          //       ElevatedButton(
-          //         onPressed: () {},
-          //         style: ElevatedButton.styleFrom(
-          //             padding: const EdgeInsets.symmetric(horizontal: 48)),
-          //         child: Text(
-          //           'Beli (${_listOfProducts.where((element) => element['checked'] == true).length})',
-          //           style: const TextStyle(
-          //             color: Colours.white,
-          //             fontSize: 14,
-          //             fontWeight: FontStyles.medium,
-          //             fontFamily: FontStyles.leagueSpartan,
-          //           ),
-          //         ),
-          //       ),
-          //     ],
-          //   ),
-          // ),
-          // const SizedBox(height: 8),
+          const SizedBox(height: 12),
+          FutureBuilder(
+            future: getRecipeRecom(context),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: SizedBox(
+                    width: 36,
+                    height: 36,
+                    child: CircularProgressIndicator(
+                      color: Colours.deepGreen,
+                      strokeWidth: 4,
+                    ),
+                  ),
+                );
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                shrinkWrap: true,
+                physics: const ScrollPhysics(),
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) => GestureDetector(
+                  onTap: () => Navigator.of(context).pushNamed(SearchProductScreen.route, arguments: snapshot.data?[index].keyword),
+                  child: Card(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    elevation: 4,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(12),
+                              bottomLeft: Radius.circular(12),
+                            ),
+                            child: Image(
+                              image: NetworkImage(
+                                  '${ApiRequest.baseStorageUrl}/${snapshot.data![index].image}'),
+                              fit: BoxFit.cover,
+                              height: 80,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 4,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // *Product Name
+                                Text(
+                                  snapshot.data![index].keyword,
+                                  softWrap: true,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontStyles.regular,
+                                    fontFamily: FontStyles.leagueSpartan,
+                                    color: Colours.black.withOpacity(.8),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 8),
         ],
       ),
     );

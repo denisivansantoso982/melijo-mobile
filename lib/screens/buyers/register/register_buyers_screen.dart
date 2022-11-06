@@ -448,7 +448,7 @@ class _RegisterBuyersScreenState extends State<RegisterBuyersScreen> {
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 40),
               child: Text(
-                'Daftar Sebagai Penjual',
+                'Daftar Sebagai Pembeli',
                 style: TextStyle(
                   fontFamily: 'Lora',
                   fontSize: 28,

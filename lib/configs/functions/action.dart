@@ -1,6 +1,5 @@
 // ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -17,6 +16,7 @@ import 'package:melijo/configs/preferences/preferences.dart';
 import 'package:melijo/models/buyers/cart_buyers_model.dart';
 import 'package:melijo/models/buyers/melijo_buyers_model.dart';
 import 'package:melijo/models/buyers/product_buyers_model.dart';
+import 'package:melijo/models/buyers/product_recom_model.dart';
 import 'package:melijo/models/buyers/promo_buyers_model.dart';
 import 'package:melijo/models/buyers/recipe_buyers_model.dart';
 import 'package:melijo/models/sellers/product_seller_model.dart';
@@ -94,6 +94,7 @@ Future<void> login(String user, String password, bool is_seller) async {
     final Map<String, dynamic> user_data = response['user'];
     final Map<String, dynamic> user_detail = response['detail'];
     final Map<String, dynamic> user_address = response['address']['address'];
+    final Map<String, dynamic> plotting = response['plotting'];
     if (is_seller && user_data['role_id'] != 4) {
       throw 'Pengguna tidak ditemukan!';
     } else if (!is_seller && user_data['role_id'] != 3) {
@@ -120,6 +121,7 @@ Future<void> login(String user, String password, bool is_seller) async {
       city: user_address['city'],
       district: user_address['districts'],
       ward: user_address['ward'],
+      seller_id: plotting['user_seller_id'],
     );
   } catch (error) {
     return Future.error(error);
@@ -138,8 +140,13 @@ Future<void> register(
   int village,
 ) async {
   try {
-    await api_request.register(name, email, phone, password, role_id, province,
-        city, districts, village);
+    if (role_id == 3) {
+      await api_request.register(name, email, phone, password, role_id,
+          province, city, districts, village);
+    } else {
+      await api_request.registerSeller(name, email, phone, password, role_id,
+          province, city, districts, village);
+    }
   } catch (error) {
     return Future.error(error);
   }
@@ -282,6 +289,7 @@ Future<void> getTransactionSeller(BuildContext context) async {
         seller_name: element['user_seller']['name'],
         total: element['total'],
         operator_id: element['user_operator_id'],
+        information: element['information'],
       ));
     }
     context.read<TransactionSellerBloc>().add(DeleteTransaction());
@@ -429,12 +437,12 @@ Future<void> getMelijoByWard(BuildContext context) async {
   }
 }
 
-Future<void> getProductsBuyers(BuildContext context, int seller_id) async {
+Future<void> getProductsBuyers(BuildContext context) async {
   try {
     final Map user_data = await preferences.getUser();
     final List<ProductBuyersModel> listProduct = [];
     final List<dynamic> response = await api_request.retrieveProductSeller(
-      seller_id,
+      user_data['seller_id'],
       user_data['token_type'],
       user_data['auth_token'],
     );
@@ -599,6 +607,49 @@ Future<void> payment(String txid, XFile file, int pay) async {
       user_data['token_type'],
       user_data['auth_token'],
     );
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<List<ProductRecomModel>> retrieveProductRecom(int recipe_id) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List<ProductRecomModel> response = await api_request.retrieveProductRecom(
+      recipe_id,
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    return Future.value(response);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<List<ProductBuyersModel>> searchProduct(String keyword) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List<ProductBuyersModel> response = await api_request.searchProduct(
+      keyword,
+      user_data['seller_id'],
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    return Future.value(response);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<List> retrieveDetailTransactionSeller(String txid) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List response = await api_request.getDetailTransactionSeller(
+      txid,
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    return Future.value(response);
   } catch (error) {
     return Future.error(error);
   }

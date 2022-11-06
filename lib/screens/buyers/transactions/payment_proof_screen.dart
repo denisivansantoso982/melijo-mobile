@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, no_leading_underscores_for_local_identifiers
+// ignore_for_file: library_private_types_in_public_api, no_leading_underscores_for_local_identifiers, use_build_context_synchronously
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -76,8 +76,13 @@ class _PaymentProofScreenState extends State<PaymentProofScreen> {
       LoadingWidget.show(context);
       final String txid = argument['transactions']['transaction']['txid'];
       final int total = argument['total'];
-      payment(txid, file!, total);
+      await payment(txid, file!, total);
       LoadingWidget.close(context);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Bukti Pembayaran Telah Dikirim!'),
+        backgroundColor: Colours.deepGreen,
+      ));
+      Navigator.of(context).pop(true);
     } catch (error) {
       LoadingWidget.close(context);
       showModalBottomSheet(

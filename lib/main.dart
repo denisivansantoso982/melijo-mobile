@@ -18,6 +18,7 @@ import 'package:melijo/screens/buyers/products/detail_product_buyers_screen.dart
 import 'package:melijo/screens/buyers/products/products_buyers_screen.dart';
 import 'package:melijo/screens/buyers/recipes/detail_recipe_buyers_screen.dart';
 import 'package:melijo/screens/buyers/recipes/favourite_recipes_buyers_screen.dart';
+import 'package:melijo/screens/buyers/products/search_product_screen.dart';
 import 'package:melijo/screens/buyers/register/register_buyers_screen.dart';
 import 'package:melijo/screens/buyers/transactions/detail_transactions_screen.dart';
 import 'package:melijo/screens/buyers/transactions/distribution_address_screen.dart';
@@ -31,6 +32,7 @@ import 'package:melijo/screens/sellers/login/login_sellers_screen.dart';
 import 'package:melijo/screens/sellers/products/add_product_sellers_screen.dart';
 import 'package:melijo/screens/sellers/products/edit_product_sellers_screen.dart';
 import 'package:melijo/screens/sellers/register/register_sellers_screen.dart';
+import 'package:melijo/screens/sellers/transaction/detail_transaction_seller_screen.dart';
 import 'package:melijo/screens/starts/first_screen.dart';
 import 'package:melijo/screens/starts/login/login_screen.dart';
 import 'package:melijo/screens/starts/register/register_screen.dart';
@@ -112,6 +114,8 @@ class MyApp extends StatelessWidget {
           PromoScreen.route: (context) => const PromoScreen(),
           ProductsBuyersScreen.route: (context) => const ProductsBuyersScreen(),
           PaymentProofScreen.route: (context) => const PaymentProofScreen(),
+          SearchProductScreen.route: (context) => const SearchProductScreen(),
+          DetailTransactionSellerScreen.route: (context) => const DetailTransactionSellerScreen(),
         },
       ),
     );

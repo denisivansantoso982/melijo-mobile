@@ -21,6 +21,7 @@ class Preferences {
     required String city,
     required String district,
     required String ward,
+    required int? seller_id,
   }) async {
     prefs = await SharedPreferences.getInstance();
     prefs.setInt('id', id);
@@ -38,6 +39,7 @@ class Preferences {
     prefs.setString('city', city);
     prefs.setString('district', district);
     prefs.setString('ward', ward);
+    prefs.setInt('seller_id', seller_id ?? 0);
   }
 
   Future<void> setUserProfile({
@@ -81,6 +83,7 @@ class Preferences {
       'city': prefs.getString('city'),
       'district': prefs.getString('district'),
       'ward': prefs.getString('ward'),
+      'seller_id': prefs.getInt('seller_id'),
     };
   }
 
