@@ -1,7 +1,8 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import 'package:melijo/configs/firebase/database.dart';
+import 'package:melijo/configs/firebase/firebase.dart';
+import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/screens/buyers/dashboard/menu/home_buyers_screen.dart';
 import 'package:melijo/screens/buyers/dashboard/menu/profile_buyers_screen.dart';
 import 'package:melijo/screens/buyers/dashboard/menu/recipe_buyers_screen.dart';
@@ -37,15 +38,9 @@ class _DashboardBuyersScreenState extends State<DashboardBuyersScreen> {
     return Container();
   }
 
-  void subscribeTopic() async {
-    await FirebaseMessaging.instance
-        .getToken(vapidKey: FDatabase.firebaseApiKey);
-    await FirebaseMessaging.instance.subscribeToTopic('subscribe');
-  }
-
   @override
   Widget build(BuildContext context) {
-    subscribeTopic();
+    subscribeNotif();
     return Scaffold(
       body: generatePage(),
       bottomNavigationBar: BottomNavigationBar(

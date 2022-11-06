@@ -6,6 +6,7 @@ import 'package:melijo/bloc/buyers/cart_action/cart_action_bloc.dart';
 import 'package:melijo/bloc/buyers/melijo/melijo_buyer_bloc.dart';
 import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/recipe/recipe_buyers_bloc.dart';
+import 'package:melijo/bloc/buyers/recipe_favourite/recipe_favourite_bloc.dart';
 import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
 import 'package:melijo/bloc/sellers/transactions/transaction_seller_bloc.dart';
 import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
@@ -59,6 +60,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<RecipeBuyersBloc>(create: (context) => RecipeBuyersBloc()),
         BlocProvider<CartBuyersBloc>(create: (context) => CartBuyersBloc()),
         BlocProvider<CartActionBloc>(create: (context) => CartActionBloc()),
+        BlocProvider<RecipeFavouriteBloc>(create: (context) => RecipeFavouriteBloc()),
       ],
       child: MaterialApp(
         title: 'Melijo.id',

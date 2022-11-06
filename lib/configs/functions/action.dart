@@ -8,10 +8,11 @@ import 'package:melijo/bloc/buyers/cart/cart_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/melijo/melijo_buyer_bloc.dart';
 import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/recipe/recipe_buyers_bloc.dart';
+import 'package:melijo/bloc/buyers/recipe_favourite/recipe_favourite_bloc.dart';
 import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
 import 'package:melijo/bloc/sellers/transactions/transaction_seller_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
-import 'package:melijo/configs/firebase/database.dart';
+import 'package:melijo/configs/firebase/firebase.dart';
 import 'package:melijo/configs/preferences/preferences.dart';
 import 'package:melijo/models/buyers/cart_buyers_model.dart';
 import 'package:melijo/models/buyers/melijo_buyers_model.dart';
@@ -19,6 +20,7 @@ import 'package:melijo/models/buyers/product_buyers_model.dart';
 import 'package:melijo/models/buyers/product_recom_model.dart';
 import 'package:melijo/models/buyers/promo_buyers_model.dart';
 import 'package:melijo/models/buyers/recipe_buyers_model.dart';
+import 'package:melijo/models/buyers/recipe_favourite_model.dart';
 import 'package:melijo/models/sellers/product_seller_model.dart';
 import 'package:melijo/models/sellers/transaction_seller_model.dart';
 
@@ -470,11 +472,17 @@ Future<void> getRecipe(BuildContext context) async {
   try {
     final Map user_data = await preferences.getUser();
     final List<RecipeBuyersModel> listRecipe = [];
-    final List<dynamic> response = await api_request.retrieveRecipes(
+    final List<RecipeFavouriteModel> listRecipeFav = [];
+    final List<dynamic> recipes = await api_request.retrieveRecipes(
       user_data['token_type'],
       user_data['auth_token'],
     );
-    for (var element in response) {
+    final List<dynamic> recipe_fav = await api_request.retrieveRecipeFavourites(
+      user_data['id_detail'],
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    for (var element in recipes) {
       listRecipe.add(RecipeBuyersModel(
         id: element['id'],
         recipe_title: element['recipe_title'],
@@ -483,8 +491,33 @@ Future<void> getRecipe(BuildContext context) async {
         image: element['image'],
       ));
     }
-    context.read<RecipeBuyersBloc>().add(DeleteRecipe());
+    for (var element in recipe_fav) {
+      listRecipeFav.add(RecipeFavouriteModel(
+        id: element['id'],
+        user_customer_id: element['user_customer_id'],
+        recipe_id: element['recipe_id'],
+      ));
+    }
+    context.read<RecipeFavouriteBloc>().add(FillRecipeFav(recipeFavs: listRecipeFav));
     context.read<RecipeBuyersBloc>().add(FillRecipe(listRecipe: listRecipe));
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> addRecipeFav(int recipe_id) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    await api_request.newRecipeFav(user_data['id_detail'], recipe_id, user_data['token_type'], user_data['auth_token'],);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> deleteRecipeFav(int fav_id) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    await api_request.removeRecipeFav(fav_id, user_data['token_type'], user_data['auth_token'],);
   } catch (error) {
     return Future.error(error);
   }
@@ -614,7 +647,8 @@ Future<void> payment(String txid, XFile file, int pay) async {
 Future<List<ProductRecomModel>> retrieveProductRecom(int recipe_id) async {
   try {
     final Map user_data = await preferences.getUser();
-    final List<ProductRecomModel> response = await api_request.retrieveProductRecom(
+    final List<ProductRecomModel> response =
+        await api_request.retrieveProductRecom(
       recipe_id,
       user_data['token_type'],
       user_data['auth_token'],
@@ -701,3 +735,6 @@ Future<void> cancelTransaction(String txid) async {
   }
 }
 
+Future<void> subscribeNotif() async {
+  await database.subscribeTopic();
+}

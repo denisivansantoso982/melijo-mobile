@@ -14,6 +14,19 @@ class FDatabase {
 
   static String get firebaseApiKey => 'AIzaSyBErFLponN1KFAVlySNIVF0AoNIkmnsKao';
 
+  // ? Subscribe to Notification
+  Future<void> subscribeTopic() async {
+    await FirebaseMessaging.instance
+        .getToken(vapidKey: FDatabase.firebaseApiKey);
+    await FirebaseMessaging.instance.subscribeToTopic('melijo');
+  }
+
+  // Future<void> unsubscribeTopic() async {
+  //   await FirebaseMessaging.instance
+  //       .getToken(vapidKey: FDatabase.firebaseApiKey);
+  //   await FirebaseMessaging.instance.unsubscribeFromTopic('melijo');
+  // }
+
   // ? Set FCM Token
   Future<void> setUserWhenLogin(dynamic user_id, String fcm_token) async {
     try {
@@ -110,8 +123,7 @@ class FDatabase {
           .orderByChild('user')
           .equalTo(user_uid)
           .onChildAdded
-          .listen((event) {
-      });
+          .listen((event) {});
     } catch (error) {
       Exception(error);
     }

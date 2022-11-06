@@ -638,9 +638,7 @@ class ApiRequest {
 
   // ? Cancel Transaction
   Future<void> cancelTransactionCustomer(
-      String txid,
-      String token_type,
-      String token) async {
+      String txid, String token_type, String token) async {
     try {
       client = http.Client();
       final Map body = {
@@ -735,6 +733,73 @@ class ApiRequest {
         throw '${response.statusCode} ${response.reasonPhrase}';
       }
       return Future.value(decodedResponse['data']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Retrieve Recipe Favourite
+  Future<List> retrieveRecipeFavourites(
+      int customer_id, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client
+          .get(Uri.parse('$baseUrl/recipe_favourite/$customer_id'), headers: {
+        'Authorization': '$token_type $token',
+        'accept': 'application/json',
+        'content-type': 'application/json',
+      });
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      final List result = decodedResponse['data'];
+      return Future.value(result);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Add Recipe Favourite
+  Future<void> newRecipeFav(
+      int customer_id, int recipe_id, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final Map body = {
+        'user_customer_id': customer_id,
+        'recipe_id': recipe_id,
+      };
+      final http.Response response = await client.post(Uri.parse('$baseUrl/recipe_favourite'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Add Recipe Favourite
+  Future<void> removeRecipeFav(int fav_id, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.delete(
+        Uri.parse('$baseUrl/recipe_favourite/$fav_id'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      );
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
     } catch (error) {
       return Future.error(error);
     }
@@ -985,7 +1050,8 @@ class ApiRequest {
   }
 
   // ? Get Detail Transaction Seller
-  Future<List> getDetailTransactionSeller(String txid, String token_type, String token) async {
+  Future<List> getDetailTransactionSeller(
+      String txid, String token_type, String token) async {
     try {
       client = http.Client();
       final http.Response response = await client.get(
@@ -1005,5 +1071,4 @@ class ApiRequest {
       return Future.error(error);
     }
   }
-
 }
