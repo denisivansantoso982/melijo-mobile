@@ -1,9 +1,11 @@
 // ignore_for_file: non_constant_identifier_names, use_build_context_synchronously
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:melijo/bloc/buyers/cart/cart_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/melijo/melijo_buyer_bloc.dart';
 import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/recipe/recipe_buyers_bloc.dart';
@@ -12,8 +14,10 @@ import 'package:melijo/bloc/sellers/transactions/transaction_seller_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/firebase/database.dart';
 import 'package:melijo/configs/preferences/preferences.dart';
+import 'package:melijo/models/buyers/cart_buyers_model.dart';
 import 'package:melijo/models/buyers/melijo_buyers_model.dart';
 import 'package:melijo/models/buyers/product_buyers_model.dart';
+import 'package:melijo/models/buyers/promo_buyers_model.dart';
 import 'package:melijo/models/buyers/recipe_buyers_model.dart';
 import 'package:melijo/models/sellers/product_seller_model.dart';
 import 'package:melijo/models/sellers/transaction_seller_model.dart';
@@ -443,6 +447,7 @@ Future<void> getProductsBuyers(BuildContext context, int seller_id) async {
         product_name: element['product_name'],
         image_uri: element['image'],
         description: element['description'],
+        user_seller_id: element['user_seller_id'],
       ));
     }
     context.read<ProductBuyersBloc>().add(const DeleteProductBuyer());
@@ -466,15 +471,134 @@ Future<void> getRecipe(BuildContext context) async {
       listRecipe.add(RecipeBuyersModel(
         id: element['id'],
         recipe_title: element['recipe_title'],
-        recipe_level: element['recipe_level'],
+        category_id: element['recipe_category_id'],
         step: element['step'],
         image: element['image'],
       ));
     }
     context.read<RecipeBuyersBloc>().add(DeleteRecipe());
-    context
-        .read<RecipeBuyersBloc>()
-        .add(FillRecipe(listRecipe: listRecipe));
+    context.read<RecipeBuyersBloc>().add(FillRecipe(listRecipe: listRecipe));
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> addToCart(int product_id, int quantity) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    await api_request.addProductToCart(
+      product_id,
+      user_data['id_detail'],
+      quantity,
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> retrieveCart(BuildContext context) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List<CartBuyersModel> listCart = [];
+    final List<dynamic> response = await api_request.retrieveCart(
+      user_data['id_detail'],
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    for (var element in response) {
+      listCart.add(CartBuyersModel(
+        id: element['cart_id'],
+        product_id: element['product_id'],
+        user_customer_id: element['user_customer_id'],
+        quantity: element['quantity'],
+        product: ProductBuyersModel(
+          id: element['product_id'],
+          price: element['price'],
+          category_id: element['category_id'],
+          unit_id: element['unit_id'],
+          product_name: element['product_name'],
+          image_uri: element['image'],
+          description: element['description'],
+          user_seller_id: element['user_seller_id'],
+        ),
+      ));
+    }
+    // context.read<CartBuyersBloc>().add(DeleteCart());
+    context.read<CartBuyersBloc>().add(FillCart(carts: listCart));
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> deleteProductCart(BuildContext context, int cart_id) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    await api_request.deleteProductCart(
+      cart_id,
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<List<PromoBuyersModel>> getPromos() async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List<PromoBuyersModel> listPromo = [];
+    final List<dynamic> response = await api_request.retrievePromo(
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    for (var element in response) {
+      listPromo.add(PromoBuyersModel(
+        promo_code: element['promo_code'],
+        promo_title: element['promo_title'],
+        promo_description: element['promo_description'],
+        promo_end: element['promo_end'],
+        promo_total: element['promo_total'],
+      ));
+    }
+    return Future.value(listPromo);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<Map> addTransaction(List<CartBuyersModel> carts, PromoBuyersModel? promo,
+    DateTime date_distribution, int total, String distribution_info) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    Map response = await api_request.addNewTransacion(
+      user_data['id_detail'],
+      carts[0].product.user_seller_id,
+      promo?.promo_code,
+      date_distribution,
+      total,
+      distribution_info,
+      carts,
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    return Future.value(response);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> payment(String txid, XFile file, int pay) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    await api_request.payment(
+      txid,
+      file,
+      pay,
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
   } catch (error) {
     return Future.error(error);
   }

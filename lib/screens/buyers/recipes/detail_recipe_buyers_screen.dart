@@ -1,7 +1,10 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, unused_import
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_html/flutter_html.dart';
+import 'package:melijo/configs/api/api_request.dart';
+import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/models/buyers/recipe_buyers_model.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
@@ -19,6 +22,7 @@ class DetailRecipeBuyersScreen extends StatefulWidget {
 class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
+  late RecipeBuyersModel recipe;
   final List<Map<String, dynamic>> _listOfProducts = [
     {
       'name': 'Bawang Daun',
@@ -42,6 +46,7 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
       'checked': true,
     },
   ];
+  late String htmlData;
 
   @override
   void dispose() {
@@ -50,6 +55,7 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
     super.dispose();
   }
 
+  // ! Total Price
   double totalPrice() {
     double total = 0;
     for (var element in _listOfProducts) {
@@ -58,9 +64,19 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
     return total;
   }
 
+  // ! render recipe picture
+  ImageProvider<Object> renderImage(RecipeBuyersModel recipe) {
+    if (recipe.image == null || recipe.image == '') {
+      return const AssetImage('lib/assets/images/recipe.png');
+    }
+    return NetworkImage('${ApiRequest.baseStorageUrl}/${recipe.image}');
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    final Map<String, dynamic> arguments = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    recipe = ModalRoute.of(context)!.settings.arguments as RecipeBuyersModel;
+    htmlData = recipe.step;
     final Size screenSize = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
@@ -108,7 +124,8 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () => Navigator.of(context).pushNamed(NotificationBuyersScreen.route),
+            onPressed: () =>
+                Navigator.of(context).pushNamed(NotificationBuyersScreen.route),
             color: Colours.white,
             iconSize: 28,
             icon: const Icon(Icons.notifications_outlined),
@@ -120,31 +137,18 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
         children: [
           // *Recipe Image
           Image(
-            image: AssetImage('lib/assets/images/recipes/${arguments['image']}'),
+            image: renderImage(recipe),
             fit: BoxFit.cover,
             width: screenSize.width,
             height: screenSize.width * 0.7,
           ),
           const SizedBox(height: 16),
-          // *Difficulty
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              'Tingkat Kesulitan : ${arguments['difficulty']}',
-              style: const TextStyle(
-                color: Colours.deepGreen,
-                fontSize: 18,
-                fontFamily: FontStyles.leagueSpartan,
-                fontWeight: FontStyles.regular,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
+          // const SizedBox(height: 12),
           // *Recipe Name
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             child: Text(
-              '${arguments['name']}',
+              recipe.recipe_title,
               style: const TextStyle(
                 color: Colours.black,
                 fontSize: 28,
@@ -154,61 +158,25 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
             ),
           ),
           const SizedBox(height: 24),
-          // *Ingredients
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              'Bahan',
-              style: TextStyle(
-                color: Colours.gray,
-                fontSize: 20,
-                fontFamily: FontStyles.leagueSpartan,
-                fontWeight: FontStyles.medium,
-              ),
-            ),
+          // *Cook Ingredients and Procedure
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Html(data: htmlData),
           ),
-          const SizedBox(height: 8),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id varius urna, vel facilisis diam. Donec auctor pretium porta. Aenean in odio at est hendrerit rhoncus vel sit amet tortor. Aenean consequat ...',
-              style: TextStyle(
-                color: Colours.gray,
-                fontSize: 18,
-                fontFamily: FontStyles.leagueSpartan,
-                fontWeight: FontStyles.regular,
-                height: 1.4,
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          // *Cook Procedure
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              'Cara Memasak',
-              style: TextStyle(
-                color: Colours.gray,
-                fontSize: 20,
-                fontFamily: FontStyles.leagueSpartan,
-                fontWeight: FontStyles.medium,
-              ),
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Text(
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id varius urna, vel facilisis diam. Donec auctor pretium porta. Aenean in odio at est hendrerit rhoncus vel sit amet tortor. Aenean consequat ...',
-              style: TextStyle(
-                color: Colours.gray,
-                fontSize: 18,
-                fontFamily: FontStyles.leagueSpartan,
-                fontWeight: FontStyles.regular,
-                height: 1.4,
-              ),
-            ),
-          ),
+          // const SizedBox(height: 8),
+          // const Padding(
+          //   padding: EdgeInsets.symmetric(horizontal: 12),
+          //   child: Text(
+          //     'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis id varius urna, vel facilisis diam. Donec auctor pretium porta. Aenean in odio at est hendrerit rhoncus vel sit amet tortor. Aenean consequat ...',
+          //     style: TextStyle(
+          //       color: Colours.gray,
+          //       fontSize: 18,
+          //       fontFamily: FontStyles.leagueSpartan,
+          //       fontWeight: FontStyles.regular,
+          //       height: 1.4,
+          //     ),
+          //   ),
+          // ),
           const SizedBox(height: 24),
           // *Recommendation Ingredients of Recipe
           const Padding(
@@ -223,154 +191,157 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
               ),
             ),
           ),
-          const SizedBox(height: 8),
-          ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            shrinkWrap: true,
-            physics: const ScrollPhysics(),
-            itemCount: _listOfProducts.length,
-            itemBuilder: (context, index) => Card(
-              margin: const EdgeInsets.symmetric(vertical: 4),
-              elevation: 4,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(12)),
-              ),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Expanded(
-                    flex: 2,
-                    child: Stack(
-                      children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(12),
-                            bottomLeft: Radius.circular(12),
-                          ),
-                          child: Image(
-                            image: AssetImage('lib/assets/images/products/${_listOfProducts[index]['image']}'),
-                            fit: BoxFit.cover,
-                            height: 80,
-                          ),
-                        ),
-                        Checkbox(
-                          value: _listOfProducts[index]['checked'],
-                          checkColor: Colours.white,
-                          activeColor: Colours.deepGreen,
-                          side: BorderSide(
-                            color: _listOfProducts[index]['checked'] ? Colours.deepGreen : Colours.white,
-                            width: 2,
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              _listOfProducts[index]['checked'] = !_listOfProducts[index]['checked'];
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    flex: 4,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // *Total Price
-                          Text(
-                            'Rp${NumberFormat('###,###').format(_listOfProducts[index]['price']).replaceAll(',', '.')}',
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              fontFamily: FontStyles.lora,
-                              color: Colours.deepGreen,
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          // *Product Name
-                          Text(
-                            _listOfProducts[index]['name'],
-                            softWrap: true,
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontStyles.regular,
-                              fontFamily: FontStyles.leagueSpartan,
-                              color: Colours.black.withOpacity(.8),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      setState(() {
-                        _listOfProducts.removeAt(index);
-                      });
-                    },
-                    icon: const Icon(
-                      Icons.delete_outline_rounded,
-                      color: Colours.black,
-                      size: 36,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          // *Total and Buy Button
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Total Harga',
-                      style: TextStyle(
-                        color: Colours.black,
-                        fontSize: 14,
-                        fontWeight: FontStyles.regular,
-                        fontFamily: FontStyles.leagueSpartan,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Rp${totalPrice().round()}',
-                      style: const TextStyle(
-                        color: Colours.black,
-                        fontSize: 16,
-                        fontWeight: FontStyles.bold,
-                        fontFamily: FontStyles.leagueSpartan,
-                      ),
-                    ),
-                  ],
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 48)
-                  ),
-                  child: Text(
-                    'Beli (${_listOfProducts.where((element) => element['checked'] == true).length})',
-                    style: const TextStyle(
-                      color: Colours.white,
-                      fontSize: 14,
-                      fontWeight: FontStyles.medium,
-                      fontFamily: FontStyles.leagueSpartan,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
+          // const SizedBox(height: 8),
+          // ListView.builder(
+          //   padding: const EdgeInsets.symmetric(horizontal: 12),
+          //   shrinkWrap: true,
+          //   physics: const ScrollPhysics(),
+          //   itemCount: _listOfProducts.length,
+          //   itemBuilder: (context, index) => Card(
+          //     margin: const EdgeInsets.symmetric(vertical: 4),
+          //     elevation: 4,
+          //     shape: const RoundedRectangleBorder(
+          //       borderRadius: BorderRadius.all(Radius.circular(12)),
+          //     ),
+          //     child: Row(
+          //       crossAxisAlignment: CrossAxisAlignment.center,
+          //       children: [
+          //         Expanded(
+          //           flex: 2,
+          //           child: Stack(
+          //             children: [
+          //               ClipRRect(
+          //                 borderRadius: const BorderRadius.only(
+          //                   topLeft: Radius.circular(12),
+          //                   bottomLeft: Radius.circular(12),
+          //                 ),
+          //                 child: Image(
+          //                   image: AssetImage(
+          //                       'lib/assets/images/products/${_listOfProducts[index]['image']}'),
+          //                   fit: BoxFit.cover,
+          //                   height: 80,
+          //                 ),
+          //               ),
+          //               Checkbox(
+          //                 value: _listOfProducts[index]['checked'],
+          //                 checkColor: Colours.white,
+          //                 activeColor: Colours.deepGreen,
+          //                 side: BorderSide(
+          //                   color: _listOfProducts[index]['checked']
+          //                       ? Colours.deepGreen
+          //                       : Colours.white,
+          //                   width: 2,
+          //                 ),
+          //                 onChanged: (value) {
+          //                   setState(() {
+          //                     _listOfProducts[index]['checked'] =
+          //                         !_listOfProducts[index]['checked'];
+          //                   });
+          //                 },
+          //               ),
+          //             ],
+          //           ),
+          //         ),
+          //         const SizedBox(width: 8),
+          //         Expanded(
+          //           flex: 4,
+          //           child: Padding(
+          //             padding: const EdgeInsets.all(8.0),
+          //             child: Column(
+          //               crossAxisAlignment: CrossAxisAlignment.start,
+          //               children: [
+          //                 // *Total Price
+          //                 Text(
+          //                   'Rp. ${thousandFormat(_listOfProducts[index]['price'])}',
+          //                   style: const TextStyle(
+          //                     fontSize: 22,
+          //                     fontWeight: FontWeight.bold,
+          //                     fontFamily: FontStyles.lora,
+          //                     color: Colours.deepGreen,
+          //                   ),
+          //                 ),
+          //                 const SizedBox(height: 12),
+          //                 // *Product Name
+          //                 Text(
+          //                   _listOfProducts[index]['name'],
+          //                   softWrap: true,
+          //                   style: TextStyle(
+          //                     fontSize: 18,
+          //                     fontWeight: FontStyles.regular,
+          //                     fontFamily: FontStyles.leagueSpartan,
+          //                     color: Colours.black.withOpacity(.8),
+          //                   ),
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
+          //         ),
+          //         IconButton(
+          //           onPressed: () {
+          //             setState(() {
+          //               _listOfProducts.removeAt(index);
+          //             });
+          //           },
+          //           icon: const Icon(
+          //             Icons.delete_outline_rounded,
+          //             color: Colours.black,
+          //             size: 36,
+          //           ),
+          //         ),
+          //       ],
+          //     ),
+          //   ),
+          // ),
+          // const SizedBox(height: 24),
+          // // *Total and Buy Button
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 20),
+          //   child: Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Column(
+          //         mainAxisAlignment: MainAxisAlignment.center,
+          //         crossAxisAlignment: CrossAxisAlignment.start,
+          //         children: [
+          //           const Text(
+          //             'Total Harga',
+          //             style: TextStyle(
+          //               color: Colours.black,
+          //               fontSize: 14,
+          //               fontWeight: FontStyles.regular,
+          //               fontFamily: FontStyles.leagueSpartan,
+          //             ),
+          //           ),
+          //           const SizedBox(height: 2),
+          //           Text(
+          //             'Rp${totalPrice().round()}',
+          //             style: const TextStyle(
+          //               color: Colours.black,
+          //               fontSize: 16,
+          //               fontWeight: FontStyles.bold,
+          //               fontFamily: FontStyles.leagueSpartan,
+          //             ),
+          //           ),
+          //         ],
+          //       ),
+          //       ElevatedButton(
+          //         onPressed: () {},
+          //         style: ElevatedButton.styleFrom(
+          //             padding: const EdgeInsets.symmetric(horizontal: 48)),
+          //         child: Text(
+          //           'Beli (${_listOfProducts.where((element) => element['checked'] == true).length})',
+          //           style: const TextStyle(
+          //             color: Colours.white,
+          //             fontSize: 14,
+          //             fontWeight: FontStyles.medium,
+          //             fontFamily: FontStyles.leagueSpartan,
+          //           ),
+          //         ),
+          //       ),
+          //     ],
+          //   ),
+          // ),
+          // const SizedBox(height: 8),
         ],
       ),
     );

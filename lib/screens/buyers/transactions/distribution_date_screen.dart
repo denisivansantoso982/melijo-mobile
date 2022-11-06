@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/models/buyers/cart_buyers_model.dart';
 import 'package:melijo/screens/buyers/transactions/distribution_address_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
@@ -18,6 +20,7 @@ class DistributionDateScreen extends StatefulWidget {
 class _DistributionDateScreenState extends State<DistributionDateScreen> {
   int _selectedDateIndex = -1;
   final List<DateTime> _listOfDate = [];
+  late List<CartBuyersModel> _listCart;
 
   @override
   void initState() {
@@ -26,18 +29,19 @@ class _DistributionDateScreenState extends State<DistributionDateScreen> {
     super.initState();
   }
 
-  double totalPrice(List _listOfCart) {
-    double total = 0;
-    for (var element in _listOfCart) {
-      if (element['checked']) total += element['price'] * element['quantity'];
+  int totalPrice() {
+    int total = 0;
+    for (var element in _listCart) {
+      if (element.checked) {
+        total += element.product.price * element.quantity;
+      }
     }
     return total;
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<dynamic> arguments =
-        ModalRoute.of(context)!.settings.arguments as List;
+    _listCart = ModalRoute.of(context)!.settings.arguments as List<CartBuyersModel>;
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
@@ -88,7 +92,9 @@ class _DistributionDateScreenState extends State<DistributionDateScreen> {
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.all(24),
                   side: BorderSide(
-                    color: _selectedDateIndex == index ? Colours.deepGreen : Colours.gray,
+                    color: _selectedDateIndex == index
+                        ? Colours.deepGreen
+                        : Colours.gray,
                     width: 2,
                   ),
                 ),
@@ -100,7 +106,9 @@ class _DistributionDateScreenState extends State<DistributionDateScreen> {
                 child: Text(
                   DateFormat('EEEE, dd MMMM yyyy').format(_listOfDate[index]),
                   style: TextStyle(
-                    color: _selectedDateIndex == index ? Colours.deepGreen : Colours.gray,
+                    color: _selectedDateIndex == index
+                        ? Colours.deepGreen
+                        : Colours.gray,
                     fontSize: 16,
                     fontWeight: FontStyles.regular,
                     fontFamily: FontStyles.leagueSpartan,
@@ -108,7 +116,8 @@ class _DistributionDateScreenState extends State<DistributionDateScreen> {
                 ),
               ),
             ),
-          ),],
+          ),
+        ],
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
@@ -139,7 +148,7 @@ class _DistributionDateScreenState extends State<DistributionDateScreen> {
                   ),
                 ),
                 Text(
-                  'Rp${totalPrice(arguments).round()}',
+                  'Rp. ${thousandFormat(totalPrice().round())}',
                   style: const TextStyle(
                     color: Colours.black,
                     fontSize: 16,
@@ -153,14 +162,15 @@ class _DistributionDateScreenState extends State<DistributionDateScreen> {
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 48),
-                backgroundColor: _selectedDateIndex < 0 ? Colours.gray : Colours.deepGreen,
+                backgroundColor:
+                    _selectedDateIndex < 0 ? Colours.gray : Colours.deepGreen,
               ),
               onPressed: () {
                 if (_selectedDateIndex < 0) return;
                 Navigator.of(context).pushNamed(
                   DistributionAddressScreen.route,
                   arguments: {
-                    'products': arguments,
+                    'products': _listCart,
                     'distribution_date': _listOfDate[_selectedDateIndex],
                   },
                 );

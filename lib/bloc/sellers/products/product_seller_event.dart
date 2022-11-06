@@ -22,3 +22,8 @@ class DeleteProductSeller extends ProductSellerEvent {
   @override
   List<Object> get props => [];
 }
+
+class RestoreProductSeller extends ProductSellerEvent {
+  @override
+  List<Object> get props => [];
+}

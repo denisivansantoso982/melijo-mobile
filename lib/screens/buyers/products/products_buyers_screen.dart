@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
-import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/models/buyers/melijo_buyers_model.dart';

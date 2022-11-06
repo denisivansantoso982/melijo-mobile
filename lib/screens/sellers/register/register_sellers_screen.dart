@@ -688,7 +688,7 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
             ),
             inputFormatters: [
               FilteringTextInputFormatter.deny(RegExp(r'0-9')),
-              LengthLimitingTextInputFormatter(20),
+              LengthLimitingTextInputFormatter(13),
             ],
             decoration: const InputDecoration(
               border: OutlineInputBorder(

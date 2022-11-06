@@ -1,9 +1,11 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, no_leading_underscores_for_local_identifiers
 
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:melijo/models/buyers/cart_buyers_model.dart';
 import 'package:melijo/models/sellers/product_seller_model.dart';
 
 class ApiRequest {
@@ -557,11 +559,9 @@ class ApiRequest {
         },
         body: jsonEncode(body),
       );
-      // final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
         throw '${response.statusCode} ${response.reasonPhrase}';
       }
-      // return Future.value(decodedResponse['data']['transaction']);
     } catch (error) {
       return Future.error(error);
     }
@@ -608,8 +608,8 @@ class ApiRequest {
       String ward, String token_type, String token) async {
     try {
       client = http.Client();
-      final http.Response response = await client
-          .get(Uri.parse('$baseUrl/user_seller/$ward'), headers: {
+      final http.Response response =
+          await client.get(Uri.parse('$baseUrl/user_seller/$ward'), headers: {
         'Authorization': '$token_type $token',
         'accept': 'application/json',
         'content-type': 'application/json',
@@ -628,8 +628,8 @@ class ApiRequest {
   Future<List<dynamic>> retrieveRecipes(String token_type, String token) async {
     try {
       client = http.Client();
-      final http.Response response = await client
-          .get(Uri.parse('$baseUrl/recipe'), headers: {
+      final http.Response response =
+          await client.get(Uri.parse('$baseUrl/recipe'), headers: {
         'Authorization': '$token_type $token',
         'accept': 'application/json',
         'content-type': 'application/json',
@@ -644,5 +644,175 @@ class ApiRequest {
     }
   }
 
+  // ? Add to Cart
+  Future<void> addProductToCart(
+    int product_id,
+    int customer_id,
+    int quantity,
+    String token_type,
+    String token,
+  ) async {
+    try {
+      client = http.Client();
+      final Map body = {
+        'user_customer_id': customer_id,
+        'product_id': product_id,
+        'quantity': quantity,
+      };
+      final http.Response response = await client.post(
+        Uri.parse('$baseUrl/cart'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
 
+  // ? Retrieve Cart
+  Future<List<dynamic>> retrieveCart(
+      int customer_id, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+        Uri.parse('$baseUrl/cart/$customer_id'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      );
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(decodedResponse['data']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Delete Product Cart
+  Future<void> deleteProductCart(
+      int cart_id, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.delete(
+        Uri.parse('$baseUrl/cart/$cart_id/destroy'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      );
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Add Transaction
+  Future<Map> addNewTransacion(
+    int user_customer_id,
+    int user_seller_id,
+    String? promo_code,
+    DateTime date_order,
+    int total,
+    String info_address,
+    List<CartBuyersModel> carts,
+    String token_type,
+    String token,
+  ) async {
+    try {
+      client = http.Client();
+      final List<int> cart_ids = [];
+      for (CartBuyersModel cart in carts) {
+        cart_ids.add(cart.id);
+      }
+      final Map body = {
+        'user_customer_id': user_customer_id,
+        'user_seller_id': user_seller_id,
+        'user_operator_id': null,
+        'promo_code': promo_code,
+        'date_order': date_order.toString(),
+        'total': total,
+        'information': info_address,
+        'cart_id': jsonEncode(cart_ids),
+      };
+      final http.Response response = await client.post(
+        Uri.parse('$baseUrl/transaction'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+      final Map responseDecoded = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(responseDecoded['data']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Retrieve Promo
+  Future<List> retrievePromo(String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+        Uri.parse('$baseUrl/promo'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+      );
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(decodedResponse['data']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Pay
+  Future<void> payment(
+    String txid,
+    XFile file,
+    int pay,
+    String token_type,
+    String token,
+  ) async {
+    try {
+      final List<int> imageBytes = await file.readAsBytes();
+      final http.MultipartRequest request = http.MultipartRequest('POST', Uri.parse('$baseUrl/payment'),);
+      request.headers.addAll({'Authorization': '$token_type $token'});
+      request.fields.addAll({'txid': txid, 'pay': '$pay'});
+      request.files.add(http.MultipartFile.fromBytes(
+        'evidence_of_transfer',
+        imageBytes,
+        filename: file.name,
+      ));
+      final http.StreamedResponse response = await request.send();
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
 }

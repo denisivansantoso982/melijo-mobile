@@ -6,14 +6,14 @@ class RecipeBuyersModel extends Equatable {
   const RecipeBuyersModel({
     required this.id,
     required this.recipe_title,
-    required this.recipe_level,
+    required this.category_id,
     required this.step,
     this.image,
   });
 
   final int id;
   final String recipe_title;
-  final String recipe_level;
+  final int category_id;
   final String step;
   final String? image;
 
@@ -21,7 +21,7 @@ class RecipeBuyersModel extends Equatable {
   List<Object?> get props => [
     id,
     recipe_title,
-    recipe_level,
+    category_id,
     step,
     image,
   ];

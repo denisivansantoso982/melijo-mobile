@@ -1,10 +1,17 @@
-// ignore_for_file: library_private_types_in_public_api, non_constant_identifier_names
+// ignore_for_file: library_private_types_in_public_api, non_constant_identifier_names, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/models/buyers/cart_buyers_model.dart';
+import 'package:melijo/models/buyers/promo_buyers_model.dart';
 import 'package:melijo/screens/buyers/transactions/payment_method_screen.dart';
+import 'package:melijo/screens/buyers/transactions/payment_proof_screen.dart';
 import 'package:melijo/screens/buyers/transactions/promo_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
+import 'package:melijo/widgets/loading_widget.dart';
+import 'package:melijo/widgets/modal_bottom.dart';
 
 class PaymentScreen extends StatefulWidget {
   const PaymentScreen({Key? key}) : super(key: key);
@@ -16,27 +23,138 @@ class PaymentScreen extends StatefulWidget {
 }
 
 class _PaymentScreenState extends State<PaymentScreen> {
-  late List<Map> products;
+  late List<CartBuyersModel> carts;
+  late DateTime date_distribution;
+  late String distribution_info;
+  final List<PromoBuyersModel> _promoList = [];
   String? payment_method;
   String? selected_promo;
   bool paid = false;
+  bool isExpandedPaymentMethod = false;
+  bool isExpandedPromo = false;
+
+  @override
+  void initState() {
+    getPromo();
+    super.initState();
+  }
+
+  Future<void> getPromo() async {
+    try {
+      final List<PromoBuyersModel> listPromo = await getPromos();
+      setState(() {
+        _promoList.addAll(listPromo);
+      });
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+  }
 
   int totalEachProduct(int index) {
-    return products[index]['price'] * products[index]['quantity'];
+    return carts[index].product.price * carts[index].quantity;
   }
 
   int totalProduct() {
-    int total = 0;
-    for (Map element in products) {
-      total += (element['price'] * element['quantity']) as int;
+    int subTotal = 0;
+    for (CartBuyersModel element in carts) {
+      subTotal += element.product.price * element.quantity;
     }
-    return total;
+    for (PromoBuyersModel promo
+        in _promoList.where((element) => element.checked)) {
+      subTotal -= promo.promo_total;
+    }
+    return subTotal;
+  }
+
+  Future<void> newTransaction() async {
+    try {
+      LoadingWidget.show(context);
+      PromoBuyersModel? promo = _promoList.where((element) => element.checked).isEmpty ? null : _promoList.firstWhere((element) => element.checked);
+      final Map transaction = await addTransaction(carts, promo, date_distribution, totalProduct(), distribution_info);
+      LoadingWidget.close(context);
+      Navigator.of(context).pushNamed(
+        PaymentProofScreen.route,
+        arguments: {
+          'transactions': transaction,
+          'total': totalProduct(),
+        },
+      );
+    } catch (error) {
+      LoadingWidget.close(context);
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
-    products = arguments['products'];
+    carts = arguments['products'];
+    date_distribution = arguments['distribution_date'];
+    distribution_info = arguments['distribution_info'];
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
@@ -68,7 +186,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ListView.builder(
             shrinkWrap: true,
             physics: const ScrollPhysics(),
-            itemCount: products.length,
+            itemCount: carts.length,
             itemBuilder: (context, index) => Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -76,7 +194,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 Expanded(
                   flex: 3,
                   child: Text(
-                    '${products[index]['name']} (x${products[index]['quantity']})',
+                    '${carts[index].product.product_name} (x${carts[index].quantity})',
                     style: const TextStyle(
                       color: Colours.black,
                       fontFamily: FontStyles.leagueSpartan,
@@ -90,7 +208,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                 Expanded(
                   flex: 1,
                   child: Text(
-                    'Rp${totalEachProduct(index)}',
+                    'Rp. ${thousandFormat(totalEachProduct(index))}',
                     textAlign: TextAlign.end,
                     style: const TextStyle(
                       color: Colours.gray,
@@ -129,7 +247,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
           Container(
             alignment: Alignment.topRight,
             child: Text(
-              'Rp${totalProduct()}',
+              'Rp. ${thousandFormat(totalProduct())}',
               style: const TextStyle(
                 color: Colours.gray,
                 fontSize: 16,
@@ -138,139 +256,323 @@ class _PaymentScreenState extends State<PaymentScreen> {
           ),
           const SizedBox(height: 24),
           // * Payment Method
-          GestureDetector(
-            onTap: () async {
-              String? result = await Navigator.of(context)
-                  .pushNamed(PaymentMethodScreen.route) as String?;
+          ExpansionPanelList(
+            expansionCallback: (int item, bool status) {
               setState(() {
-                payment_method = result;
+                isExpandedPaymentMethod = !isExpandedPaymentMethod;
               });
             },
-            child: Card(
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        payment_method ?? 'Pilih Metode Pembayaran',
-                        style: const TextStyle(
-                          color: Colours.black,
-                          fontSize: 16,
-                          fontFamily: FontStyles.leagueSpartan,
-                        ),
-                      ),
-                    ),
-                    const Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 32,
-                      color: Colours.black,
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          // * Promo
-          GestureDetector(
-            onTap: () async {
-              String? result = await Navigator.of(context)
-                  .pushNamed(PromoScreen.route) as String?;
-              setState(() {
-                selected_promo = result;
-              });
-            },
-            child: Card(
-              elevation: 4,
-              child: Padding(
-                padding: const EdgeInsets.all(18),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Text(
-                        selected_promo ?? 'Pilih Promo yang Tersedia',
-                        style: const TextStyle(
-                          color: Colours.black,
-                          fontSize: 16,
-                          fontFamily: FontStyles.leagueSpartan,
-                        ),
-                      ),
-                    ),
-                    const Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 32,
-                      color: Colours.black,
-                    )
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Visibility(
-            visible: payment_method == null ? false : true,
-            child: Column(
-              children: [
-                const Text(
-                  'Midtrans adalah salah satu layanan online terbaik yang dapat memudahkan anda dalam menyelesaikan proses pembayaran dengan cepat',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colours.black,
-                    fontSize: 16,
-                    fontFamily: FontStyles.leagueSpartan,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 28),
-                const Text(
-                  'Silahkan Klik Tombol dibawah untuk transaksi',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colours.black,
-                    fontSize: 16,
-                    fontFamily: FontStyles.leagueSpartan,
-                    height: 1.4,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(16),
-                  ),
-                  onPressed: () {
-                    setState(() {
-                      paid = true;
-                    });
-                  },
+            children: [
+              ExpansionPanel(
+                isExpanded: isExpandedPaymentMethod,
+                headerBuilder: (context, isExpanded) => Container(
+                  padding: const EdgeInsets.all(18),
                   child: const Text(
-                    'Bayar',
+                    'Online Payment Via Transfer',
                     style: TextStyle(
-                      color: Colours.white,
-                      fontSize: 18,
-                      fontWeight: FontStyles.medium,
+                      color: Colours.black,
+                      fontSize: 16,
                       fontFamily: FontStyles.leagueSpartan,
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
-                Text(
-                  paid
-                      ? 'Status : Anda sudah membayar'
-                      : 'Status : Anda belum membayar',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: paid ? Colours.deepGreen : Colours.gray,
-                    fontSize: 20,
-                    fontFamily: FontStyles.lora,
-                    fontWeight: FontStyles.medium,
+                body: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Card(
+                            child: Text(
+                              '1',
+                              style: TextStyle(
+                                color: Colours.deepGreen,
+                                fontSize: 16,
+                                fontWeight: FontStyles.bold,
+                                fontFamily: FontStyles.leagueSpartan,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Pilih transfer ke rekening berikut :',
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                    color: Colours.black,
+                                    fontSize: 16,
+                                    fontFamily: FontStyles.leagueSpartan,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                // * BCA
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Image(
+                                      image: AssetImage(
+                                          'lib/assets/images/bca.png'),
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.center,
+                                      height: 16,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      '3160330341\nan Farah Fathimah Azzahra',
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.fade,
+                                      style: TextStyle(
+                                        color: Colours.gray,
+                                        fontSize: 16,
+                                        height: 1.1,
+                                        fontWeight: FontStyles.regular,
+                                        fontFamily: FontStyles.leagueSpartan,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await Clipboard.setData(
+                                            const ClipboardData(
+                                                text: '3160330341'));
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                          content:
+                                              Text('Nomor Rekening tersalin!'),
+                                          backgroundColor: Colours.deepGreen,
+                                        ));
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                            color: Colours.deepGreen
+                                                .withOpacity(.25),
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(64))),
+                                        child: const Text(
+                                          'SALIN',
+                                          style: TextStyle(
+                                            color: Colours.deepGreen,
+                                            fontSize: 16,
+                                            fontWeight: FontStyles.regular,
+                                            fontFamily:
+                                                FontStyles.leagueSpartan,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                // * BRI
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Image(
+                                      image: AssetImage(
+                                          'lib/assets/images/bri.png'),
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.center,
+                                      height: 16,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      '0554 0103 1005 509\nan Habib Fitriana Azzahra',
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.fade,
+                                      style: TextStyle(
+                                        color: Colours.gray,
+                                        fontSize: 16,
+                                        height: 1.1,
+                                        fontWeight: FontStyles.regular,
+                                        fontFamily: FontStyles.leagueSpartan,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await Clipboard.setData(
+                                            const ClipboardData(
+                                                text: '0554 0103 1005 509'));
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                          content:
+                                              Text('Nomor Rekening tersalin!'),
+                                          backgroundColor: Colours.deepGreen,
+                                        ));
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                            color: Colours.deepGreen
+                                                .withOpacity(.25),
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(64))),
+                                        child: const Text(
+                                          'SALIN',
+                                          style: TextStyle(
+                                            color: Colours.deepGreen,
+                                            fontSize: 16,
+                                            fontWeight: FontStyles.regular,
+                                            fontFamily:
+                                                FontStyles.leagueSpartan,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                // * BTN
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Image(
+                                      image: AssetImage(
+                                          'lib/assets/images/btn.png'),
+                                      fit: BoxFit.cover,
+                                      alignment: Alignment.center,
+                                      height: 16,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    const Text(
+                                      '6221 0082 0861 3128\nan Habib Fitriana Azzahra',
+                                      textAlign: TextAlign.center,
+                                      overflow: TextOverflow.fade,
+                                      style: TextStyle(
+                                        color: Colours.gray,
+                                        fontSize: 16,
+                                        height: 1.1,
+                                        fontWeight: FontStyles.regular,
+                                        fontFamily: FontStyles.leagueSpartan,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await Clipboard.setData(
+                                            const ClipboardData(
+                                                text: '6221 0082 0861 3128'));
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                          content:
+                                              Text('Nomor Rekening tersalin!'),
+                                          backgroundColor: Colours.deepGreen,
+                                        ));
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.all(12),
+                                        decoration: BoxDecoration(
+                                            color: Colours.deepGreen
+                                                .withOpacity(.25),
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                                    Radius.circular(64))),
+                                        child: const Text(
+                                          'SALIN',
+                                          style: TextStyle(
+                                            color: Colours.deepGreen,
+                                            fontSize: 16,
+                                            fontWeight: FontStyles.regular,
+                                            fontFamily:
+                                                FontStyles.leagueSpartan,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Card(
+                            child: Text(
+                              '2',
+                              style: TextStyle(
+                                color: Colours.deepGreen,
+                                fontSize: 16,
+                                fontWeight: FontStyles.bold,
+                                fontFamily: FontStyles.leagueSpartan,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Kirimkan bukti bayar di kolom kanan bawah',
+                              textAlign: TextAlign.left,
+                              style: TextStyle(
+                                color: Colours.black,
+                                fontSize: 16,
+                                fontFamily: FontStyles.leagueSpartan,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          // * Promo
+          ExpansionPanelList(
+            expansionCallback: (int item, bool status) {
+              setState(() {
+                isExpandedPromo = !isExpandedPromo;
+              });
+            },
+            children: [
+              ExpansionPanel(
+                isExpanded: isExpandedPromo,
+                headerBuilder: (context, isExpanded) => Container(
+                  padding: const EdgeInsets.all(18),
+                  child: const Text(
+                    'Promo yang tersedia',
+                    style: TextStyle(
+                      color: Colours.black,
+                      fontSize: 16,
+                      fontFamily: FontStyles.leagueSpartan,
+                    ),
+                  ),
+                ),
+                body: Container(
+                  padding: const EdgeInsets.all(8),
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _promoList.length,
+                    itemBuilder: (context, index) => CheckboxListTile(
+                      title: Text(_promoList[index].promo_title),
+                      value: _promoList[index].checked,
+                      activeColor: Colours.deepGreen,
+                      onChanged: (value) {
+                        setState(() {
+                          _promoList[index].checked =
+                              !_promoList[index].checked;
+                        });
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -303,7 +605,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                   ),
                 ),
                 Text(
-                  'Rp${totalProduct()}',
+                  'Rp. ${thousandFormat(totalProduct())} ${(_promoList.where((element) => element.checked).isNotEmpty ? '(Promo)' : '')}',
                   style: const TextStyle(
                     color: Colours.black,
                     fontSize: 16,
@@ -315,19 +617,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
             ),
             // *Buy Button
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                backgroundColor: !paid ? Colours.gray : Colours.deepGreen,
-              ),
-              onPressed: () {
-                if (paid) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Pesanan Selesai'),
-                  ));
-                }
-              },
+              onPressed: () => newTransaction(),
               child: const Text(
-                'Selesaikan Pesanan',
+                'Kirim Bukti Bayar',
                 style: TextStyle(
                   color: Colours.white,
                   fontSize: 14,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:melijo/bloc/buyers/cart/cart_buyers_bloc.dart';
+import 'package:melijo/bloc/buyers/cart_action/cart_action_bloc.dart';
 import 'package:melijo/bloc/buyers/melijo/melijo_buyer_bloc.dart';
 import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/recipe/recipe_buyers_bloc.dart';
@@ -22,6 +23,7 @@ import 'package:melijo/screens/buyers/transactions/detail_transactions_screen.da
 import 'package:melijo/screens/buyers/transactions/distribution_address_screen.dart';
 import 'package:melijo/screens/buyers/transactions/distribution_date_screen.dart';
 import 'package:melijo/screens/buyers/transactions/payment_method_screen.dart';
+import 'package:melijo/screens/buyers/transactions/payment_proof_screen.dart';
 import 'package:melijo/screens/buyers/transactions/payment_screen.dart';
 import 'package:melijo/screens/buyers/transactions/promo_screen.dart';
 import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
@@ -54,6 +56,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<ProductBuyersBloc>(create: (context) => ProductBuyersBloc()),
         BlocProvider<RecipeBuyersBloc>(create: (context) => RecipeBuyersBloc()),
         BlocProvider<CartBuyersBloc>(create: (context) => CartBuyersBloc()),
+        BlocProvider<CartActionBloc>(create: (context) => CartActionBloc()),
       ],
       child: MaterialApp(
         title: 'Melijo.id',
@@ -108,6 +111,7 @@ class MyApp extends StatelessWidget {
           PaymentMethodScreen.route: (context) => const PaymentMethodScreen(),
           PromoScreen.route: (context) => const PromoScreen(),
           ProductsBuyersScreen.route: (context) => const ProductsBuyersScreen(),
+          PaymentProofScreen.route: (context) => const PaymentProofScreen(),
         },
       ),
     );

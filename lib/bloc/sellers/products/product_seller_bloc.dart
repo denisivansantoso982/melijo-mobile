@@ -11,6 +11,7 @@ class ProductSellerBloc extends Bloc<ProductSellerEvent, ProductSellerState> {
   ProductSellerBloc() : super(ProductSellerLoading()) {
     on<AddProductSeller>((event, emit) => _onAddProduct(event, emit));
     on<DeleteProductSeller>((event, emit) => _onDeleteProduct(event, emit));
+    on<RestoreProductSeller>((event, emit) => _onRestoreProduct(event, emit));
   }
 
   void _onAddProduct(AddProductSeller event, Emitter<ProductSellerState> emit) {
@@ -33,5 +34,11 @@ class ProductSellerBloc extends Bloc<ProductSellerEvent, ProductSellerState> {
         const ProductSellerInit(productsSeller: []),
       );
     }
+  }
+
+  void _onRestoreProduct(RestoreProductSeller event, Emitter<ProductSellerState> emit) {
+    emit(
+      ProductSellerLoading(),
+    );
   }
 }

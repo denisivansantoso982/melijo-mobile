@@ -1,10 +1,10 @@
-// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: non_constant_identifier_names, must_be_immutable
 
 import 'package:equatable/equatable.dart';
 import 'package:melijo/models/buyers/product_buyers_model.dart';
 
 class CartBuyersModel extends Equatable {
-  const CartBuyersModel({
+  CartBuyersModel({
     required this.id,
     required this.product_id,
     required this.user_customer_id,
@@ -17,6 +17,7 @@ class CartBuyersModel extends Equatable {
   final int user_customer_id;
   final int quantity;
   final ProductBuyersModel product;
+  bool checked = false;
 
   @override
   List<Object?> get props => [
@@ -25,5 +26,6 @@ class CartBuyersModel extends Equatable {
     user_customer_id,
     quantity,
     product,
+    checked
   ];
 }

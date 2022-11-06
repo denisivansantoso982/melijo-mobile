@@ -186,35 +186,34 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                   ),
                   const SizedBox(width: 8),
                   FutureBuilder(
-                    future: getUserInfo(),
-                    builder: (context, snapshot) {
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Halo, selamat datang ${snapshot.data?['name']}!',
-                            style: const TextStyle(
-                              color: Colours.white,
-                              fontSize: 18,
-                              fontFamily: FontStyles.leagueSpartan,
-                              fontWeight: FontStyles.regular,
+                      future: getUserInfo(),
+                      builder: (context, snapshot) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Halo, selamat datang ${snapshot.data?['name']}!',
+                              style: const TextStyle(
+                                color: Colours.white,
+                                fontSize: 18,
+                                fontFamily: FontStyles.leagueSpartan,
+                                fontWeight: FontStyles.regular,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          const Text(
-                            'Mau masak apa kamu hari ini?',
-                            style: TextStyle(
-                              color: Colours.white,
-                              fontSize: 18,
-                              fontFamily: FontStyles.leagueSpartan,
-                              fontWeight: FontStyles.regular,
+                            const SizedBox(height: 4),
+                            const Text(
+                              'Mau masak apa kamu hari ini?',
+                              style: TextStyle(
+                                color: Colours.white,
+                                fontSize: 18,
+                                fontFamily: FontStyles.leagueSpartan,
+                                fontWeight: FontStyles.regular,
+                              ),
                             ),
-                          ),
-                        ],
-                      );
-                    }
-                  )
+                          ],
+                        );
+                      })
                 ],
               ),
             ),
@@ -292,7 +291,8 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                     child: Container(
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: const BorderRadius.all(Radius.circular(8)),
+                        borderRadius:
+                            const BorderRadius.all(Radius.circular(8)),
                         boxShadow: [
                           BoxShadow(
                             blurRadius: 4,
@@ -321,7 +321,8 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                           ),
                           // *Title
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
                               state.melijoBuyers[index].name,
                               style: const TextStyle(
@@ -334,7 +335,8 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                           ),
                           // *Phone
                           Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 8.0),
                             child: Text(
                               state.melijoBuyers[index].phone,
                               style: const TextStyle(

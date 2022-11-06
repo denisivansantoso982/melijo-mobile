@@ -13,10 +13,22 @@ import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/loading_widget.dart';
 import 'package:melijo/widgets/modal_bottom.dart';
 
-class ProductSellersScreen extends StatelessWidget {
+class ProductSellersScreen extends StatefulWidget {
   const ProductSellersScreen({Key? key}) : super(key: key);
 
-  static Widget productIsEmpty(BuildContext context) {
+  @override
+  State<ProductSellersScreen> createState() => _ProductSellersScreenState();
+}
+
+class _ProductSellersScreenState extends State<ProductSellersScreen> {
+  GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Widget productIsEmpty(BuildContext context) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -149,7 +161,8 @@ class ProductSellersScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: OutlinedButton(
-                        onPressed: () => deleteProduct(context, listProduct[index].id),
+                        onPressed: () =>
+                            deleteProduct(context, listProduct[index].id),
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colours.deepGreen),
                         ),

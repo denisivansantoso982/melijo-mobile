@@ -11,6 +11,7 @@ class ProductBuyersModel extends Equatable {
     required this.product_name,
     required this.image_uri,
     required this.description,
+    required this.user_seller_id,
   });
 
   final int id;
@@ -20,15 +21,17 @@ class ProductBuyersModel extends Equatable {
   final String product_name;
   final String image_uri;
   final String description;
+  final int user_seller_id;
 
   @override
   List<Object?> get props => [
-    id,
-    price,
-    unit_id,
-    category_id,
-    product_name,
-    image_uri,
-    description,
-  ];
+        id,
+        price,
+        unit_id,
+        category_id,
+        product_name,
+        image_uri,
+        description,
+        user_seller_id,
+      ];
 }
