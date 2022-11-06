@@ -39,9 +39,8 @@ Future<int?> checkUserRole() async {
 Future<void> logout() async {
   try {
     final Map<String, dynamic> user_data = await preferences.getUser();
-    await preferences.deleteUser();
     await database.deleteUserToken(user_data['id']);
-    await api_request.logout(user_data['token_type'], user_data['auth_token']);
+    await preferences.deleteUser();
   } catch (error) {
     return Future.error(Exception(error));
   }
@@ -654,3 +653,51 @@ Future<List> retrieveDetailTransactionSeller(String txid) async {
     return Future.error(error);
   }
 }
+
+Future<void> getTransactionCustomer(BuildContext context) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List<TransactionSellerModel> listTransaction = [];
+    final List<dynamic> response = await api_request.retrieveTransactionSeller(
+      user_data['id_detail'],
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    for (var element in response) {
+      listTransaction.add(TransactionSellerModel(
+        txid: element['txid'],
+        date_order: DateTime.parse(element['date_order']),
+        status: element['status'],
+        promo: element['promo'],
+        promo_code: element['promo_code'],
+        customer_id: element['user_customer']['id'],
+        seller_id: element['user_seller']['id'],
+        customer_name: element['user_customer']['name'],
+        seller_name: element['user_seller']['name'],
+        total: element['total'],
+        operator_id: element['user_operator_id'],
+        information: element['information'],
+      ));
+    }
+    context.read<TransactionSellerBloc>().add(DeleteTransaction());
+    context
+        .read<TransactionSellerBloc>()
+        .add(FillTransaction(transactionSellerModel: listTransaction));
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> cancelTransaction(String txid) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    await api_request.cancelTransactionCustomer(
+      txid,
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+

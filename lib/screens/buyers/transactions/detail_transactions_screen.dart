@@ -1,8 +1,14 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:melijo/configs/api/api_request.dart';
+import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/models/sellers/transaction_seller_model.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
+import 'package:melijo/widgets/loading_widget.dart';
+import 'package:melijo/widgets/modal_bottom.dart';
 
 class DetailTransactionScreen extends StatefulWidget {
   const DetailTransactionScreen({ Key? key }) : super(key: key);
@@ -14,25 +20,150 @@ class DetailTransactionScreen extends StatefulWidget {
 }
 
 class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
-  final List<Map<String, dynamic>> _listOfTransaction = [
-    {
-      'name': 'Buah Naga',
-      'price': '14.000',
-      'image': 'buah_naga.jpg',
-      'status': 'Menunggu Konfirmasi',
-      'checked': false,
-    },
-    {
-      'name': 'Jambu Crystal',
-      'price': '28.000',
-      'image': 'jambu.jpg',
-      'status': 'Menunggu Konfirmasi',
-      'checked': false,
-    },
-  ];
+  late TransactionSellerModel transactionSellerModel;
+
+  // ! Retrieve Transaction
+  Future<void> retrieveTransaction(BuildContext context) async {
+    try {
+      await getTransactionCustomer(context);
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  // ! Cancel Status
+  Future<void> cancelTheTransaction(BuildContext context,
+      TransactionSellerModel transactionSellerModel) async {
+    try {
+      LoadingWidget.show(context);
+      await cancelTransaction(
+        transactionSellerModel.txid,
+      );
+      await retrieveTransaction(context);
+      LoadingWidget.close(context);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        backgroundColor: Colours.deepGreen,
+        duration: Duration(seconds: 2),
+        content: Text('Transaksi Dibatalkan!'),
+      ));
+    } catch (error) {
+      LoadingWidget.close(context);
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<List> getDetailTransaction() async {
+    try {
+      final List result =
+          await retrieveDetailTransactionSeller(transactionSellerModel.txid);
+      return result;
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+      return [];
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final Size screenSize = MediaQuery.of(context).size;
+    transactionSellerModel =
+        ModalRoute.of(context)!.settings.arguments as TransactionSellerModel;
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
@@ -48,103 +179,130 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
           ),
         ),
         title: const Text(
-          'Transaksi',
+          'Detail Transaksi',
           style: TextStyle(
-            color: Colors.white,
+            color: Colours.white,
             fontSize: 20,
-            fontWeight: FontStyles.bold,
-            fontFamily: FontStyles.lora,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'Lora',
           ),
         ),
       ),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(12),
-        itemCount: _listOfTransaction.length,
-        itemBuilder: (context, index) => Card(
-          margin: const EdgeInsets.symmetric(vertical: 4),
-          elevation: 4,
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12))),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        bottomLeft: Radius.circular(12),
-                      ),
-                      child: Image(
-                        image: AssetImage('lib/assets/images/${_listOfTransaction[index]['image']}'),
-                        fit: BoxFit.cover,
-                        height: 80,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            FutureBuilder(
+              future: getDetailTransaction(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: SizedBox(
+                      width: 36,
+                      height: 36,
+                      child: CircularProgressIndicator(
+                        color: Colours.deepGreen,
+                        strokeWidth: 4,
                       ),
                     ),
-                    Checkbox(
-                      value: _listOfTransaction[index]['checked'],
-                      checkColor: Colours.white,
-                      activeColor: Colours.deepGreen,
-                      side: const BorderSide(color: Colours.deepGreen),
-                      onChanged: (value) {
-                        setState(() {
-                          _listOfTransaction[index]['checked'] = !_listOfTransaction[index]['checked'];
-                        });
-                      },
+                  );
+                }
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                  itemBuilder: (context, index) => Card(
+                    margin: const EdgeInsets.symmetric(vertical: 4),
+                    shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12))),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(12),
+                            bottomLeft: Radius.circular(12),
+                          ),
+                          child: Image(
+                            image: NetworkImage(
+                                '${ApiRequest.baseStorageUrl}/${snapshot.data![index]['image']}'),
+                            fit: BoxFit.cover,
+                            height: screenSize.height / 8,
+                            width: screenSize.width / 4,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          fit: FlexFit.tight,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // *Total
+                                Text(
+                                  'Rp. ${thousandFormat(snapshot.data![index]['subtotal'])}',
+                                  style: const TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    fontFamily: 'Lora',
+                                    color: Colours.deepGreen,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                // *Product Name
+                                Text(
+                                  '${snapshot.data![index]['product_name']} (x${snapshot.data![index]['quantity']})',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    overflow: TextOverflow.ellipsis,
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: 'League Spartan',
+                                    color: Colours.black.withOpacity(.8),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                flex: 4,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // *Total Price
-                      Text(
-                        'Rp${_listOfTransaction[index]['price']}',
-                        style: const TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          fontFamily: FontStyles.lora,
-                          color: Colours.deepGreen,
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      // *Product Name
-                      Text(
-                        _listOfTransaction[index]['name'],
-                        softWrap: true,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontStyles.regular,
-                          fontFamily: FontStyles.leagueSpartan,
-                          color: Colours.black.withOpacity(.8),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      // *Status
-                      Text(
-                        _listOfTransaction[index]['status'],
-                        style: const TextStyle(
-                          fontSize: 16,
-                          overflow: TextOverflow.ellipsis,
-                          fontWeight: FontStyles.medium,
-                          fontFamily: FontStyles.leagueSpartan,
-                          color: Colours.deepGreen,
-                        ),
-                      ),
-                    ],
                   ),
-                ),
-              ),
-            ],
-          ),
+                );
+              },
+            ),
+            // const SizedBox(height: 16),
+            // Text(
+            //   'Pengiriman Tanggal : ${DateFormat('dd - MM - yyyy').format(transactionSellerModel.date_order)}',
+            //   style: const TextStyle(
+            //     fontSize: 18,
+            //     fontWeight: FontStyles.regular,
+            //     fontFamily: FontStyles.leagueSpartan,
+            //     color: Colours.gray,
+            //   ),
+            // ),
+            // const SizedBox(height: 16),
+            // Text(
+            //   'Pemesan : ${transactionSellerModel.customer_name}',
+            //   style: const TextStyle(
+            //     fontSize: 18,
+            //     fontWeight: FontStyles.regular,
+            //     fontFamily: FontStyles.leagueSpartan,
+            //     color: Colours.gray,
+            //   ),
+            // ),
+            // const SizedBox(height: 16),
+            // Text(
+            //   'Alamat : \n\n${transactionSellerModel.information}',
+            //   style: const TextStyle(
+            //     fontSize: 18,
+            //     fontWeight: FontStyles.regular,
+            //     fontFamily: FontStyles.leagueSpartan,
+            //     color: Colours.gray,
+            //   ),
+            // ),
+          ],
         ),
       ),
       bottomNavigationBar: Container(
@@ -164,8 +322,8 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
+              children: [
+                const Text(
                   'Total Harga',
                   style: TextStyle(
                     color: Colours.black,
@@ -175,8 +333,8 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
                   ),
                 ),
                 Text(
-                  'Rp42.000',
-                  style: TextStyle(
+                  'Rp. ${thousandFormat(transactionSellerModel.total)}',
+                  style: const TextStyle(
                     color: Colours.black,
                     fontSize: 16,
                     fontWeight: FontStyles.bold,
@@ -186,9 +344,19 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
               ],
             ),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                if (transactionSellerModel.status != 'canceled') {
+                  cancelTheTransaction(
+                    context,
+                    transactionSellerModel,
+                  );
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: transactionSellerModel.status != 'canceled' ? Colours.deepGreen : Colours.gray,
+              ),
               child: Text(
-                'Batalkan Pesanan (${_listOfTransaction.where((element) => element['checked'] == true).length})',
+                transactionSellerModel.status != 'canceled' ? 'Batalkan' : 'Dibatalkan',
                 style: const TextStyle(
                   color: Colours.white,
                   fontSize: 14,

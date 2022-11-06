@@ -556,13 +556,35 @@ class ApiRequest {
     }
   }
 
-  // ? Retrieve Transactions
+  // ? Retrieve Transactions Seller
   Future<List<dynamic>> retrieveTransactionSeller(
       int seller_id, String token_type, String token) async {
     try {
       client = http.Client();
       final http.Response response = await client.get(
           Uri.parse('$baseUrl/user_seller/$seller_id/transaction'),
+          headers: {
+            'Authorization': '$token_type $token',
+            'accept': 'application/json',
+            'content-type': 'application/json',
+          });
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      return Future.value(decodedResponse['data']['transaction']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Retrieve Transactions Customer
+  Future<List<dynamic>> retrieveTransactionCustomer(
+      int customer_id, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client.get(
+          Uri.parse('$baseUrl/user_seller/$customer_id/customer'),
           headers: {
             'Authorization': '$token_type $token',
             'accept': 'application/json',
@@ -599,6 +621,33 @@ class ApiRequest {
       };
       final http.Response response = await client.put(
         Uri.parse('$baseUrl/transaction/$txid/confirmation'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Cancel Transaction
+  Future<void> cancelTransactionCustomer(
+      String txid,
+      String token_type,
+      String token) async {
+    try {
+      client = http.Client();
+      final Map body = {
+        'txid': txid,
+      };
+      final http.Response response = await client.put(
+        Uri.parse('$baseUrl/transaction/$txid/canceled'),
         headers: {
           'Authorization': '$token_type $token',
           'accept': 'application/json',
