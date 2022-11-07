@@ -10,8 +10,8 @@ import 'package:melijo/models/buyers/product_recom_model.dart';
 import 'package:melijo/models/sellers/product_seller_model.dart';
 
 class ApiRequest {
-  static const String baseUrl = 'http://192.168.43.59:8000/api';
-  static const String baseStorageUrl = 'http://192.168.43.59:8000/storage';
+  static const String baseUrl = 'https://panel.melijo.id/api';
+  static const String baseStorageUrl = 'https://panel.melijo.id/storage';
   // static const String baseUrl = 'http://192.168.100.191:8000/api';
   // static const String baseStorageUrl = 'http://192.168.100.191:8000/storage';
   static const String locationBaseUrl =
