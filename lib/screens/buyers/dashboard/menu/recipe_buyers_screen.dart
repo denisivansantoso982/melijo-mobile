@@ -233,36 +233,36 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
           children: [
             const SizedBox(height: 8),
             // *Category Recipes
-            SizedBox(
-              height: 32,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _listRecipeCategory.length,
-                itemBuilder: (context, index) => Container(
-                  alignment: Alignment.center,
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  margin: const EdgeInsets.symmetric(horizontal: 4),
-                  decoration: BoxDecoration(
-                    color: _listRecipeCategory[index]['selected']
-                        ? Colours.deepGreen
-                        : Colors.transparent,
-                    borderRadius: const BorderRadius.all(Radius.circular(64)),
-                  ),
-                  child: Text(
-                    _listRecipeCategory[index]['name'],
-                    style: TextStyle(
-                      color: _listRecipeCategory[index]['selected']
-                          ? Colours.white
-                          : Colours.black,
-                      fontSize: 14,
-                      fontFamily: FontStyles.leagueSpartan,
-                      fontWeight: FontStyles.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
+            // SizedBox(
+            //   height: 32,
+            //   child: ListView.builder(
+            //     scrollDirection: Axis.horizontal,
+            //     itemCount: _listRecipeCategory.length,
+            //     itemBuilder: (context, index) => Container(
+            //       alignment: Alignment.center,
+            //       padding: const EdgeInsets.symmetric(horizontal: 8),
+            //       margin: const EdgeInsets.symmetric(horizontal: 4),
+            //       decoration: BoxDecoration(
+            //         color: _listRecipeCategory[index]['selected']
+            //             ? Colours.deepGreen
+            //             : Colors.transparent,
+            //         borderRadius: const BorderRadius.all(Radius.circular(64)),
+            //       ),
+            //       child: Text(
+            //         _listRecipeCategory[index]['name'],
+            //         style: TextStyle(
+            //           color: _listRecipeCategory[index]['selected']
+            //               ? Colours.white
+            //               : Colours.black,
+            //           fontSize: 14,
+            //           fontFamily: FontStyles.leagueSpartan,
+            //           fontWeight: FontStyles.bold,
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // const SizedBox(height: 12),
             // *Promo or Ads Panel
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),

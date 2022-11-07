@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/models/buyers/product_buyers_model.dart';
+import 'package:melijo/models/search_model.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/detail_product_buyers_screen.dart';
 import 'package:melijo/utils/colours.dart';
@@ -22,6 +23,12 @@ class SearchProductScreen extends StatefulWidget {
 class _SearchProductScreenState extends State<SearchProductScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
+
+  @override
+  void initState() {
+    _searchController.text = SearchModel.product;
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -84,8 +91,6 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    _searchController.text =
-        ModalRoute.of(context)!.settings.arguments as String;
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
@@ -120,7 +125,7 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
                     enabledBorder: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.all(4),
-                    hintText: 'Cari Resep di Melijo.id',
+                    hintText: 'Cari Produk di Melijo.id',
                   ),
                   onFieldSubmitted: (value) {
                     _searchController.text = value;
@@ -150,86 +155,99 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
         elevation: 0,
       ),
       body: FutureBuilder(
-          future: searchTheProduct(),
-          builder: (context, snapshot) {
-            return GridView.builder(
-              padding: const EdgeInsets.all(20),
-              shrinkWrap: true,
-              itemCount: snapshot.data != null ? snapshot.data!.length : 0,
-              physics: const ScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 4 / 5,
-              ),
-              itemBuilder: (context, index) => GestureDetector(
-                onTap: () => Navigator.of(context).pushNamed(
-                  DetailProductBuyersScreen.route,
-                  arguments: snapshot.data![index],
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    boxShadow: [
-                      BoxShadow(
-                        blurRadius: 4,
-                        color: Colours.black.withOpacity(.25),
-                        offset: const Offset(2, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // *Images
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          topRight: Radius.circular(8),
-                        ),
-                        child: Image(
-                          image: renderImage(snapshot.data![index]),
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: screenSize.height / 6,
-                        ),
-                      ),
-                      // *Title
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          snapshot.data![index].product_name,
-                          style: const TextStyle(
-                            color: Colours.black,
-                            fontFamily: FontStyles.leagueSpartan,
-                            fontWeight: FontStyles.regular,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                      // *Price
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          'Rp. ${thousandFormat(snapshot.data![index].price)}',
-                          style: const TextStyle(
-                            color: Colours.deepGreen,
-                            fontFamily: FontStyles.leagueSpartan,
-                            fontWeight: FontStyles.medium,
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(),
-                    ],
-                  ),
+        future: searchTheProduct(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: SizedBox(
+                width: 32,
+                height: 32,
+                child: CircularProgressIndicator(
+                  color: Colours.deepGreen,
+                  strokeWidth: 4,
                 ),
               ),
             );
-          }),
+          }
+          return GridView.builder(
+            padding: const EdgeInsets.all(20),
+            shrinkWrap: true,
+            itemCount: snapshot.data != null ? snapshot.data!.length : 0,
+            physics: const ScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 4 / 5,
+            ),
+            itemBuilder: (context, index) => GestureDetector(
+              onTap: () => Navigator.of(context).pushNamed(
+                DetailProductBuyersScreen.route,
+                arguments: snapshot.data![index],
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  boxShadow: [
+                    BoxShadow(
+                      blurRadius: 4,
+                      color: Colours.black.withOpacity(.25),
+                      offset: const Offset(2, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // *Images
+                    ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(8),
+                        topRight: Radius.circular(8),
+                      ),
+                      child: Image(
+                        image: renderImage(snapshot.data![index]),
+                        fit: BoxFit.cover,
+                        width: double.infinity,
+                        height: screenSize.height / 6,
+                      ),
+                    ),
+                    // *Title
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        snapshot.data![index].product_name,
+                        style: const TextStyle(
+                          color: Colours.black,
+                          fontFamily: FontStyles.leagueSpartan,
+                          fontWeight: FontStyles.regular,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    // *Price
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        'Rp. ${thousandFormat(snapshot.data![index].price)}',
+                        style: const TextStyle(
+                          color: Colours.deepGreen,
+                          fontFamily: FontStyles.leagueSpartan,
+                          fontWeight: FontStyles.medium,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }

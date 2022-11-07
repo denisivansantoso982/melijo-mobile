@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -6,9 +6,11 @@ import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/models/buyers/product_buyers_model.dart';
+import 'package:melijo/models/search_model.dart';
 import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/detail_product_buyers_screen.dart';
+import 'package:melijo/screens/buyers/products/search_product_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/modal_bottom.dart';
@@ -21,40 +23,66 @@ class HomeBuyersScreen extends StatefulWidget {
 }
 
 class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
+  final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
-  final List<Map<String, String>> _listCategory = [
-    {
-      'title': 'Sayur',
-      'image': 'Sayur.png',
-    },
-    {
-      'title': 'Daging',
-      'image': 'Daging.png',
-    },
-    {
-      'title': 'Unggas',
-      'image': 'Unggas.png',
-    },
-    {
-      'title': 'Seafood',
-      'image': 'Seafood.png',
-    },
-    {
-      'title': 'Protein',
-      'image': 'Protein.png',
-    },
-    {
-      'title': 'Bumbu',
-      'image': 'Bumbu.png',
-    },
-  ];
+  final List _listCategory = [];
+  int category_id = 0;
+
+  @override
+  void initState() {
+    retrieveCategory();
+    super.initState();
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
     _searchFocus.dispose();
     super.dispose();
+  }
+
+  Future<void> retrieveCategory() async {
+    try {
+      final List resCategories = await getCategoryProduct();
+      setState(() {
+        _listCategory.addAll(resCategories);
+      });
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: _globalKey.currentContext!,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   // ! Retrieve Melijo
@@ -121,10 +149,15 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
       );
     }
     if (state is ProductBuyersInit) {
+      List<ProductBuyersModel> listProduct = category_id == 0
+          ? state.listOfProduct
+          : state.listOfProduct
+              .where((element) => element.category_id == category_id)
+              .toList();
       return GridView.builder(
         padding: const EdgeInsets.all(20),
         shrinkWrap: true,
-        itemCount: state.listOfProduct.length,
+        itemCount: listProduct.length,
         physics: const ScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -160,7 +193,7 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                     topRight: Radius.circular(8),
                   ),
                   child: Image(
-                    image: renderImage(state.listOfProduct[index]),
+                    image: renderImage(listProduct[index]),
                     fit: BoxFit.cover,
                     width: double.infinity,
                     height: screenSize.height / 6,
@@ -170,7 +203,7 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(
-                    state.listOfProduct[index].product_name,
+                    listProduct[index].product_name,
                     style: const TextStyle(
                       color: Colours.black,
                       fontFamily: FontStyles.leagueSpartan,
@@ -183,7 +216,7 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8.0),
                   child: Text(
-                    'Rp. ${thousandFormat(state.listOfProduct[index].price)}',
+                    'Rp. ${thousandFormat(listProduct[index].price)}',
                     style: const TextStyle(
                       color: Colours.deepGreen,
                       fontFamily: FontStyles.leagueSpartan,
@@ -208,6 +241,7 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
     final Size screenSize = MediaQuery.of(context).size;
     getProducts(context);
     return Scaffold(
+      key: _globalKey,
       appBar: AppBar(
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -234,12 +268,18 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                 child: TextFormField(
                   controller: _searchController,
                   focusNode: _searchFocus,
+                  keyboardType: TextInputType.name,
+                  textInputAction: TextInputAction.search,
+                  onFieldSubmitted: (value) {
+                    SearchModel.product = value;
+                    Navigator.of(context).pushNamed(SearchProductScreen.route);
+                  },
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.all(4),
-                    hintText: 'Cari nama produk',
+                    hintText: 'Cari produk',
                   ),
                 ),
               ),
@@ -346,55 +386,76 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                       );
                     }),
                 // *Category Panel
-                SizedBox(
-                  height: 120,
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    scrollDirection: Axis.horizontal,
-                    itemCount: _listCategory.length,
-                    itemBuilder: (context, index) => Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 8),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colours.white,
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(64)),
-                              boxShadow: [
-                                BoxShadow(
-                                  blurRadius: 4,
-                                  color: Colours.black.withOpacity(.25),
-                                  offset: const Offset(4, 4),
+                  SizedBox(
+                    height: 120,
+                    child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      scrollDirection: Axis.horizontal,
+                      itemCount: _listCategory.length,
+                      itemBuilder: (context, index) => GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            if (_listCategory[index]['id'] != category_id) {
+                              category_id = _listCategory[index]['id'];
+                            } else {
+                              category_id = 0;
+                            }
+                          });
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 8),
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colours.white,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(64)),
+                                  border: Border.all(
+                                    width: _listCategory[index]['id'] ==
+                                            category_id
+                                        ? 2
+                                        : 0,
+                                    color: _listCategory[index]['id'] == category_id ? Colours.deepGreen : Colors.transparent,
+                                  ),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      blurRadius: 4,
+                                      color: _listCategory[index]['id'] ==
+                                              category_id
+                                          ? Colours.deepGreen.withOpacity(.25)
+                                          : Colours.black.withOpacity(.25),
+                                      offset: const Offset(4, 4),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                            child: ClipRRect(
-                              child: Image(
-                                image: AssetImage(
-                                    'lib/assets/images/category/${_listCategory[index]['image']}'),
-                                fit: BoxFit.cover,
-                                height: 32,
-                                width: 32,
+                                child: ClipRRect(
+                                  child: Image(
+                                    image: AssetImage(
+                                        'lib/assets/images/category/${_listCategory[index]['category_name']}.png'),
+                                    fit: BoxFit.cover,
+                                    height: 32,
+                                    width: 32,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(height: 8),
+                              Text(
+                                '${_listCategory[index]['category_name']}',
+                                style: const TextStyle(
+                                  color: Colours.deepGreen,
+                                  fontSize: 16,
+                                  fontWeight: FontStyles.medium,
+                                  fontFamily: FontStyles.leagueSpartan,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 16),
-                          Text(
-                            '${_listCategory[index]['title']}',
-                            style: const TextStyle(
-                              color: Colours.deepGreen,
-                              fontSize: 16,
-                              fontWeight: FontStyles.medium,
-                              fontFamily: FontStyles.leagueSpartan,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   ),
-                ),
                 // *Promo or Ads Panel
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),

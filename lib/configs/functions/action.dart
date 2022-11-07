@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:melijo/bloc/buyers/cart/cart_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/melijo/melijo_buyer_bloc.dart';
 import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/recipe/recipe_buyers_bloc.dart';
@@ -95,7 +94,7 @@ Future<void> login(String user, String password, bool is_seller) async {
     final Map<String, dynamic> user_data = response['user'];
     final Map<String, dynamic> user_detail = response['detail'];
     final Map<String, dynamic> user_address = response['address']['address'];
-    final Map<String, dynamic> plotting = response['plotting'];
+    final Map<String, dynamic>? plotting = response['plotting'];
     if (is_seller && user_data['role_id'] != 4) {
       throw 'Pengguna tidak ditemukan!';
     } else if (!is_seller && user_data['role_id'] != 3) {
@@ -123,7 +122,7 @@ Future<void> login(String user, String password, bool is_seller) async {
       city: user_address['city'],
       district: user_address['districts'],
       ward: user_address['ward'],
-      seller_id: plotting['user_seller_id'],
+      seller_id: plotting?['user_seller_id'],
     );
   } catch (error) {
     return Future.error(error);
@@ -688,6 +687,20 @@ Future<List<ProductBuyersModel>> searchProduct(String keyword) async {
   }
 }
 
+Future<List<RecipeBuyersModel>> searchRecipe(String keyword) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List<RecipeBuyersModel> response = await api_request.searchRecipe(
+      keyword,
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    return Future.value(response);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
 Future<List> retrieveDetailTransactionSeller(String txid) async {
   try {
     final Map user_data = await preferences.getUser();
@@ -767,6 +780,19 @@ Future<void> pushNotifToSeller(String body, String title) async {
     final Map user_data = await preferences.getUser();
     final String fcm = await database.getFCMToken(user_data['seller_id'], 4);
     await api_request.pushNotification(fcm, body, title);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<List> getCategoryProduct() async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List categories = await api_request.retrieveCategoryProduct(
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    return Future.value(categories);
   } catch (error) {
     return Future.error(error);
   }

@@ -8,8 +8,10 @@ import 'package:melijo/bloc/buyers/cart_action/cart_action_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/models/buyers/product_buyers_model.dart';
+import 'package:melijo/models/search_model.dart';
 import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
+import 'package:melijo/screens/buyers/products/search_product_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/loading_widget.dart';
@@ -361,12 +363,18 @@ class _DetailProductBuyersScreenState extends State<DetailProductBuyersScreen> {
                   child: TextFormField(
                     controller: _searchController,
                     focusNode: _searchFocus,
+                    keyboardType: TextInputType.name,
+                    textInputAction: TextInputAction.search,
+                    onFieldSubmitted: (value) {
+                      SearchModel.product = value;
+                      Navigator.of(context).pushNamed(SearchProductScreen.route);
+                    },
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       isDense: true,
                       contentPadding: EdgeInsets.all(4),
-                      hintText: 'Cari Resep produk',
+                      hintText: 'Cari produk',
                     ),
                   ),
                 ),

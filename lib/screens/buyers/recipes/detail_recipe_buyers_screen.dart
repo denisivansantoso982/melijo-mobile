@@ -6,6 +6,7 @@ import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/models/buyers/product_recom_model.dart';
 import 'package:melijo/models/buyers/recipe_buyers_model.dart';
+import 'package:melijo/models/search_model.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/search_product_screen.dart';
 import 'package:melijo/utils/colours.dart';
@@ -48,7 +49,8 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
   // ! Get Recipe Recommendation
   Future<List<ProductRecomModel>> getRecipeRecom(BuildContext context) async {
     try {
-      final List<ProductRecomModel> recom = await retrieveProductRecom(recipe.id);
+      final List<ProductRecomModel> recom =
+          await retrieveProductRecom(recipe.id);
       return Future.value(recom);
       // setState(() {
       //   _listOfProducts.addAll(recom);
@@ -239,7 +241,11 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
                 physics: const ScrollPhysics(),
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) => GestureDetector(
-                  onTap: () => Navigator.of(context).pushNamed(SearchProductScreen.route, arguments: snapshot.data?[index].keyword),
+                  onTap: () {
+                    String? keyword = snapshot.data?[index].keyword;
+                    SearchModel.product = keyword ?? '';
+                    Navigator.of(context).pushNamed(SearchProductScreen.route);
+                  },
                   child: Card(
                     margin: const EdgeInsets.symmetric(vertical: 4),
                     elevation: 4,

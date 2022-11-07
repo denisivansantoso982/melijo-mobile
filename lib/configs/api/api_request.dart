@@ -7,13 +7,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:melijo/models/buyers/cart_buyers_model.dart';
 import 'package:melijo/models/buyers/product_buyers_model.dart';
 import 'package:melijo/models/buyers/product_recom_model.dart';
+import 'package:melijo/models/buyers/recipe_buyers_model.dart';
 import 'package:melijo/models/sellers/product_seller_model.dart';
 
 class ApiRequest {
-  static const String baseUrl = 'https://panel.melijo.id/api';
-  static const String baseStorageUrl = 'https://panel.melijo.id/storage';
-  // static const String baseUrl = 'http://192.168.100.191:8000/api';
-  // static const String baseStorageUrl = 'http://192.168.100.191:8000/storage';
+  static const String baseUrl = 'http://192.168.43.59:8000/api';
+  static const String baseStorageUrl = 'http://192.168.43.59:8000/storage';
+  // static const String baseUrl = 'https://panel.melijo.id/api';
+  // static const String baseStorageUrl = 'https://panel.melijo.id/storage';
   static const String locationBaseUrl =
       'https://dev.farizdotid.com/api/daerahindonesia';
   late http.Client client;
@@ -1051,6 +1052,42 @@ class ApiRequest {
     }
   }
 
+  // ? Search Recipe
+  Future<List<RecipeBuyersModel>> searchRecipe(
+      String keyword, String token_type, String token) async {
+    try {
+      client = http.Client();
+      final List<RecipeBuyersModel> _products = [];
+      final Map body = {'recipe_title': keyword};
+      final http.Response response = await client.post(
+        Uri.parse('$baseUrl/recipe/search'),
+        headers: {
+          'Authorization': '$token_type $token',
+          'accept': 'application/json',
+          'content-type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      for (var element in decodedResponse['data']) {
+        _products.add(RecipeBuyersModel(
+          id: element['id'],
+          recipe_title: element['recipe_title'],
+          category_id: element['category_id'],
+          step: element['step'],
+          image: element['image'],
+        ));
+      }
+      return Future.value(_products);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+
   // ? Get Detail Transaction Seller
   Future<List> getDetailTransactionSeller(
       String txid, String token_type, String token) async {
@@ -1091,6 +1128,27 @@ class ApiRequest {
           }
         }),
       );
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  // ? Retrieve Recipe Favourite
+  Future<List> retrieveCategoryProduct(String token_type, String token) async {
+    try {
+      client = http.Client();
+      final http.Response response = await client
+          .get(Uri.parse('$baseUrl/category'), headers: {
+        'Authorization': '$token_type $token',
+        'accept': 'application/json',
+        'content-type': 'application/json',
+      });
+      final Map decodedResponse = jsonDecode(response.body);
+      if (response.statusCode != 200) {
+        throw '${response.statusCode} ${response.reasonPhrase}';
+      }
+      final List result = decodedResponse['data'];
+      return Future.value(result);
     } catch (error) {
       return Future.error(error);
     }
