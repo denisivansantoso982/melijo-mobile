@@ -12,6 +12,7 @@ class CartBuyersBloc extends Bloc<CartBuyersEvent, CartBuyersState> {
     on<FillCart>((event, emit) => _onCartFilled(event, emit));
     on<DeleteCart>((event, emit) => _onCartDeleted(event, emit));
     on<ToggleCart>((event, emit) => _onCartToggle(event, emit));
+    on<LoadingCart>((event, emit) => _onCartLoading(event, emit));
   }
 
   void _onCartFilled(FillCart event, Emitter<CartBuyersState> emit) {
@@ -49,5 +50,13 @@ class CartBuyersBloc extends Bloc<CartBuyersEvent, CartBuyersState> {
         CartBuyersInit(carts: newCarts),
       );
     }
+  }
+
+  void _onCartLoading(LoadingCart event, Emitter<CartBuyersState> emit) {
+    // final CartBuyersState state = CartBuyersLoading();
+
+    emit(
+      CartBuyersLoading(),
+    );
   }
 }

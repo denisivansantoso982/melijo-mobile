@@ -277,72 +277,74 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
               children: [
                 // *Welcome Panel
                 FutureBuilder(
-                  future: getUserInfo(),
-                  builder: (context, snapshot) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 20,
-                      ),
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment(-1, -1),
-                          end: Alignment(-0.1, 0.6),
-                          colors: [
-                            Colours.oliveGreen,
-                            Colours.deepGreen,
+                    future: getUserInfo(),
+                    builder: (context, snapshot) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                          horizontal: 20,
+                        ),
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment(-1, -1),
+                            end: Alignment(-0.1, 0.6),
+                            colors: [
+                              Colours.oliveGreen,
+                              Colours.deepGreen,
+                            ],
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              height: 56,
+                              width: 56,
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(64)),
+                                color: Colours.white,
+                              ),
+                              child: const ClipRRect(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(64)),
+                                child: Image(
+                                  image:
+                                      AssetImage('lib/assets/images/logo.png'),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Halo, selamat datang ${snapshot.data?['name']}!',
+                                  style: const TextStyle(
+                                    color: Colours.white,
+                                    fontSize: 18,
+                                    fontFamily: FontStyles.leagueSpartan,
+                                    fontWeight: FontStyles.regular,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  'Mau masak apa kamu hari ini?',
+                                  style: TextStyle(
+                                    color: Colours.white,
+                                    fontSize: 18,
+                                    fontFamily: FontStyles.leagueSpartan,
+                                    fontWeight: FontStyles.regular,
+                                  ),
+                                ),
+                              ],
+                            )
                           ],
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            height: 56,
-                            width: 56,
-                            padding: const EdgeInsets.all(2),
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(64)),
-                              color: Colours.white,
-                            ),
-                            child: const ClipRRect(
-                              borderRadius: BorderRadius.all(Radius.circular(64)),
-                              child: Image(
-                                image: AssetImage('lib/assets/images/logo.png'),
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Halo, selamat datang ${snapshot.data?['name']}!',
-                                style: const TextStyle(
-                                  color: Colours.white,
-                                  fontSize: 18,
-                                  fontFamily: FontStyles.leagueSpartan,
-                                  fontWeight: FontStyles.regular,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              const Text(
-                                'Mau masak apa kamu hari ini?',
-                                style: TextStyle(
-                                  color: Colours.white,
-                                  fontSize: 18,
-                                  fontFamily: FontStyles.leagueSpartan,
-                                  fontWeight: FontStyles.regular,
-                                ),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                    );
-                  }
-                ),
+                      );
+                    }),
                 // *Category Panel
                 SizedBox(
                   height: 120,

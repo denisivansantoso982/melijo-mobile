@@ -28,23 +28,24 @@ class FDatabase {
   // }
 
   // ? Set FCM Token
-  Future<void> setUserWhenLogin(dynamic user_id, String fcm_token) async {
+  Future<void> setUserWhenLogin(
+      dynamic detail_id, dynamic role_id, String fcm_token) async {
     try {
       await database
           .ref('users')
-          .orderByChild('user_id')
-          .equalTo(user_id)
+          .orderByChild(role_id == 3 ? 'customer_id' : 'seller_id')
+          .equalTo(detail_id)
           .get()
           .then((snapshot) async {
         if (snapshot.exists) {
           final DataSnapshot val = snapshot.children.first;
           await database.ref('users/${val.key}').set({
-            'user_id': user_id,
+            role_id == 3 ? 'customer_id' : 'seller_id': detail_id,
             'fcm_token': fcm_token,
           });
         } else {
           await database.ref('users').push().set({
-            'user_id': user_id,
+            role_id == 3 ? 'customer_id' : 'seller_id': detail_id,
             'fcm_token': fcm_token,
             'created_at': DateTime.now().millisecondsSinceEpoch,
           });
@@ -68,18 +69,18 @@ class FDatabase {
   }
 
   // ? Delete FCM Token
-  Future<void> deleteUserToken(int user_id) async {
+  Future<void> deleteUserToken(int detail_id, int role_id) async {
     try {
       database = FirebaseDatabase.instance;
       await database
           .ref('users')
-          .orderByChild('user_id')
-          .equalTo(user_id)
+          .orderByChild(role_id == 3 ? 'customer_id' : 'seller_id')
+          .equalTo(detail_id)
           .get()
           .then((snapshot) async {
         final DataSnapshot val = snapshot.children.first;
         await database.ref('users/${val.key}').set({
-          'user_id': user_id,
+          role_id == 3 ? 'customer_id' : 'seller_id': detail_id,
           'fcm_token': null,
         });
         await FirebaseMessaging.instance.deleteToken();
@@ -126,6 +127,29 @@ class FDatabase {
           .listen((event) {});
     } catch (error) {
       Exception(error);
+    }
+  }
+
+  // ? Get FCM Token
+  Future<String> getFCMToken(int detail_id, int role_id) async {
+    try {
+      String fcm = '';
+      database = FirebaseDatabase.instance;
+      await database
+          .ref('users')
+          .orderByChild(role_id == 3 ? 'customer_id' : 'seller_id')
+          .equalTo(detail_id)
+          .get()
+          .then((snapshot) async {
+        if (!snapshot.exists) {
+          return fcm;
+        }
+        final Map val = snapshot.children.first.value as Map;
+        fcm = val['fcm_token'];
+      });
+      return fcm;
+    } catch (error) {
+      return Future.error(error);
     }
   }
 }

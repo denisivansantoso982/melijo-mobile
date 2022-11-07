@@ -64,6 +64,7 @@ class TransactionBuyersScreen extends StatelessWidget {
       await cancelTransaction(
         transactionSellerModel.txid,
       );
+      await pushNotifToSeller('Transaksi ${transactionSellerModel.txid} Dibatalkan oleh pembeli!', 'Pembatalan Transaksi!');
       await retrieveTransaction(context);
       LoadingWidget.close(context);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -232,7 +233,8 @@ class TransactionBuyersScreen extends StatelessWidget {
                                   const SizedBox(height: 16),
                                   // *Customer
                                   Text(
-                                    translateStatus(state.transactionSellerModel[index].status),
+                                    translateStatus(state
+                                        .transactionSellerModel[index].status),
                                     style: const TextStyle(
                                       fontSize: 18,
                                       overflow: TextOverflow.ellipsis,

@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, non_constant_identifier_names, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, non_constant_identifier_names, use_build_context_synchronously, no_leading_underscores_for_local_identifiers
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,14 +18,20 @@ class CartProductBuyersScreen extends StatefulWidget {
   static const String route = '/cart_product_buyers_screen';
 
   @override
-  _CartProductBuyersScreenState createState() =>
+  State<CartProductBuyersScreen> createState() =>
       _CartProductBuyersScreenState();
 }
 
 class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
-  List<CartBuyersModel> _listCart = [];
+  final List<CartBuyersModel> carts = [];
 
-  int totalPrice() {
+  @override
+  void initState() {
+    getCarts();
+    super.initState();
+  }
+
+  int totalPrice(List<CartBuyersModel> _listCart) {
     int total = 0;
     for (var element in _listCart) {
       if (element.checked) {
@@ -35,9 +41,14 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
     return total;
   }
 
-  Future<void> getCarts(BuildContext context) async {
+  Future<void> getCarts() async {
     try {
-      await retrieveCart(context);
+      final List<CartBuyersModel> resCarts = await retrieveCart();
+      setState(() {
+        carts.clear();
+        carts.addAll(resCarts);
+      });
+      // context.read<CartBuyersBloc>().add(FillCart(carts: carts));
     } catch (error) {
       showModalBottomSheet(
         backgroundColor: Colors.transparent,
@@ -75,12 +86,55 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
     }
   }
 
+  // Future<void> getCarts(BuildContext context) async {
+  //   try {
+  //     final List<CartBuyersModel> carts = await retrieveCart(context);
+  //     context.read<CartBuyersBloc>().add(FillCart(carts: carts));
+  //   } catch (error) {
+  //     showModalBottomSheet(
+  //       backgroundColor: Colors.transparent,
+  //       context: context,
+  //       builder: (context) => Container(
+  //         padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+  //         decoration: const BoxDecoration(
+  //           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  //           color: Colours.white,
+  //         ),
+  //         child: ModalBottom(
+  //           title: 'Terjadi Kesalahan!',
+  //           message: '$error',
+  //           widgets: [
+  //             OutlinedButton(
+  //               style: OutlinedButton.styleFrom(
+  //                 side: const BorderSide(color: Colours.deepGreen, width: 1),
+  //                 fixedSize: const Size.fromWidth(80),
+  //               ),
+  //               onPressed: () => Navigator.of(context).pop(),
+  //               child: const Text(
+  //                 'Oke',
+  //                 style: TextStyle(
+  //                   color: Colours.deepGreen,
+  //                   fontSize: 18,
+  //                   fontWeight: FontStyles.regular,
+  //                   fontFamily: FontStyles.leagueSpartan,
+  //                 ),
+  //               ),
+  //             )
+  //           ],
+  //         ),
+  //       ),
+  //     );
+  //   }
+  // }
+
   Future<void> deleteCart(
       BuildContext context, int cart_id, int product_id) async {
     try {
       LoadingWidget.show(context);
-      await deleteProductCart(context, cart_id);
-      setState(() {});
+      await deleteProductCart(cart_id);
+      setState(() {
+        carts.removeWhere((element) => element.id == cart_id);
+      });
       LoadingWidget.close(context);
     } catch (error) {
       LoadingWidget.close(context);
@@ -146,203 +200,173 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
           ),
         ),
       ),
-      body: FutureBuilder(
-        future: getCarts(context),
-        builder: (context, snapshot) => RefreshIndicator(
-          onRefresh: () => getCarts(context),
-          child: BlocBuilder<CartBuyersBloc, CartBuyersState>(
-            builder: (context, state) {
-              if (state is CartBuyersLoading) {
-                return const Center(
-                  child: SizedBox(
-                    width: 56,
-                    height: 56,
-                    child: CircularProgressIndicator(
-                      color: Colours.deepGreen,
-                      strokeWidth: 4,
-                    ),
+      body: RefreshIndicator(
+        onRefresh: () => getCarts(),
+        child: ListView.builder(
+          padding: const EdgeInsets.all(12),
+          itemCount: carts.length,
+          itemBuilder: (context, index) => Card(
+            margin: const EdgeInsets.symmetric(vertical: 4),
+            elevation: 4,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(12)),
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // *Product Image
+                Expanded(
+                  flex: 2,
+                  child: Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          bottomLeft: Radius.circular(12),
+                        ),
+                        child: Image(
+                          image: NetworkImage(
+                              '${ApiRequest.baseStorageUrl}/${carts[index].product.image_uri}'),
+                          fit: BoxFit.cover,
+                          alignment: Alignment.center,
+                          height: 80,
+                        ),
+                      ),
+                      Checkbox(
+                        value: carts[index].checked,
+                        checkColor: Colours.white,
+                        activeColor: Colours.deepGreen,
+                        side: const BorderSide(
+                          color: Colours.deepGreen,
+                          width: 2,
+                        ),
+                        onChanged: (value) {
+                          // context.read<CartBuyersBloc>().add(ToggleCart(
+                          //     carts: carts,
+                          //     cart_id: carts[index].id));
+                          setState(() {
+                            carts[index].checked = !carts[index].checked;
+                          });
+                        },
+                      ),
+                    ],
                   ),
-                );
-              }
-              if (state is CartBuyersInit) {
-                _listCart = state.carts;
-                return ListView.builder(
-                  padding: const EdgeInsets.all(12),
-                  itemCount: state.carts.length,
-                  itemBuilder: (context, index) => Card(
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    elevation: 4,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(12)),
-                    ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                ),
+                const SizedBox(width: 8),
+                // *Product Information
+                Expanded(
+                  flex: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // *Product Image
-                        Expanded(
-                          flex: 2,
-                          child: Stack(
-                            children: [
-                              ClipRRect(
-                                borderRadius: const BorderRadius.only(
-                                  topLeft: Radius.circular(12),
-                                  bottomLeft: Radius.circular(12),
-                                ),
-                                child: Image(
-                                  image: NetworkImage(
-                                      '${ApiRequest.baseStorageUrl}/${state.carts[index].product.image_uri}'),
-                                  fit: BoxFit.cover,
-                                  alignment: Alignment.center,
-                                  height: 80,
-                                ),
-                              ),
-                              Checkbox(
-                                value: state.carts[index].checked,
-                                checkColor: Colours.white,
-                                activeColor: Colours.deepGreen,
-                                side: const BorderSide(
-                                  color: Colours.deepGreen,
-                                  width: 2,
-                                ),
-                                onChanged: (value) {
-                                  context.read<CartBuyersBloc>().add(ToggleCart(
-                                      carts: state.carts,
-                                      cart_id: state.carts[index].id));
-                                  setState(() {});
-                                },
-                              ),
-                            ],
+                        // *Total Price
+                        Text(
+                          'Rp. ${thousandFormat(carts[index].product.price * carts[index].quantity)}',
+                          style: const TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: FontStyles.lora,
+                            color: Colours.deepGreen,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        // *Product Information
-                        Expanded(
-                          flex: 4,
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // *Total Price
-                                Text(
-                                  'Rp. ${thousandFormat(state.carts[index].product.price * state.carts[index].quantity)}',
-                                  style: const TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: FontStyles.lora,
-                                    color: Colours.deepGreen,
-                                  ),
-                                ),
-                                const SizedBox(height: 12),
-                                // *Product Name
-                                Text(
-                                  '${state.carts[index].product.product_name} (x${state.carts[index].quantity})',
-                                  softWrap: true,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontStyles.regular,
-                                    fontFamily: FontStyles.leagueSpartan,
-                                    color: Colours.black.withOpacity(.8),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () => deleteCart(
-                              context,
-                              state.carts[index].id,
-                              state.carts[index].product_id),
-                          icon: const Icon(
-                            Icons.delete_outline_rounded,
-                            color: Colours.black,
-                            size: 36,
+                        const SizedBox(height: 12),
+                        // *Product Name
+                        Text(
+                          '${carts[index].product.product_name} (x${carts[index].quantity})',
+                          softWrap: true,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontStyles.regular,
+                            fontFamily: FontStyles.leagueSpartan,
+                            color: Colours.black.withOpacity(.8),
                           ),
                         ),
                       ],
                     ),
                   ),
-                );
-              } else {
-                return const Center(child: Text('Terjadi Kesalahan'));
-              }
-            },
-          ),
-        ),
-      ),
-      bottomNavigationBar: BlocBuilder<CartBuyersBloc, CartBuyersState>(
-        builder: (context, state) {
-          return Container(
-            padding: const EdgeInsets.all(16),
-            height: 72,
-            decoration: const BoxDecoration(
-              border: Border(
-                top: BorderSide(
-                  color: Colours.lightGray,
-                  width: 2,
                 ),
-              ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // *Total Price
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Total Harga',
-                      style: TextStyle(
-                        color: Colours.black,
-                        fontSize: 14,
-                        fontWeight: FontStyles.regular,
-                        fontFamily: FontStyles.leagueSpartan,
-                      ),
-                    ),
-                    Text(
-                      state is CartBuyersLoading
-                          ? 'Memuat...'
-                          : 'Rp. ${thousandFormat(totalPrice())}',
-                      style: const TextStyle(
-                        color: Colours.black,
-                        fontSize: 16,
-                        fontWeight: FontStyles.bold,
-                        fontFamily: FontStyles.leagueSpartan,
-                      ),
-                    ),
-                  ],
-                ),
-                // *Buy Button
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 48),
-                    backgroundColor:
-                        totalPrice() > 0 ? Colours.deepGreen : Colours.gray,
-                  ),
-                  onPressed: () {
-                    if (totalPrice() > 0) {
-                      Navigator.of(context).pushNamed(
-                        DistributionDateScreen.route,
-                        arguments: state is CartBuyersInit ? state.carts : _listCart,
-                      );
-                    }
-                  },
-                  child: Text(
-                    'Beli (${_listCart.where((element) => element.checked).toList().length})',
-                    style: const TextStyle(
-                      color: Colours.white,
-                      fontSize: 14,
-                      fontWeight: FontStyles.medium,
-                      fontFamily: FontStyles.leagueSpartan,
-                    ),
+                IconButton(
+                  onPressed: () => deleteCart(
+                      context, carts[index].id, carts[index].product_id),
+                  icon: const Icon(
+                    Icons.delete_outline_rounded,
+                    color: Colours.black,
+                    size: 36,
                   ),
                 ),
               ],
             ),
-          );
-        },
+          ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(16),
+        height: 72,
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: Colours.lightGray,
+              width: 2,
+            ),
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // *Total Price
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Total Harga',
+                  style: TextStyle(
+                    color: Colours.black,
+                    fontSize: 14,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+                Text(
+                  'Rp. ${thousandFormat(totalPrice(carts))}',
+                  style: const TextStyle(
+                    color: Colours.black,
+                    fontSize: 16,
+                    fontWeight: FontStyles.bold,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              ],
+            ),
+            // *Buy Button
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 48),
+                backgroundColor:
+                    totalPrice(carts) > 0 ? Colours.deepGreen : Colours.gray,
+              ),
+              onPressed: () {
+                if (totalPrice(carts) > 0) {
+                  Navigator.of(context).pushNamed(
+                    DistributionDateScreen.route,
+                    arguments: carts,
+                  );
+                }
+              },
+              child: Text(
+                'Beli (${carts.where((element) => element.checked).toList().length})',
+                style: const TextStyle(
+                  color: Colours.white,
+                  fontSize: 14,
+                  fontWeight: FontStyles.medium,
+                  fontFamily: FontStyles.leagueSpartan,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

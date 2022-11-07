@@ -71,6 +71,7 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
       await cancelTransaction(
         transactionSellerModel.txid,
       );
+      await pushNotifToSeller('Transaksi ${transactionSellerModel.txid} Dibatalkan oleh pembeli!', 'Pembatalan Transaksi!');
       await retrieveTransaction(context);
       LoadingWidget.close(context);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

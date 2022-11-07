@@ -32,3 +32,8 @@ class ToggleCart extends CartBuyersEvent {
   @override
   List<Object> get props => [carts, cart_id];
 }
+
+class LoadingCart extends CartBuyersEvent {
+  @override
+  List<Object> get props => [];
+}

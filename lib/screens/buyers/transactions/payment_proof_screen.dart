@@ -3,11 +3,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/loading_widget.dart';
 import 'package:melijo/widgets/modal_bottom.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class PaymentProofScreen extends StatefulWidget {
   const PaymentProofScreen({Key? key}) : super(key: key);
@@ -121,6 +123,50 @@ class _PaymentProofScreenState extends State<PaymentProofScreen> {
     }
   }
 
+  Future<void> chatWithCS(BuildContext context) async {
+    try {
+      if (await canLaunchUrl(Uri.parse(ApiRequest.whatsapp))) {
+        await launchUrl(Uri.parse(ApiRequest.whatsapp));
+      } else {
+        throw 'Tidak dapat membuka link ${ApiRequest.whatsapp}';
+      }
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
   Widget generateContent(Size screenSize) {
     if (image == null) {
       return IconButton(
@@ -174,16 +220,15 @@ class _PaymentProofScreenState extends State<PaymentProofScreen> {
         padding: const EdgeInsets.all(12),
         margin: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colours.white,
-          borderRadius: const BorderRadius.all(Radius.circular(4)),
-          boxShadow: [
-            BoxShadow(
-              blurRadius: 2,
-              color: Colours.black.withOpacity(.25),
-              offset: const Offset(2, 2),
-            ),
-          ]
-        ),
+            color: Colours.white,
+            borderRadius: const BorderRadius.all(Radius.circular(4)),
+            boxShadow: [
+              BoxShadow(
+                blurRadius: 2,
+                color: Colours.black.withOpacity(.25),
+                offset: const Offset(2, 2),
+              ),
+            ]),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -206,8 +251,8 @@ class _PaymentProofScreenState extends State<PaymentProofScreen> {
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text(
+              children: [
+                const Text(
                   'Butuh Bantuan?',
                   overflow: TextOverflow.fade,
                   style: TextStyle(
@@ -217,14 +262,17 @@ class _PaymentProofScreenState extends State<PaymentProofScreen> {
                     color: Colours.black,
                   ),
                 ),
-                Text(
-                  ' Hubungi CS Melijo.id',
-                  overflow: TextOverflow.fade,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontStyles.medium,
-                    fontFamily: FontStyles.leagueSpartan,
-                    color: Colours.deepGreen,
+                GestureDetector(
+                  onTap: () => chatWithCS(context),
+                  child: const Text(
+                    ' Hubungi CS Melijo.id',
+                    overflow: TextOverflow.fade,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontStyles.medium,
+                      fontFamily: FontStyles.leagueSpartan,
+                      color: Colours.deepGreen,
+                    ),
                   ),
                 ),
               ],

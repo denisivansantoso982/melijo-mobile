@@ -10,7 +10,6 @@ import 'package:melijo/screens/buyers/dashboard/menu/transaction_buyers_screen.d
 import 'package:melijo/screens/buyers/products/cart_product_buyers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 
 class DashboardBuyersScreen extends StatefulWidget {
   const DashboardBuyersScreen({Key? key}) : super(key: key);

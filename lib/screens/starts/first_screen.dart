@@ -16,7 +16,7 @@ class FirstScreen extends StatelessWidget {
   // ! check user auth
   Future<void> initUser(BuildContext context) async {
     final int? role = await checkUserRole();
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 2000));
     if (role == 3) {
       Navigator.of(context).pushReplacementNamed(DashboardBuyersScreen.route);
     } else if (role == 4) {

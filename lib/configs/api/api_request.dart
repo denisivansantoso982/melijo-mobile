@@ -18,6 +18,8 @@ class ApiRequest {
       'https://dev.farizdotid.com/api/daerahindonesia';
   late http.Client client;
 
+  static const String whatsapp = 'https://api.whatsapp.com/send/?phone=6285748374053&text&type=phone_number&app_absent=0';
+
   // ? Login
   Future<Map<String, dynamic>> login(String user, String password) async {
     try {
@@ -116,7 +118,7 @@ class ApiRequest {
         'province': '$province',
         'city': '$city',
         'districts': '$districts',
-        'ward': '$village',
+        'ward': ['$village'],
       };
       final http.Response response = await http
           .post(
@@ -1067,6 +1069,28 @@ class ApiRequest {
         throw '${response.statusCode} ${response.reasonPhrase}';
       }
       return Future.value(decodedResponse['data']['detail_transaction']);
+    } catch (error) {
+      return Future.error(error);
+    }
+  }
+
+  Future<void> pushNotification(String fcm, String body, String title) async {
+    try {
+      client = http.Client();
+      await client.post(
+        Uri.parse('https://fcm.googleapis.com/fcm/send'),
+        headers: {
+          'Authorization': 'key=AAAACd3VpkQ:APA91bEI6Jy7g7sM-FPLB1WYeFfC8nFX51EVwDxHFy1bKtmPDZltPZtITrpVidzIaUt14zLyXlA4d6I15YnpPjo0zq6EyV06YTNfhynzHUuHJj1Zm4fggX2o69-EWB5pCBPtVqBmW7ou',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'registration_ids': [fcm],
+          'notification': {
+            "body" : body,
+            "title": title,
+          }
+        }),
+      );
     } catch (error) {
       return Future.error(error);
     }

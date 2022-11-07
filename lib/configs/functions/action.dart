@@ -41,8 +41,8 @@ Future<int?> checkUserRole() async {
 Future<void> logout() async {
   try {
     final Map<String, dynamic> user_data = await preferences.getUser();
-    await database.deleteUserToken(user_data['id']);
     await preferences.deleteUser();
+    await database.deleteUserToken(user_data['id'], user_data['role']);
   } catch (error) {
     return Future.error(Exception(error));
   }
@@ -105,7 +105,8 @@ Future<void> login(String user, String password, bool is_seller) async {
     final String token_type = response['token_type'];
     final String fcm_token = await database.generateFCMToken();
     await api_request.setFCMToken(user_data['id'], fcm_token);
-    await database.setUserWhenLogin(user_data['id'], fcm_token);
+    await database.setUserWhenLogin(
+        user_detail['id'], user_data['role_id'], fcm_token);
     await preferences.setUserLogin(
       id: user_data['id'],
       id_detail: user_detail['id'],
@@ -498,7 +499,9 @@ Future<void> getRecipe(BuildContext context) async {
         recipe_id: element['recipe_id'],
       ));
     }
-    context.read<RecipeFavouriteBloc>().add(FillRecipeFav(recipeFavs: listRecipeFav));
+    context
+        .read<RecipeFavouriteBloc>()
+        .add(FillRecipeFav(recipeFavs: listRecipeFav));
     context.read<RecipeBuyersBloc>().add(FillRecipe(listRecipe: listRecipe));
   } catch (error) {
     return Future.error(error);
@@ -508,7 +511,12 @@ Future<void> getRecipe(BuildContext context) async {
 Future<void> addRecipeFav(int recipe_id) async {
   try {
     final Map user_data = await preferences.getUser();
-    await api_request.newRecipeFav(user_data['id_detail'], recipe_id, user_data['token_type'], user_data['auth_token'],);
+    await api_request.newRecipeFav(
+      user_data['id_detail'],
+      recipe_id,
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
   } catch (error) {
     return Future.error(error);
   }
@@ -517,7 +525,11 @@ Future<void> addRecipeFav(int recipe_id) async {
 Future<void> deleteRecipeFav(int fav_id) async {
   try {
     final Map user_data = await preferences.getUser();
-    await api_request.removeRecipeFav(fav_id, user_data['token_type'], user_data['auth_token'],);
+    await api_request.removeRecipeFav(
+      fav_id,
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
   } catch (error) {
     return Future.error(error);
   }
@@ -538,7 +550,7 @@ Future<void> addToCart(int product_id, int quantity) async {
   }
 }
 
-Future<void> retrieveCart(BuildContext context) async {
+Future<List<CartBuyersModel>> retrieveCart() async {
   try {
     final Map user_data = await preferences.getUser();
     final List<CartBuyersModel> listCart = [];
@@ -565,14 +577,15 @@ Future<void> retrieveCart(BuildContext context) async {
         ),
       ));
     }
-    // context.read<CartBuyersBloc>().add(DeleteCart());
-    context.read<CartBuyersBloc>().add(FillCart(carts: listCart));
+    // context.read<CartBuyersBloc>().add(FillCart(carts: listCart));
+    // BlocProvider.of<CartBuyersBloc>(context, listen: false).add(FillCart(carts: listCart));
+    return Future.value(listCart);
   } catch (error) {
     return Future.error(error);
   }
 }
 
-Future<void> deleteProductCart(BuildContext context, int cart_id) async {
+Future<void> deleteProductCart(int cart_id) async {
   try {
     final Map user_data = await preferences.getUser();
     await api_request.deleteProductCart(
@@ -580,6 +593,7 @@ Future<void> deleteProductCart(BuildContext context, int cart_id) async {
       user_data['token_type'],
       user_data['auth_token'],
     );
+    // BlocProvider.of<CartBuyersBloc>(context, listen: false).add(DeleteCart());
   } catch (error) {
     return Future.error(error);
   }
@@ -737,4 +751,23 @@ Future<void> cancelTransaction(String txid) async {
 
 Future<void> subscribeNotif() async {
   await database.subscribeTopic();
+}
+
+Future<void> pushNotifToCust(int customer_id, String body, String title) async {
+  try {
+    final String fcm = await database.getFCMToken(customer_id, 3);
+    await api_request.pushNotification(fcm, body, title);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> pushNotifToSeller(String body, String title) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final String fcm = await database.getFCMToken(user_data['seller_id'], 4);
+    await api_request.pushNotification(fcm, body, title);
+  } catch (error) {
+    return Future.error(error);
+  }
 }

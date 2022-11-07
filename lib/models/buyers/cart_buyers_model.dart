@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, must_be_immutable
+// ignore_for_file: non_constant_identifier_names, must_be_immutable, unused_import
 
 import 'package:equatable/equatable.dart';
 import 'package:melijo/models/buyers/product_buyers_model.dart';

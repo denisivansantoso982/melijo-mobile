@@ -78,6 +78,7 @@ class _DetailTransactionSellerScreenState
         transactionSellerModel.total,
         transactionSellerModel.operator_id,
       );
+      await pushNotifToCust(transactionSellerModel.customer_id, 'Transaksi ${transactionSellerModel.txid} telah dikonfirmasi oleh penjual!', 'Konfirmasi Transaksi!');
       await retrieveTransaction(context);
       LoadingWidget.close(context);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
