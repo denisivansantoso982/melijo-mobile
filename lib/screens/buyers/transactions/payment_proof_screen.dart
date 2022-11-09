@@ -125,10 +125,10 @@ class _PaymentProofScreenState extends State<PaymentProofScreen> {
 
   Future<void> chatWithCS(BuildContext context) async {
     try {
-      if (await canLaunchUrl(Uri.parse(ApiRequest.whatsapp))) {
-        await launchUrl(Uri.parse(ApiRequest.whatsapp));
+      if (await canLaunchUrl(Uri.parse(ApiRequest.launchLink))) {
+        await launchUrl(Uri.parse(ApiRequest.launchLink));
       } else {
-        throw 'Tidak dapat membuka link ${ApiRequest.whatsapp}';
+        throw 'Tidak dapat membuka link ${ApiRequest.launchLink}';
       }
     } catch (error) {
       showModalBottomSheet(

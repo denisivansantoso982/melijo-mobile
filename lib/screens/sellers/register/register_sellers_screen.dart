@@ -37,11 +37,15 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
   int id_province = 0;
   int id_city = 0;
   int id_district = 0;
-  int id_village = 0;
+  int id_village_1 = 0;
+  int id_village_2 = 0;
+  int id_village_3 = 0;
   List<dynamic> provinces = [];
   List<dynamic> cities = [];
   List<dynamic> districts = [];
-  List<dynamic> villages = [];
+  List<dynamic> villages_1 = [];
+  List<dynamic> villages_2 = [];
+  List<dynamic> villages_3 = [];
   bool _visiblePass = false;
   bool _visibleRepeatPass = false;
 
@@ -71,6 +75,7 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
     super.dispose();
   }
 
+   // ! init Province
   Future<void> initProvinces() async {
     try {
       List<dynamic> response = await retrieveProvinces();
@@ -113,6 +118,7 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
     }
   }
 
+  // ! init City
   Future<void> initCities() async {
     try {
       List<dynamic> response = await retrieveCities(id_province);
@@ -155,6 +161,7 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
     }
   }
 
+  // ! init District
   Future<void> initDistricts() async {
     try {
       List<dynamic> response = await retrieveDistricts(id_city);
@@ -197,11 +204,12 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
     }
   }
 
+  // ! init Village / Ward
   Future<void> initVillages() async {
     try {
       List<dynamic> response = await retrieveVillages(id_district);
       setState(() {
-        villages = response;
+        villages_1 = response;
       });
     } catch (error) {
       showModalBottomSheet(
@@ -296,25 +304,25 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
     if (id_province == 0) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         backgroundColor: Colours.red,
-        content: Text('Harap pilih Provinsi anda tinggal!'),
+        content: Text('Harap pilih Provinsi Operasional!'),
       ));
       _provinceFocus.requestFocus();
     } else if (id_city == 0) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         backgroundColor: Colours.red,
-        content: Text('Harap pilih Kabupaten/Kota anda tinggal!'),
+        content: Text('Harap pilih Kabupaten/Kota Operasional!'),
       ));
       _cityFocus.requestFocus();
     } else if (id_district == 0) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         backgroundColor: Colours.red,
-        content: Text('Harap pilih Kecamatan anda tinggal!'),
+        content: Text('Harap pilih Kecamatan Operasional!'),
       ));
       _districtFocus.requestFocus();
-    } else if (id_village == 0) {
+    } else if (id_village_1 == 0) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         backgroundColor: Colours.red,
-        content: Text('Harap pilih Kelurahan anda tinggal!'),
+        content: Text('Harap pilih Minimal 1 Kelurahan Operasional!'),
       ));
       _villageFocus.requestFocus();
     } else {
@@ -346,6 +354,13 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
   Future doProcessRegistration(BuildContext context) async {
     try {
       LoadingWidget.show(context);
+      final List<int> theVillages = [id_village_1];
+      if (id_village_2 != 0) {
+        theVillages.add(id_village_2);
+      }
+      if (id_village_3 != 0) {
+        theVillages.add(id_village_3);
+      }
       await register(
         _nameController.text,
         _emailController.text,
@@ -355,7 +370,7 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
         id_province,
         id_city,
         id_district,
-        id_village,
+        theVillages,
       );
       LoadingWidget.close(context);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -459,7 +474,7 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
               ),
             ),
             SizedBox(
-              height: 550,
+              height: 650,
               child: PageView(
                 controller: _pageController,
                 physics:
@@ -805,12 +820,16 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
             onChanged: (value) {
               cities.clear();
               districts.clear();
-              villages.clear();
+              villages_1.clear();
+              villages_2.clear();
+              villages_3.clear();
               setState(() {
                 id_province = value;
                 id_city = 0;
                 id_district = 0;
-                id_village = 0;
+                id_village_1 = 0;
+                id_village_2 = 0;
+                id_village_3 = 0;
               });
               initCities();
             },
@@ -869,11 +888,15 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
                 .toList(),
             onChanged: (value) {
               districts.clear();
-              villages.clear();
+              villages_1.clear();
+              villages_2.clear();
+              villages_3.clear();
               setState(() {
                 id_city = value;
                 id_district = 0;
-                id_village = 0;
+                id_village_1 = 0;
+                id_village_2 = 0;
+                id_village_3 = 0;
               });
               initDistricts();
             },
@@ -922,17 +945,21 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
                     ))
                 .toList(),
             onChanged: (value) {
-              villages.clear();
+              villages_1.clear();
+              villages_2.clear();
+              villages_3.clear();
               setState(() {
                 id_district = value;
-                id_village = 0;
+                id_village_1 = 0;
+                id_village_2 = 0;
+                id_village_3 = 0;
               });
               initVillages();
             },
           ),
         ),
         const SizedBox(height: 16),
-        // * Village Field
+        // * Village 1 Field
         Container(
           decoration: const BoxDecoration(
             color: Colours.lightGray,
@@ -959,15 +986,116 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
                 borderRadius: BorderRadius.all(Radius.circular(12)),
               ),
               contentPadding: EdgeInsets.all(16),
-              hintText: 'Kelurahan',
+              hintText: 'Kelurahan 1',
             ),
-            value: villages.isNotEmpty
-                ? (id_village != 0
-                    ? villages.firstWhere(
-                        (element) => element['id'] == id_village)['id']
-                    : villages[0]['id'])
+            value: villages_1.isNotEmpty
+                ? (id_village_1 != 0
+                    ? villages_1.firstWhere(
+                        (element) => element['id'] == id_village_1)['id']
+                    : villages_1[0]['id'])
                 : 0,
-            items: villages
+            items: villages_1
+                .map<DropdownMenuItem>((element) => DropdownMenuItem(
+                      value: element['id'],
+                      child: Text(element['nama']),
+                    ))
+                .toList(),
+            onChanged: (value) {
+              villages_2.clear();
+              villages_3.clear();
+              setState(() {
+                id_village_1 = value;
+                villages_2.addAll(villages_1.where((element) => element['id'] != value));
+              });
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+        // * Village 2 Field
+        Container(
+          decoration: const BoxDecoration(
+            color: Colours.lightGray,
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
+          child: DropdownButtonFormField(
+            isExpanded: true,
+            style: const TextStyle(
+              color: Colours.black,
+              fontSize: 18,
+              fontFamily: 'League Spartan',
+              fontWeight: FontWeight.w400,
+              overflow: TextOverflow.ellipsis,
+            ),
+            decoration: const InputDecoration(
+              fillColor: Colours.lightGray,
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              contentPadding: EdgeInsets.all(16),
+              hintText: 'Kelurahan 2 (Opsional)',
+            ),
+            value: villages_2.isNotEmpty
+                ? (id_village_2 != 0
+                    ? villages_2.firstWhere(
+                        (element) => element['id'] == id_village_2)['id']
+                    : villages_2[0]['id'])
+                : 0,
+            items: villages_2
+                .map<DropdownMenuItem>((element) => DropdownMenuItem(
+                      value: element['id'],
+                      child: Text(element['nama']),
+                    ))
+                .toList(),
+            onChanged: (value) {
+              villages_3.clear();
+              setState(() {
+                id_village_2 = value;
+                villages_3.addAll(villages_2.where((element) => element['id'] != value));
+              });
+            },
+          ),
+        ),
+        const SizedBox(height: 16),
+        // * Village 3 Field
+        Container(
+          decoration: const BoxDecoration(
+            color: Colours.lightGray,
+            borderRadius: BorderRadius.all(Radius.circular(12)),
+          ),
+          child: DropdownButtonFormField(
+            isExpanded: true,
+            style: const TextStyle(
+              color: Colours.black,
+              fontSize: 18,
+              fontFamily: 'League Spartan',
+              fontWeight: FontWeight.w400,
+              overflow: TextOverflow.ellipsis,
+            ),
+            decoration: const InputDecoration(
+              fillColor: Colours.lightGray,
+              enabledBorder: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderSide: BorderSide.none,
+                borderRadius: BorderRadius.all(Radius.circular(12)),
+              ),
+              contentPadding: EdgeInsets.all(16),
+              hintText: 'Kelurahan 3 (Opsional)',
+            ),
+            value: villages_3.isNotEmpty
+                ? (id_village_3 != 0
+                    ? villages_3.firstWhere(
+                        (element) => element['id'] == id_village_3)['id']
+                    : villages_3[0]['id'])
+                : 0,
+            items: villages_3
                 .map<DropdownMenuItem>((element) => DropdownMenuItem(
                       value: element['id'],
                       child: Text(element['nama']),
@@ -975,7 +1103,7 @@ class _RegisterSellersScreenState extends State<RegisterSellersScreen> {
                 .toList(),
             onChanged: (value) {
               setState(() {
-                id_village = value;
+                id_village_3 = value;
               });
             },
           ),

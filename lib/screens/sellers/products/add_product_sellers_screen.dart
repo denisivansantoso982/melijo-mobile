@@ -21,6 +21,7 @@ class AddProductSellerScreen extends StatefulWidget {
 }
 
 class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
+  final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
   final ImagePicker _picker = ImagePicker();
   final TextEditingController _nameController = TextEditingController();
   int _categoryValue = 1;
@@ -34,20 +35,14 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
   final FocusNode _priceFocus = FocusNode();
   final FocusNode _descriptionFocus = FocusNode();
   final List<XFile> _listOfPicture = [];
-  final List<Map<String, dynamic>> _listOfCategory = [
-    {'id': 1, 'value': 'Sayur'},
-    {'id': 2, 'value': 'Daging'},
-    {'id': 3, 'value': 'Unggas'},
-    {'id': 4, 'value': 'Seafood'},
-    {'id': 5, 'value': 'Protein'},
-    {'id': 6, 'value': 'Bumbu'},
-  ];
-  final List<Map<String, dynamic>> _listOfUnit = [
-    {'id': 1, 'value': 'PCS'},
-    {'id': 2, 'value': 'KG'},
-    {'id': 3, 'value': 'GR'},
-    {'id': 4, 'value': 'IKAT'},
-  ];
+  final List _listOfCategory = [];
+  final List _listOfUnit = [];
+
+  @override
+  void initState() {
+    retrieveCategoryAndUnit();
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -298,6 +293,52 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
     }
   }
 
+  // ! Retrieve Category & Unit
+  Future<void> retrieveCategoryAndUnit() async {
+    try {
+      final List categories = await getCategoryProduct();
+      final List units = await getUnit();
+      setState(() {
+        _listOfCategory.addAll(categories);
+        _listOfUnit.addAll(units);
+      });
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: _globalKey.currentContext!,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
   // ! Validation
   bool validation() {
     if (_listOfPicture.isEmpty) {
@@ -348,6 +389,7 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _globalKey,
       appBar: AppBar(
         backgroundColor: Colours.deepGreen,
         title: const Text(
@@ -488,6 +530,7 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
               decoration: InputDecoration(
                 enabledBorder: outlineInputBorder(Colours.gray),
                 focusedBorder: outlineInputBorder(Colours.deepGreen),
+                hintText: 'Memuat...',
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 12,
                   horizontal: 12,
@@ -509,14 +552,14 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
                           children: [
                             Image(
                               image: AssetImage(
-                                  'lib/assets/images/category/${item['value']}.png'),
+                                  'lib/assets/images/category/${item['category_name']}.png'),
                               fit: BoxFit.cover,
                               height: 30,
                               width: 30,
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              item['value']!,
+                              item['category_name']!,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontStyles.regular,
@@ -568,6 +611,7 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
               decoration: InputDecoration(
                 enabledBorder: outlineInputBorder(Colours.gray),
                 focusedBorder: outlineInputBorder(Colours.deepGreen),
+                hintText: 'Memuat...',
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 12,
                   horizontal: 12,
@@ -579,7 +623,7 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
                     (item) => DropdownMenuItem<int>(
                       value: item['id'],
                       child: Text(
-                        item['value']!,
+                        item['unit_name']!,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontStyles.regular,

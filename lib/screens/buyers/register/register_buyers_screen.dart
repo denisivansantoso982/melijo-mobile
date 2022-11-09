@@ -355,7 +355,7 @@ class _RegisterBuyersScreenState extends State<RegisterBuyersScreen> {
         id_province,
         id_city,
         id_district,
-        id_village,
+        [id_village],
       );
       LoadingWidget.close(context);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(

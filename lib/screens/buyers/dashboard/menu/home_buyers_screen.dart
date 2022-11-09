@@ -42,6 +42,7 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
     super.dispose();
   }
 
+  // ! Retrieve Product Category
   Future<void> retrieveCategory() async {
     try {
       final List resCategories = await getCategoryProduct();
@@ -168,7 +169,7 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
         itemBuilder: (context, index) => GestureDetector(
           onTap: () => Navigator.of(context).pushNamed(
             DetailProductBuyersScreen.route,
-            arguments: state.listOfProduct[index],
+            arguments: listProduct[index],
           ),
           child: Container(
             decoration: BoxDecoration(
@@ -310,7 +311,10 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
         elevation: 0,
       ),
       body: RefreshIndicator(
-        onRefresh: () => getProducts(context),
+        onRefresh: () async {
+          await getProducts(context);
+          await retrieveCategory();
+        },
         child: BlocBuilder<ProductBuyersBloc, ProductBuyersState>(
           builder: (context, state) {
             return ListView(
@@ -386,76 +390,79 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                       );
                     }),
                 // *Category Panel
-                  SizedBox(
-                    height: 120,
-                    child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      scrollDirection: Axis.horizontal,
-                      itemCount: _listCategory.length,
-                      itemBuilder: (context, index) => GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            if (_listCategory[index]['id'] != category_id) {
-                              category_id = _listCategory[index]['id'];
-                            } else {
-                              category_id = 0;
-                            }
-                          });
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colours.white,
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(64)),
-                                  border: Border.all(
-                                    width: _listCategory[index]['id'] ==
+                SizedBox(
+                  height: 120,
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: _listCategory.length,
+                    itemBuilder: (context, index) => GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          if (_listCategory[index]['id'] != category_id) {
+                            category_id = _listCategory[index]['id'];
+                          } else {
+                            category_id = 0;
+                          }
+                        });
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 8),
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colours.white,
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(64)),
+                                border: Border.all(
+                                  width:
+                                      _listCategory[index]['id'] == category_id
+                                          ? 2
+                                          : 0,
+                                  color:
+                                      _listCategory[index]['id'] == category_id
+                                          ? Colours.deepGreen
+                                          : Colors.transparent,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 4,
+                                    color: _listCategory[index]['id'] ==
                                             category_id
-                                        ? 2
-                                        : 0,
-                                    color: _listCategory[index]['id'] == category_id ? Colours.deepGreen : Colors.transparent,
+                                        ? Colours.deepGreen.withOpacity(.25)
+                                        : Colours.black.withOpacity(.25),
+                                    offset: const Offset(4, 4),
                                   ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      blurRadius: 4,
-                                      color: _listCategory[index]['id'] ==
-                                              category_id
-                                          ? Colours.deepGreen.withOpacity(.25)
-                                          : Colours.black.withOpacity(.25),
-                                      offset: const Offset(4, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  child: Image(
-                                    image: AssetImage(
-                                        'lib/assets/images/category/${_listCategory[index]['category_name']}.png'),
-                                    fit: BoxFit.cover,
-                                    height: 32,
-                                    width: 32,
-                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                child: Image(
+                                  image: AssetImage(
+                                      'lib/assets/images/category/${_listCategory[index]['category_name']}.png'),
+                                  fit: BoxFit.cover,
+                                  height: 32,
+                                  width: 32,
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '${_listCategory[index]['category_name']}',
-                                style: const TextStyle(
-                                  color: Colours.deepGreen,
-                                  fontSize: 16,
-                                  fontWeight: FontStyles.medium,
-                                  fontFamily: FontStyles.leagueSpartan,
-                                ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              '${_listCategory[index]['category_name']}',
+                              style: const TextStyle(
+                                color: Colours.deepGreen,
+                                fontSize: 16,
+                                fontWeight: FontStyles.medium,
+                                fontFamily: FontStyles.leagueSpartan,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ),
+                ),
                 // *Promo or Ads Panel
                 Container(
                   margin: const EdgeInsets.symmetric(horizontal: 20),

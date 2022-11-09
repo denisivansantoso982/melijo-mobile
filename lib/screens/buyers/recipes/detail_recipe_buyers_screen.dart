@@ -9,6 +9,7 @@ import 'package:melijo/models/buyers/recipe_buyers_model.dart';
 import 'package:melijo/models/search_model.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/search_product_screen.dart';
+import 'package:melijo/screens/buyers/recipes/search_recipe_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/modal_bottom.dart';
@@ -133,6 +134,12 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
                 child: TextFormField(
                   controller: _searchController,
                   focusNode: _searchFocus,
+                  keyboardType: TextInputType.name,
+                  textInputAction: TextInputAction.search,
+                  onFieldSubmitted: (value) {
+                    SearchModel.recipe = value;
+                    Navigator.of(context).pushNamed(SearchRecipeScreen.route);
+                  },
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,

@@ -89,12 +89,12 @@ Future<List<dynamic>> retrieveVillages(int id_district) async {
 
 Future<void> login(String user, String password, bool is_seller) async {
   try {
-    final Map<String, dynamic> response =
+    final Map response =
         await api_request.login(user, password);
     final Map<String, dynamic> user_data = response['user'];
     final Map<String, dynamic> user_detail = response['detail'];
     final Map<String, dynamic> user_address = response['address']['address'];
-    final Map<String, dynamic>? plotting = response['plotting'];
+    final Map<String, dynamic>? plotting = response['plotting'].isNotEmpty ? response['plotting'][0] : null ;
     if (is_seller && user_data['role_id'] != 4) {
       throw 'Pengguna tidak ditemukan!';
     } else if (!is_seller && user_data['role_id'] != 3) {
@@ -138,12 +138,12 @@ Future<void> register(
   int province,
   int city,
   int districts,
-  int village,
+  List<int> village,
 ) async {
   try {
     if (role_id == 3) {
       await api_request.register(name, email, phone, password, role_id,
-          province, city, districts, village);
+          province, city, districts, village[0]);
     } else {
       await api_request.registerSeller(name, email, phone, password, role_id,
           province, city, districts, village);
@@ -785,10 +785,36 @@ Future<void> pushNotifToSeller(String body, String title) async {
   }
 }
 
+Future<List> getUnit() async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List categories = await api_request.retrieveUnit(
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    return Future.value(categories);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
 Future<List> getCategoryProduct() async {
   try {
     final Map user_data = await preferences.getUser();
     final List categories = await api_request.retrieveCategoryProduct(
+      user_data['token_type'],
+      user_data['auth_token'],
+    );
+    return Future.value(categories);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<List> getCategoryRecipe() async {
+  try {
+    final Map user_data = await preferences.getUser();
+    final List categories = await api_request.retrieveCategoryRecipe(
       user_data['token_type'],
       user_data['auth_token'],
     );

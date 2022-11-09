@@ -1,8 +1,6 @@
 // ignore_for_file: library_private_types_in_public_api, non_constant_identifier_names, use_build_context_synchronously, no_leading_underscores_for_local_identifiers
 
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:melijo/bloc/buyers/cart/cart_buyers_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/models/buyers/cart_buyers_model.dart';
@@ -24,6 +22,7 @@ class CartProductBuyersScreen extends StatefulWidget {
 
 class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
   final List<CartBuyersModel> carts = [];
+  bool _loadingCart = true;
 
   @override
   void initState() {
@@ -47,8 +46,8 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
       setState(() {
         carts.clear();
         carts.addAll(resCarts);
+        _loadingCart = false;
       });
-      // context.read<CartBuyersBloc>().add(FillCart(carts: carts));
     } catch (error) {
       showModalBottomSheet(
         backgroundColor: Colors.transparent,
@@ -200,7 +199,16 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
           ),
         ),
       ),
-      body: RefreshIndicator(
+      body: _loadingCart ? const Center(
+        child: SizedBox(
+          width: 56,
+          height: 56,
+          child: CircularProgressIndicator(
+            color: Colours.deepGreen,
+            strokeWidth: 4,
+          ),
+        ),
+      ) : RefreshIndicator(
         onRefresh: () => getCarts(),
         child: ListView.builder(
           padding: const EdgeInsets.all(12),

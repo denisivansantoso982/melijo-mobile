@@ -129,6 +129,7 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
                   ),
                   onFieldSubmitted: (value) {
                     _searchController.text = value;
+                    SearchModel.product = value;
                   },
                 ),
               ),
@@ -172,7 +173,7 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
           return GridView.builder(
             padding: const EdgeInsets.all(20),
             shrinkWrap: true,
-            itemCount: snapshot.data != null ? snapshot.data!.length : 0,
+            itemCount: snapshot.hasData ? snapshot.data!.length : 0,
             physics: const ScrollPhysics(),
             gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,

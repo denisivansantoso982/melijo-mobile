@@ -31,6 +31,7 @@ class _ProfileSellersScreenState extends State<ProfileSellersScreen> {
   final FocusNode _addressFocus = FocusNode();
   String imageUrl = '';
   bool _isEditable = false;
+  bool _loadingProfile = true;
 
   @override
   void initState() {
@@ -113,6 +114,7 @@ class _ProfileSellersScreenState extends State<ProfileSellersScreen> {
         _addressController.text =
             'Kelurahan ${location['ward']}, Kecamatan ${location['district']}, ${location['city']}, ${location['province']}';
         imageUrl = user_data['avatar'];
+        _loadingProfile = false;
       });
     } catch (error) {
       showModalBottomSheet(
@@ -309,7 +311,7 @@ class _ProfileSellersScreenState extends State<ProfileSellersScreen> {
             fontFamily: 'Lora',
           ),
         ),
-        actions: [
+        actions: _loadingProfile ? [] : [
           IconButton(
             onPressed: () async {
               if (_isEditable) {
@@ -325,7 +327,16 @@ class _ProfileSellersScreenState extends State<ProfileSellersScreen> {
           ),
         ],
       ),
-      body: RefreshIndicator(
+      body: _loadingProfile ? const Center(
+        child: SizedBox(
+          width: 56,
+          height: 56,
+          child: CircularProgressIndicator(
+            color: Colours.deepGreen,
+            strokeWidth: 4,
+          ),
+        ),
+      ) : RefreshIndicator(
         onRefresh: () => retrieveProfile(),
         child: Form(
           child: ListView(

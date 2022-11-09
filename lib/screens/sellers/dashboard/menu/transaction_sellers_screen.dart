@@ -77,6 +77,7 @@ class TransactionSellersScreen extends StatelessWidget {
         duration: Duration(seconds: 2),
         content: Text('Transaksi dikonfirmasi!'),
       ));
+      Navigator.of(context).pop();
     } catch (error) {
       LoadingWidget.close(context);
       showModalBottomSheet(
@@ -243,9 +244,56 @@ class TransactionSellersScreen extends StatelessWidget {
                                     child: ElevatedButton(
                                       onPressed: () {
                                         if (state.transactionSellerModel[index].status == 'paid') {
-                                          confirmTheTransaction(
-                                            context,
-                                            state.transactionSellerModel[index],
+                                          // * Confirmation
+                                          showModalBottomSheet(
+                                            backgroundColor: Colors.transparent,
+                                            context: context,
+                                            builder: (context) => Container(
+                                              padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+                                              decoration: const BoxDecoration(
+                                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                                color: Colours.white,
+                                              ),
+                                              child: ModalBottom(
+                                                title: 'Apakah anda yakin?',
+                                                message: 'Apakah anda yakin untuk mengkonfirmasi transaksi ${state.transactionSellerModel[index].txid}?',
+                                                widgets: [
+                                                  OutlinedButton(
+                                                    style: OutlinedButton.styleFrom(
+                                                      side: const BorderSide(color: Colours.deepGreen, width: 1),
+                                                      fixedSize: const Size.fromWidth(80),
+                                                    ),
+                                                    onPressed: () => Navigator.of(context).pop(),
+                                                    child: const Text(
+                                                      'Tidak',
+                                                      style: TextStyle(
+                                                        color: Colours.deepGreen,
+                                                        fontSize: 18,
+                                                        fontWeight: FontStyles.regular,
+                                                        fontFamily: FontStyles.leagueSpartan,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  ElevatedButton(
+                                                    style: ElevatedButton.styleFrom(
+                                                      side: const BorderSide(color: Colours.deepGreen, width: 1),
+                                                      fixedSize: const Size.fromWidth(80),
+                                                    ),
+                                                    onPressed: () => confirmTheTransaction(context, state.transactionSellerModel[index]),
+                                                    child: const Text(
+                                                      'Ya',
+                                                      style: TextStyle(
+                                                        color: Colours.white,
+                                                        fontSize: 18,
+                                                        fontWeight: FontStyles.regular,
+                                                        fontFamily: FontStyles.leagueSpartan,
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                            ),
                                           );
                                         }
                                       },

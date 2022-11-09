@@ -20,6 +20,7 @@ import 'package:melijo/screens/buyers/products/products_buyers_screen.dart';
 import 'package:melijo/screens/buyers/recipes/detail_recipe_buyers_screen.dart';
 import 'package:melijo/screens/buyers/recipes/favourite_recipes_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/search_product_screen.dart';
+import 'package:melijo/screens/buyers/recipes/search_recipe_screen.dart';
 import 'package:melijo/screens/buyers/register/register_buyers_screen.dart';
 import 'package:melijo/screens/buyers/transactions/detail_transactions_screen.dart';
 import 'package:melijo/screens/buyers/transactions/distribution_address_screen.dart';
@@ -117,6 +118,7 @@ class MyApp extends StatelessWidget {
           ProductsBuyersScreen.route: (context) => const ProductsBuyersScreen(),
           PaymentProofScreen.route: (context) => const PaymentProofScreen(),
           SearchProductScreen.route: (context) => const SearchProductScreen(),
+          SearchRecipeScreen.route: (context) => const SearchRecipeScreen(),
           DetailTransactionSellerScreen.route: (context) => const DetailTransactionSellerScreen(),
         },
       ),

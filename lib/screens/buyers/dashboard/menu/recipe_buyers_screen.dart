@@ -7,9 +7,11 @@ import 'package:melijo/bloc/buyers/recipe_favourite/recipe_favourite_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/models/buyers/recipe_buyers_model.dart';
+import 'package:melijo/models/search_model.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/screens/buyers/recipes/detail_recipe_buyers_screen.dart';
 import 'package:melijo/screens/buyers/recipes/favourite_recipes_buyers_screen.dart';
+import 'package:melijo/screens/buyers/recipes/search_recipe_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/loading_widget.dart';
@@ -23,44 +25,72 @@ class RecipeBuyersScreen extends StatefulWidget {
 }
 
 class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
+  final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
-  final List<Map<String, dynamic>> _listRecipeCategory = [
+  final List _listRecipeCategory = [
     {
-      'name': 'Semua',
-      'selected': true,
-    },
-    {
-      'name': 'Healthy',
-      'selected': false,
-    },
-    {
-      'name': 'Western',
-      'selected': false,
-    },
-    {
-      'name': 'Asian',
-      'selected': false,
-    },
-    {
-      'name': 'Manis',
-      'selected': false,
-    },
-    {
-      'name': 'Pedas',
-      'selected': false,
-    },
-    {
-      'name': 'Camilan',
-      'selected': false,
+      'id': 0,
+      'recipe_category_name': 'Semua',
     },
   ];
+  int recipe_category_id = 0;
+
+  @override
+  void initState() {
+    retrieveRecipeCategory();
+    super.initState();
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
     _searchFocus.dispose();
     super.dispose();
+  }
+
+  // ! Retrieve Recipe Category
+  Future<void> retrieveRecipeCategory() async {
+    try {
+      final List resCategories = await getCategoryRecipe();
+      setState(() {
+        _listRecipeCategory.addAll(resCategories);
+      });
+    } catch (error) {
+      showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: _globalKey.currentContext!,
+        builder: (context) => Container(
+          padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            color: Colours.white,
+          ),
+          child: ModalBottom(
+            title: 'Terjadi Kesalahan!',
+            message: '$error',
+            widgets: [
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Colours.deepGreen, width: 1),
+                  fixedSize: const Size.fromWidth(80),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Oke',
+                  style: TextStyle(
+                    color: Colours.deepGreen,
+                    fontSize: 18,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    }
   }
 
   // ! Retrieve Recipe
@@ -192,12 +222,18 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
                 child: TextFormField(
                   controller: _searchController,
                   focusNode: _searchFocus,
+                  keyboardType: TextInputType.name,
+                  textInputAction: TextInputAction.search,
+                  onFieldSubmitted: (value) {
+                    SearchModel.recipe = value;
+                    Navigator.of(context).pushNamed(SearchRecipeScreen.route);
+                  },
                   decoration: const InputDecoration(
                     border: InputBorder.none,
                     enabledBorder: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.all(4),
-                    hintText: 'Cari Resep produk',
+                    hintText: 'Cari Resep',
                   ),
                 ),
               ),
@@ -228,41 +264,56 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
         elevation: 0,
       ),
       body: RefreshIndicator(
-        onRefresh: () => getRecipe(context),
+        onRefresh: () async {
+          await getRecipe(context);
+          await retrieveRecipeCategory();
+        },
         child: ListView(
           children: [
             const SizedBox(height: 8),
             // *Category Recipes
-            // SizedBox(
-            //   height: 32,
-            //   child: ListView.builder(
-            //     scrollDirection: Axis.horizontal,
-            //     itemCount: _listRecipeCategory.length,
-            //     itemBuilder: (context, index) => Container(
-            //       alignment: Alignment.center,
-            //       padding: const EdgeInsets.symmetric(horizontal: 8),
-            //       margin: const EdgeInsets.symmetric(horizontal: 4),
-            //       decoration: BoxDecoration(
-            //         color: _listRecipeCategory[index]['selected']
-            //             ? Colours.deepGreen
-            //             : Colors.transparent,
-            //         borderRadius: const BorderRadius.all(Radius.circular(64)),
-            //       ),
-            //       child: Text(
-            //         _listRecipeCategory[index]['name'],
-            //         style: TextStyle(
-            //           color: _listRecipeCategory[index]['selected']
-            //               ? Colours.white
-            //               : Colours.black,
-            //           fontSize: 14,
-            //           fontFamily: FontStyles.leagueSpartan,
-            //           fontWeight: FontStyles.bold,
-            //         ),
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // const SizedBox(height: 12),
+            SizedBox(
+              height: 36,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: _listRecipeCategory.length,
+                itemBuilder: (context, index) => GestureDetector(
+                  onTap: () {
+                    if (_listRecipeCategory[index]['id'] !=
+                        recipe_category_id) {
+                      setState(() {
+                        recipe_category_id = _listRecipeCategory[index]['id'];
+                      });
+                    }
+                  },
+                  child: Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      color:
+                          recipe_category_id == _listRecipeCategory[index]['id']
+                              ? Colours.deepGreen
+                              : Colors.transparent,
+                      borderRadius: const BorderRadius.all(Radius.circular(64)),
+                    ),
+                    child: Text(
+                      _listRecipeCategory[index]['recipe_category_name'],
+                      style: TextStyle(
+                        color: recipe_category_id ==
+                                _listRecipeCategory[index]['id']
+                            ? Colours.white
+                            : Colours.black,
+                        fontSize: 14,
+                        fontFamily: FontStyles.leagueSpartan,
+                        fontWeight: FontStyles.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             // *Promo or Ads Panel
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -313,10 +364,17 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
                         );
                       }
                       if (recipe is RecipeBuyersInit) {
+                        List<RecipeBuyersModel> recipes =
+                            recipe_category_id == 0
+                                ? recipe.recipes
+                                : recipe.recipes
+                                    .where((element) =>
+                                        element.id == recipe_category_id)
+                                    .toList();
                         return GridView.builder(
                           padding: const EdgeInsets.all(20),
                           shrinkWrap: true,
-                          itemCount: recipe.recipes.length,
+                          itemCount: recipes.length,
                           physics: const ScrollPhysics(),
                           gridDelegate:
                               const SliverGridDelegateWithFixedCrossAxisCount(
@@ -328,7 +386,7 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
                           itemBuilder: (context, index) => GestureDetector(
                             onTap: () => Navigator.of(context).pushNamed(
                               DetailRecipeBuyersScreen.route,
-                              arguments: recipe.recipes[index],
+                              arguments: recipes[index],
                             ),
                             child: Container(
                               decoration: BoxDecoration(
@@ -358,8 +416,7 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
                                           topRight: Radius.circular(8),
                                         ),
                                         child: Image(
-                                          image: renderImage(
-                                              recipe.recipes[index]),
+                                          image: renderImage(recipes[index]),
                                           fit: BoxFit.cover,
                                           width: double.infinity,
                                           height: screenSize.height / 6,
@@ -371,7 +428,7 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 8.0),
                                           child: Text(
-                                            recipe.recipes[index].recipe_title,
+                                            recipes[index].recipe_title,
                                             maxLines: 2,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
@@ -399,7 +456,7 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
                                         favourite.recipeFavs
                                                 .where((element) =>
                                                     element.recipe_id ==
-                                                    recipe.recipes[index].id)
+                                                    recipes[index].id)
                                                 .isNotEmpty
                                             ? toggleFavourite(
                                                 context,
@@ -409,22 +466,22 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
                                                         recipe
                                                             .recipes[index].id)
                                                     .id,
-                                                recipe.recipes[index].id)
+                                                recipes[index].id)
                                             : toggleFavourite(context, null,
-                                                recipe.recipes[index].id);
+                                                recipes[index].id);
                                       },
                                       child: Icon(
                                         favourite.recipeFavs
                                                 .where((element) =>
                                                     element.recipe_id ==
-                                                    recipe.recipes[index].id)
+                                                    recipes[index].id)
                                                 .isNotEmpty
                                             ? Icons.favorite
                                             : Icons.favorite_border,
                                         color: favourite.recipeFavs
                                                 .where((element) =>
                                                     element.recipe_id ==
-                                                    recipe.recipes[index].id)
+                                                    recipes[index].id)
                                                 .isNotEmpty
                                             ? Colors.red
                                             : Colours.black,
