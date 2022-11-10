@@ -407,7 +407,7 @@ class _DetailTransactionSellerScreenState
                 backgroundColor: transactionSellerModel.status == 'paid' ? Colours.deepGreen : Colours.gray,
               ),
               child: Text(
-                transactionSellerModel.status == 'paid' ? 'Konfirmasi' : (transactionSellerModel.status != 'waiting' ? 'Menunggu...' : 'Sudah Dikonfirmasi'),
+                transactionSellerModel.status == 'paid' ? 'Konfirmasi' : (transactionSellerModel.status == 'waiting' ? 'Sudah Dikonfirmasi' : (transactionSellerModel.status == 'canceled' ? 'Dibatalkan' : 'Menunggu...')),
                 style: const TextStyle(
                   color: Colours.white,
                   fontSize: 14,

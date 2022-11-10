@@ -94,7 +94,7 @@ Future<void> login(String user, String password, bool is_seller) async {
     final Map<String, dynamic> user_data = response['user'];
     final Map<String, dynamic> user_detail = response['detail'];
     final Map<String, dynamic> user_address = response['address']['address'];
-    final Map<String, dynamic>? plotting = response['plotting'].isNotEmpty ? response['plotting'][0] : null ;
+    final Map<String, dynamic>? plotting = is_seller ? null : response['plotting'];
     if (is_seller && user_data['role_id'] != 4) {
       throw 'Pengguna tidak ditemukan!';
     } else if (!is_seller && user_data['role_id'] != 3) {
@@ -719,7 +719,7 @@ Future<void> getTransactionCustomer(BuildContext context) async {
   try {
     final Map user_data = await preferences.getUser();
     final List<TransactionSellerModel> listTransaction = [];
-    final List<dynamic> response = await api_request.retrieveTransactionSeller(
+    final List<dynamic> response = await api_request.retrieveTransactionCustomer(
       user_data['id_detail'],
       user_data['token_type'],
       user_data['auth_token'],

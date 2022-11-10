@@ -301,7 +301,7 @@ class TransactionSellersScreen extends StatelessWidget {
                                         backgroundColor: state.transactionSellerModel[index].status == 'paid' ? Colours.deepGreen : Colours.gray,
                                       ),
                                       child: Text(
-                                        state.transactionSellerModel[index].status == 'paid' ? 'Konfirmasi' : (state.transactionSellerModel[index].status != 'waiting' ? 'Menunggu...' : 'Sudah Dikonfirmasi'),
+                                        state.transactionSellerModel[index].status == 'paid' ? 'Konfirmasi' : (state.transactionSellerModel[index].status == 'waiting' ? 'Sudah Dikonfirmasi' : (state.transactionSellerModel[index].status == 'canceled' ? 'Dibatalkan' : 'Menunggu...')),
                                         style: const TextStyle(
                                           fontFamily: 'League Spartan',
                                           fontWeight: FontWeight.w600,

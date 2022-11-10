@@ -323,6 +323,12 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                 FutureBuilder(
                     future: getUserInfo(),
                     builder: (context, snapshot) {
+                      if(snapshot.data!['seller_id'] == 0) {
+                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          backgroundColor: Colours.deepGreen,
+                          content: Text('Untuk saat ini tidak ada melijo di wilayah anda!'),
+                        ));
+                      }
                       return Container(
                         padding: const EdgeInsets.symmetric(
                           vertical: 16,

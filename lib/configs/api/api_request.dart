@@ -11,10 +11,10 @@ import 'package:melijo/models/buyers/recipe_buyers_model.dart';
 import 'package:melijo/models/sellers/product_seller_model.dart';
 
 class ApiRequest {
-  static const String baseUrl = 'http://192.168.43.59:8000/api';
-  static const String baseStorageUrl = 'http://192.168.43.59:8000/storage';
-  // static const String baseUrl = 'https://panel.melijo.id/api';
-  // static const String baseStorageUrl = 'https://panel.melijo.id/storage';
+  // static const String baseUrl = 'http://192.168.43.59:8000/api';
+  // static const String baseStorageUrl = 'http://192.168.43.59:8000/storage';
+  static const String baseUrl = 'https://panel.melijo.id/api';
+  static const String baseStorageUrl = 'https://panel.melijo.id/storage';
   static const String locationBaseUrl =
       'https://dev.farizdotid.com/api/daerahindonesia';
   late http.Client client;
@@ -41,6 +41,9 @@ class ApiRequest {
           .timeout(const Duration(seconds: 30));
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
+        if (response.statusCode == 401) {
+          throw 'Pengguna tidak ditemukan!';
+        }
         throw '${response.statusCode} ${decodedResponse['message']}';
       }
       final Map data = decodedResponse['data'];
@@ -592,7 +595,7 @@ class ApiRequest {
     try {
       client = http.Client();
       final http.Response response = await client.get(
-          Uri.parse('$baseUrl/user_seller/$customer_id/customer'),
+          Uri.parse('$baseUrl/transaction/$customer_id/customer'),
           headers: {
             'Authorization': '$token_type $token',
             'accept': 'application/json',
