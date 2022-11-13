@@ -20,7 +20,7 @@ class TransactionSellerModel extends Equatable {
 
   final String txid;
   final DateTime date_order;
-  final String? promo;
+  final Map? promo;
   final String? promo_code;
   final String status;
   final String customer_name;

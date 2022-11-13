@@ -275,8 +275,7 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
                                 const SizedBox(height: 4),
                                 // *Package
                                 Visibility(
-                                  visible: snapshot.data![index]['grouping'] !=
-                                      'none',
+                                  visible: packageName(snapshot.data![index]['grouping']) != 'none',
                                   child: Container(
                                     padding: const EdgeInsets.symmetric(
                                       vertical: 2,
