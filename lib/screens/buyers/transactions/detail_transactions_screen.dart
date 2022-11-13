@@ -10,16 +10,22 @@ import 'package:melijo/widgets/loading_widget.dart';
 import 'package:melijo/widgets/modal_bottom.dart';
 
 class DetailTransactionScreen extends StatefulWidget {
-  const DetailTransactionScreen({ Key? key }) : super(key: key);
+  const DetailTransactionScreen({Key? key}) : super(key: key);
 
   static const String route = '/detail_transaction_screen';
 
   @override
-  _DetailTransactionScreenState createState() => _DetailTransactionScreenState();
+  _DetailTransactionScreenState createState() =>
+      _DetailTransactionScreenState();
 }
 
 class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
   late TransactionSellerModel transactionSellerModel;
+
+  String packageName(String package) {
+    String result = package.split('-')[2];
+    return result;
+  }
 
   // ! Retrieve Transaction
   Future<void> retrieveTransaction(BuildContext context) async {
@@ -70,7 +76,9 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
       await cancelTransaction(
         transactionSellerModel.txid,
       );
-      await pushNotifToSeller('Transaksi ${transactionSellerModel.txid} Dibatalkan oleh pembeli!', 'Pembatalan Transaksi!');
+      await pushNotifToSeller(
+          'Transaksi ${transactionSellerModel.txid} Dibatalkan oleh pembeli!',
+          'Pembatalan Transaksi!');
       await retrieveTransaction(context);
       LoadingWidget.close(context);
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -264,6 +272,28 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
                                     color: Colours.black.withOpacity(.8),
                                   ),
                                 ),
+                                const SizedBox(height: 4),
+                                // *Package
+                                Visibility(
+                                  visible: snapshot.data![index]['grouping'] !=
+                                      'none',
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 2,
+                                      horizontal: 4,
+                                    ),
+                                    color: Colours.deepGreen,
+                                    child: Text(
+                                      packageName(snapshot.data![index]['grouping']),
+                                      style: const TextStyle(
+                                        color: Colours.white,
+                                        fontSize: 16,
+                                        fontFamily: FontStyles.leagueSpartan,
+                                        fontWeight: FontStyles.regular,
+                                      ),
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
                           ),
@@ -274,36 +304,6 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
                 );
               },
             ),
-            // const SizedBox(height: 16),
-            // Text(
-            //   'Pengiriman Tanggal : ${DateFormat('dd - MM - yyyy').format(transactionSellerModel.date_order)}',
-            //   style: const TextStyle(
-            //     fontSize: 18,
-            //     fontWeight: FontStyles.regular,
-            //     fontFamily: FontStyles.leagueSpartan,
-            //     color: Colours.gray,
-            //   ),
-            // ),
-            // const SizedBox(height: 16),
-            // Text(
-            //   'Pemesan : ${transactionSellerModel.customer_name}',
-            //   style: const TextStyle(
-            //     fontSize: 18,
-            //     fontWeight: FontStyles.regular,
-            //     fontFamily: FontStyles.leagueSpartan,
-            //     color: Colours.gray,
-            //   ),
-            // ),
-            // const SizedBox(height: 16),
-            // Text(
-            //   'Alamat : \n\n${transactionSellerModel.information}',
-            //   style: const TextStyle(
-            //     fontSize: 18,
-            //     fontWeight: FontStyles.regular,
-            //     fontFamily: FontStyles.leagueSpartan,
-            //     color: Colours.gray,
-            //   ),
-            // ),
           ],
         ),
       ),
@@ -352,18 +352,22 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
                     backgroundColor: Colors.transparent,
                     context: context,
                     builder: (context) => Container(
-                      padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 28, horizontal: 20),
                       decoration: const BoxDecoration(
-                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        borderRadius:
+                            BorderRadius.vertical(top: Radius.circular(20)),
                         color: Colours.white,
                       ),
                       child: ModalBottom(
                         title: 'Apakah anda yakin?',
-                        message: 'Apakah anda yakin ingin menghapus transaksi ${transactionSellerModel.txid}?',
+                        message:
+                            'Apakah anda yakin ingin menghapus transaksi ${transactionSellerModel.txid}?',
                         widgets: [
                           OutlinedButton(
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(color: Colours.deepGreen, width: 1),
+                              side: const BorderSide(
+                                  color: Colours.deepGreen, width: 1),
                               fixedSize: const Size.fromWidth(80),
                             ),
                             onPressed: () => Navigator.of(context).pop(),
@@ -380,10 +384,12 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
                           const SizedBox(width: 8),
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              side: const BorderSide(color: Colours.deepGreen, width: 1),
+                              side: const BorderSide(
+                                  color: Colours.deepGreen, width: 1),
                               fixedSize: const Size.fromWidth(80),
                             ),
-                            onPressed: () => cancelTheTransaction(context, transactionSellerModel),
+                            onPressed: () => cancelTheTransaction(
+                                context, transactionSellerModel),
                             child: const Text(
                               'Ya',
                               style: TextStyle(
@@ -401,10 +407,14 @@ class _DetailTransactionScreenState extends State<DetailTransactionScreen> {
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: transactionSellerModel.status != 'canceled' ? Colours.deepGreen : Colours.gray,
+                backgroundColor: transactionSellerModel.status != 'canceled'
+                    ? Colours.deepGreen
+                    : Colours.gray,
               ),
               child: Text(
-                transactionSellerModel.status != 'canceled' ? 'Batalkan' : 'Dibatalkan',
+                transactionSellerModel.status != 'canceled'
+                    ? 'Batalkan'
+                    : 'Dibatalkan',
                 style: const TextStyle(
                   color: Colours.white,
                   fontSize: 14,

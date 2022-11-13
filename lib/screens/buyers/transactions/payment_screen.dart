@@ -251,15 +251,34 @@ class _PaymentScreenState extends State<PaymentScreen> {
               ),
             ],
           ),
-          Container(
-            alignment: Alignment.topRight,
-            child: Text(
-              'Rp. ${thousandFormat(totalProduct())}',
-              style: const TextStyle(
-                color: Colours.gray,
-                fontSize: 16,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Visibility(
+                visible: carts[0].grouping != 'none',
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8,),
+                  color: Colours.deepGreen,
+                  child: Text(
+                    carts[0].grouping,
+                    style: const TextStyle(
+                      color: Colours.white,
+                      fontSize: 16,
+                      fontFamily: FontStyles.leagueSpartan,
+                      fontWeight: FontStyles.regular,
+                    ),
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(width: 12),
+              Text(
+                'Rp. ${thousandFormat(totalProduct())}',
+                style: const TextStyle(
+                  color: Colours.gray,
+                  fontSize: 16,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           // * Payment Method

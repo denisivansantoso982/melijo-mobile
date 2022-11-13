@@ -31,6 +31,14 @@
           }
         },
         {
+          "client_id": "42376472132-v94ik7qndptlj53548gc2i5mgvgvo3h8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.melijo",
+            "certificate_hash": "bacab07407944fd765eec94dff49ee813c9a8a82"
+          }
+        },
+        {
           "client_id": "42376472132-749c9giu5ulp19r68i1s7fr649cag067.apps.googleusercontent.com",
           "client_type": 3
         }

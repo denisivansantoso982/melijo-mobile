@@ -24,6 +24,11 @@ class _DetailTransactionSellerScreenState
     extends State<DetailTransactionSellerScreen> {
   late TransactionSellerModel transactionSellerModel;
 
+  String packageName(String package) {
+    String result = package.split('-')[2];
+    return result;
+  }
+
   // ! Retrieve Transaction
   Future<void> retrieveTransaction(BuildContext context) async {
     try {
@@ -265,6 +270,24 @@ class _DetailTransactionSellerScreenState
                                     fontWeight: FontWeight.w500,
                                     fontFamily: 'League Spartan',
                                     color: Colours.black.withOpacity(.8),
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                // *Package
+                                Visibility(
+                                  visible: snapshot.data![index]['grouping'] != 'none',
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4,),
+                                    color: Colours.deepGreen,
+                                    child: Text(
+                                      packageName(snapshot.data![index]['grouping']),
+                                      style: const TextStyle(
+                                        color: Colours.white,
+                                        fontSize: 16,
+                                        fontFamily: FontStyles.leagueSpartan,
+                                        fontWeight: FontStyles.regular,
+                                      ),
+                                    ),
                                   ),
                                 ),
                               ],

@@ -169,7 +169,10 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
         itemBuilder: (context, index) => GestureDetector(
           onTap: () => Navigator.of(context).pushNamed(
             DetailProductBuyersScreen.route,
-            arguments: listProduct[index],
+            arguments: {
+              'product': listProduct[index],
+              'grouping': null,
+            },
           ),
           child: Container(
             decoration: BoxDecoration(
@@ -273,7 +276,12 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                   textInputAction: TextInputAction.search,
                   onFieldSubmitted: (value) {
                     SearchModel.product = value;
-                    Navigator.of(context).pushNamed(SearchProductScreen.route);
+                    Navigator.of(context).pushNamed(
+                      SearchProductScreen.route,
+                      arguments: {
+                        'grouping': null,
+                      }
+                    );
                   },
                   decoration: const InputDecoration(
                     border: InputBorder.none,
@@ -323,12 +331,6 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                 FutureBuilder(
                     future: getUserInfo(),
                     builder: (context, snapshot) {
-                      if(snapshot.data!['seller_id'] == 0) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          backgroundColor: Colours.deepGreen,
-                          content: Text('Untuk saat ini tidak ada melijo di wilayah anda!'),
-                        ));
-                      }
                       return Container(
                         padding: const EdgeInsets.symmetric(
                           vertical: 16,
@@ -445,8 +447,8 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                               ),
                               child: ClipRRect(
                                 child: Image(
-                                  image: AssetImage(
-                                      'lib/assets/images/category/${_listCategory[index]['category_name']}.png'),
+                                  image: NetworkImage(
+                                      '${ApiRequest.baseStorageUrl}/${_listCategory[index]['image']}'),
                                   fit: BoxFit.cover,
                                   height: 32,
                                   width: 32,

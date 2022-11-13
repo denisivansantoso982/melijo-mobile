@@ -251,7 +251,12 @@ class _DetailRecipeBuyersScreenState extends State<DetailRecipeBuyersScreen> {
                   onTap: () {
                     String? keyword = snapshot.data?[index].keyword;
                     SearchModel.product = keyword ?? '';
-                    Navigator.of(context).pushNamed(SearchProductScreen.route);
+                    Navigator.of(context).pushNamed(
+                      SearchProductScreen.route,
+                      arguments: {
+                        'grouping': recipe.recipe_title,
+                      }
+                    );
                   },
                   child: Card(
                     margin: const EdgeInsets.symmetric(vertical: 4),

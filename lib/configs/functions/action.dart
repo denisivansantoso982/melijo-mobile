@@ -534,13 +534,14 @@ Future<void> deleteRecipeFav(int fav_id) async {
   }
 }
 
-Future<void> addToCart(int product_id, int quantity) async {
+Future<void> addToCart(int product_id, int quantity, String? grouping) async {
   try {
     final Map user_data = await preferences.getUser();
     await api_request.addProductToCart(
       product_id,
       user_data['id_detail'],
       quantity,
+      grouping ?? 'none',
       user_data['token_type'],
       user_data['auth_token'],
     );
@@ -564,6 +565,7 @@ Future<List<CartBuyersModel>> retrieveCart() async {
         product_id: element['product_id'],
         user_customer_id: element['user_customer_id'],
         quantity: element['quantity'],
+        grouping: element['grouping'],
         product: ProductBuyersModel(
           id: element['product_id'],
           price: element['price'],

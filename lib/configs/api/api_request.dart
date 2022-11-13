@@ -44,7 +44,7 @@ class ApiRequest {
         if (response.statusCode == 401) {
           throw 'Pengguna tidak ditemukan!';
         }
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       final Map data = decodedResponse['data'];
       return Future.value(data);
@@ -90,7 +90,7 @@ class ApiRequest {
           .timeout(const Duration(seconds: 30));
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       final Map<String, dynamic> data = decodedResponse['data'];
       return Future.value(data);
@@ -136,7 +136,7 @@ class ApiRequest {
           .timeout(const Duration(seconds: 30));
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       final Map<String, dynamic> data = decodedResponse['data'];
       return Future.value(data);
@@ -182,7 +182,7 @@ class ApiRequest {
           .timeout(const Duration(seconds: 30));
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
     } catch (error) {
       return Future.error(error);
@@ -348,7 +348,7 @@ class ApiRequest {
       ).timeout(const Duration(seconds: 30));
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       final Map<String, dynamic> data = decodedResponse['data'];
       return Future.value(data);
@@ -393,7 +393,7 @@ class ApiRequest {
           .timeout(const Duration(seconds: 30));
       final Map<String, dynamic> decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(decodedResponse['data']);
     } catch (error) {
@@ -416,10 +416,10 @@ class ApiRequest {
         filename: file.name,
       ));
       final http.StreamedResponse response = await request.send();
-      // final responseByteArray = await response.stream.toBytes();
-      // final jsonDecoded = jsonDecode(utf8.decode(responseByteArray));
+      final responseByteArray = await response.stream.toBytes();
+      final jsonDecoded = jsonDecode(utf8.decode(responseByteArray));
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${response.reasonPhrase}';
+        throw '${response.statusCode} ${jsonDecoded['message']}';
       }
       // return Future.error(jsonDecoded);
     } catch (error) {
@@ -440,7 +440,7 @@ class ApiRequest {
       });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(decodedResponse['data']);
     } catch (error) {
@@ -461,7 +461,7 @@ class ApiRequest {
       });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(decodedResponse['data']);
     } catch (error) {
@@ -482,7 +482,7 @@ class ApiRequest {
       });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
     } catch (error) {
       return Future.error(error);
@@ -515,7 +515,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
     } catch (error) {
       return Future.error(error);
@@ -559,7 +559,7 @@ class ApiRequest {
       });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(jsonDecode(response.body)['data']);
     } catch (error) {
@@ -581,7 +581,7 @@ class ApiRequest {
           });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(decodedResponse['data']['transaction']);
     } catch (error) {
@@ -603,7 +603,7 @@ class ApiRequest {
           });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(decodedResponse['data']['transaction']);
     } catch (error) {
@@ -641,7 +641,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
     } catch (error) {
       return Future.error(error);
@@ -667,7 +667,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
     } catch (error) {
       return Future.error(error);
@@ -703,7 +703,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(jsonDecode(response.body)['data']);
     } catch (error) {
@@ -724,7 +724,7 @@ class ApiRequest {
       });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(decodedResponse['data']);
     } catch (error) {
@@ -744,7 +744,7 @@ class ApiRequest {
       });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(decodedResponse['data']);
     } catch (error) {
@@ -765,7 +765,7 @@ class ApiRequest {
       });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       final List result = decodedResponse['data'];
       return Future.value(result);
@@ -793,7 +793,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
     } catch (error) {
       return Future.error(error);
@@ -814,7 +814,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
     } catch (error) {
       return Future.error(error);
@@ -826,6 +826,7 @@ class ApiRequest {
     int product_id,
     int customer_id,
     int quantity,
+    String grouping,
     String token_type,
     String token,
   ) async {
@@ -835,6 +836,7 @@ class ApiRequest {
         'user_customer_id': customer_id,
         'product_id': product_id,
         'quantity': quantity,
+        'grouping': grouping,
       };
       final http.Response response = await client.post(
         Uri.parse('$baseUrl/cart'),
@@ -847,7 +849,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
     } catch (error) {
       return Future.error(error);
@@ -869,7 +871,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(decodedResponse['data']);
     } catch (error) {
@@ -892,7 +894,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
     } catch (error) {
       return Future.error(error);
@@ -939,7 +941,7 @@ class ApiRequest {
       final Map decodedResponse = jsonDecode(response.body);
       final Map responseDecoded = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(responseDecoded['data']);
     } catch (error) {
@@ -961,7 +963,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(decodedResponse['data']);
     } catch (error) {
@@ -1015,7 +1017,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       for (var element in decodedResponse['data']['recoms']) {
         _recom.add(ProductRecomModel(
@@ -1048,7 +1050,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       for (var element in decodedResponse['data']) {
         _products.add(ProductBuyersModel(
@@ -1086,7 +1088,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       for (var element in decodedResponse['data']) {
         _products.add(RecipeBuyersModel(
@@ -1119,7 +1121,7 @@ class ApiRequest {
       );
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       return Future.value(decodedResponse['data']['detail_transaction']);
     } catch (error) {
@@ -1161,7 +1163,7 @@ class ApiRequest {
       });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       final List result = decodedResponse['data'];
       return Future.value(result);
@@ -1182,7 +1184,7 @@ class ApiRequest {
       });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       final List result = decodedResponse['data'];
       return Future.value(result);
@@ -1203,7 +1205,7 @@ class ApiRequest {
       });
       final Map decodedResponse = jsonDecode(response.body);
       if (response.statusCode != 200) {
-        throw '${response.statusCode} ${decodedResponse['message']}';
+        throw '${response.statusCode} ${decodedResponse['errors']}';
       }
       final List result = decodedResponse['data'];
       return Future.value(result);

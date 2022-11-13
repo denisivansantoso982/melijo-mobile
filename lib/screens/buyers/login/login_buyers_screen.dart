@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,7 +42,15 @@ class _LoginBuyersScreenState extends State<LoginBuyersScreen> {
           _isLoading = true;
         });
         await login(_userController.text, _passwordController.text, false);
-        Navigator.of(context).pushNamedAndRemoveUntil(DashboardBuyersScreen.route, (route) => false);
+        final Map user_info = await getUserInfo();
+        if (user_info['seller_id'] == 0) {
+          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            backgroundColor: Colours.deepGreen,
+            content: Text('Untuk saat ini tidak ada Melijo di wilayah anda!'),
+          ));
+        }
+        Navigator.of(context).pushNamedAndRemoveUntil(
+            DashboardBuyersScreen.route, (route) => false);
       }
     } catch (error) {
       setState(() {
@@ -267,10 +275,11 @@ class _LoginBuyersScreenState extends State<LoginBuyersScreen> {
                           ),
                         )
                       : const SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: CircularProgressIndicator(color: Colours.white, strokeWidth: 2),
-                      ),
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                              color: Colours.white, strokeWidth: 2),
+                        ),
                 ),
               ),
             ],

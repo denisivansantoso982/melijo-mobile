@@ -21,6 +21,7 @@ class CartProductBuyersScreen extends StatefulWidget {
 }
 
 class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
+  final GlobalKey<ScaffoldState> _globalKey = GlobalKey<ScaffoldState>();
   final List<CartBuyersModel> carts = [];
   bool _loadingCart = true;
 
@@ -51,7 +52,7 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
     } catch (error) {
       showModalBottomSheet(
         backgroundColor: Colors.transparent,
-        context: context,
+        context: _globalKey.currentContext!,
         builder: (context) => Container(
           padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
           decoration: const BoxDecoration(
@@ -84,47 +85,6 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
       );
     }
   }
-
-  // Future<void> getCarts(BuildContext context) async {
-  //   try {
-  //     final List<CartBuyersModel> carts = await retrieveCart(context);
-  //     context.read<CartBuyersBloc>().add(FillCart(carts: carts));
-  //   } catch (error) {
-  //     showModalBottomSheet(
-  //       backgroundColor: Colors.transparent,
-  //       context: context,
-  //       builder: (context) => Container(
-  //         padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
-  //         decoration: const BoxDecoration(
-  //           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-  //           color: Colours.white,
-  //         ),
-  //         child: ModalBottom(
-  //           title: 'Terjadi Kesalahan!',
-  //           message: '$error',
-  //           widgets: [
-  //             OutlinedButton(
-  //               style: OutlinedButton.styleFrom(
-  //                 side: const BorderSide(color: Colours.deepGreen, width: 1),
-  //                 fixedSize: const Size.fromWidth(80),
-  //               ),
-  //               onPressed: () => Navigator.of(context).pop(),
-  //               child: const Text(
-  //                 'Oke',
-  //                 style: TextStyle(
-  //                   color: Colours.deepGreen,
-  //                   fontSize: 18,
-  //                   fontWeight: FontStyles.regular,
-  //                   fontFamily: FontStyles.leagueSpartan,
-  //                 ),
-  //               ),
-  //             )
-  //           ],
-  //         ),
-  //       ),
-  //     );
-  //   }
-  // }
 
   Future<void> deleteCart(
       BuildContext context, int cart_id, int product_id) async {
@@ -176,6 +136,7 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _globalKey,
       appBar: AppBar(
         flexibleSpace: Container(
           decoration: const BoxDecoration(
@@ -199,116 +160,149 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
           ),
         ),
       ),
-      body: _loadingCart ? const Center(
-        child: SizedBox(
-          width: 56,
-          height: 56,
-          child: CircularProgressIndicator(
-            color: Colours.deepGreen,
-            strokeWidth: 4,
-          ),
-        ),
-      ) : RefreshIndicator(
-        onRefresh: () => getCarts(),
-        child: ListView.builder(
-          padding: const EdgeInsets.all(12),
-          itemCount: carts.length,
-          itemBuilder: (context, index) => Card(
-            margin: const EdgeInsets.symmetric(vertical: 4),
-            elevation: 4,
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(12)),
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // *Product Image
-                Expanded(
-                  flex: 2,
-                  child: Stack(
+      body: _loadingCart
+          ? const Center(
+              child: SizedBox(
+                width: 56,
+                height: 56,
+                child: CircularProgressIndicator(
+                  color: Colours.deepGreen,
+                  strokeWidth: 4,
+                ),
+              ),
+            )
+          : RefreshIndicator(
+              onRefresh: () => getCarts(),
+              child: ListView.builder(
+                padding: const EdgeInsets.all(12),
+                itemCount: carts.length,
+                itemBuilder: (context, index) => Card(
+                  margin: const EdgeInsets.symmetric(vertical: 4),
+                  elevation: 4,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(12),
-                          bottomLeft: Radius.circular(12),
-                        ),
-                        child: Image(
-                          image: NetworkImage(
-                              '${ApiRequest.baseStorageUrl}/${carts[index].product.image_uri}'),
-                          fit: BoxFit.cover,
-                          alignment: Alignment.center,
-                          height: 80,
+                      // *Product Image
+                      Expanded(
+                        flex: 2,
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(12),
+                                bottomLeft: Radius.circular(12),
+                              ),
+                              child: Image(
+                                image: NetworkImage(
+                                    '${ApiRequest.baseStorageUrl}/${carts[index].product.image_uri}'),
+                                fit: BoxFit.cover,
+                                alignment: Alignment.center,
+                                height: 80,
+                              ),
+                            ),
+                            Checkbox(
+                              value: carts[index].checked,
+                              checkColor: Colours.white,
+                              activeColor: Colours.deepGreen,
+                              side: const BorderSide(
+                                color: Colours.deepGreen,
+                                width: 2,
+                              ),
+                              onChanged: (value) {
+                                if (carts[index].grouping == 'none') {
+                                  List<CartBuyersModel> groupingCart = carts.where((element) => element.grouping != 'none').toList();
+                                  setState(() {
+                                    for (CartBuyersModel cart in groupingCart) {
+                                      cart.checked = false;
+                                    }
+                                    carts[index].checked = !carts[index].checked;
+                                  });
+                                } else {
+                                  List<CartBuyersModel> groupingCart = carts.where((element) => element.grouping == carts[index].grouping).toList();
+                                  setState(() {
+                                    for (CartBuyersModel cart in carts) {
+                                      cart.checked = false;
+                                    }
+                                    for (CartBuyersModel cart in groupingCart) {
+                                      cart.checked = !cart.checked;
+                                    }
+                                  });
+                                }
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                      Checkbox(
-                        value: carts[index].checked,
-                        checkColor: Colours.white,
-                        activeColor: Colours.deepGreen,
-                        side: const BorderSide(
-                          color: Colours.deepGreen,
-                          width: 2,
+                      const SizedBox(width: 4),
+                      // *Product Information
+                      Expanded(
+                        flex: 4,
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // *Total Price
+                              Text(
+                                'Rp. ${thousandFormat(carts[index].product.price * carts[index].quantity)}',
+                                style: const TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  fontFamily: FontStyles.lora,
+                                  color: Colours.deepGreen,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              // *Product Name
+                              Text(
+                                '${carts[index].product.product_name} (x${carts[index].quantity})',
+                                softWrap: true,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontStyles.regular,
+                                  fontFamily: FontStyles.leagueSpartan,
+                                  color: Colours.black.withOpacity(.8),
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              // *Package
+                              Visibility(
+                                visible: carts[index].grouping != 'none',
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4,),
+                                  color: Colours.deepGreen,
+                                  child: Text(
+                                    carts[index].grouping,
+                                    style: const TextStyle(
+                                      color: Colours.white,
+                                      fontSize: 16,
+                                      fontFamily: FontStyles.leagueSpartan,
+                                      fontWeight: FontStyles.regular,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                        onChanged: (value) {
-                          // context.read<CartBuyersBloc>().add(ToggleCart(
-                          //     carts: carts,
-                          //     cart_id: carts[index].id));
-                          setState(() {
-                            carts[index].checked = !carts[index].checked;
-                          });
-                        },
+                      ),
+                      IconButton(
+                        onPressed: () => deleteCart(
+                            context, carts[index].id, carts[index].product_id),
+                        icon: const Icon(
+                          Icons.delete_outline_rounded,
+                          color: Colours.black,
+                          size: 36,
+                        ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                // *Product Information
-                Expanded(
-                  flex: 4,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // *Total Price
-                        Text(
-                          'Rp. ${thousandFormat(carts[index].product.price * carts[index].quantity)}',
-                          style: const TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            fontFamily: FontStyles.lora,
-                            color: Colours.deepGreen,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        // *Product Name
-                        Text(
-                          '${carts[index].product.product_name} (x${carts[index].quantity})',
-                          softWrap: true,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontStyles.regular,
-                            fontFamily: FontStyles.leagueSpartan,
-                            color: Colours.black.withOpacity(.8),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () => deleteCart(
-                      context, carts[index].id, carts[index].product_id),
-                  icon: const Icon(
-                    Icons.delete_outline_rounded,
-                    color: Colours.black,
-                    size: 36,
-                  ),
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-      ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         height: 72,
@@ -359,7 +353,7 @@ class _CartProductBuyersScreenState extends State<CartProductBuyersScreen> {
                 if (totalPrice(carts) > 0) {
                   Navigator.of(context).pushNamed(
                     DistributionDateScreen.route,
-                    arguments: carts,
+                    arguments: carts.where((element) => element.checked).toList(),
                   );
                 }
               },

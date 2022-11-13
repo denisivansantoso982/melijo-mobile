@@ -10,12 +10,14 @@ class CartBuyersModel extends Equatable {
     required this.user_customer_id,
     required this.quantity,
     required this.product,
+    required this.grouping,
   });
 
   final int id;
   final int product_id;
   final int user_customer_id;
   final int quantity;
+  final String grouping;
   final ProductBuyersModel product;
   bool checked = false;
 
@@ -26,6 +28,7 @@ class CartBuyersModel extends Equatable {
     user_customer_id,
     quantity,
     product,
-    checked
+    checked,
+    grouping,
   ];
 }

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
@@ -26,8 +27,7 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
   final TextEditingController _nameController = TextEditingController();
   int _categoryValue = 1;
   int _unitValue = 1;
-  final TextEditingController _priceController =
-      TextEditingController(text: '0');
+  final TextEditingController _priceController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _categoryFocus = FocusNode();
@@ -299,6 +299,8 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
       final List categories = await getCategoryProduct();
       final List units = await getUnit();
       setState(() {
+        _categoryValue = categories[0]['id'];
+        _unitValue = units[0]['id'];
         _listOfCategory.addAll(categories);
         _listOfUnit.addAll(units);
       });
@@ -354,7 +356,7 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
       ));
       _nameFocus.requestFocus();
       return false;
-    } else if (_categoryValue < 1 || _categoryValue > 6) {
+    } else if (_categoryValue < 1) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         backgroundColor: Colours.red,
         content: Text('Pilih category!'),
@@ -427,7 +429,18 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
                     fontWeight: FontStyles.medium,
                     fontFamily: FontStyles.leagueSpartan,
                   ),
-                )
+                ),
+                SizedBox(width: 8),
+                Text(
+                  '(Maksimal Ukuran Foto 2MB)',
+                  style: TextStyle(
+                    color: Colours.black,
+                    fontWeight: FontStyles.regular,
+                    fontFamily: FontStyles.leagueSpartan,
+                    fontSize: 16,
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
               ],
             ),
             const SizedBox(height: 4),
@@ -551,8 +564,8 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
                         child: Row(
                           children: [
                             Image(
-                              image: AssetImage(
-                                  'lib/assets/images/category/${item['category_name']}.png'),
+                              image: NetworkImage(
+                                  '${ApiRequest.baseStorageUrl}/${item['image']}'),
                               fit: BoxFit.cover,
                               height: 30,
                               width: 30,
@@ -574,9 +587,7 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
                   )
                   .toList(),
               onChanged: (value) {
-                setState(() {
-                  _categoryValue = value!;
-                });
+                _categoryValue = value!;
               },
             ),
             const SizedBox(height: 8),
@@ -635,9 +646,7 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
                   )
                   .toList(),
               onChanged: (value) {
-                setState(() {
-                  _unitValue = value!;
-                });
+                _unitValue = value!;
               },
             ),
             const SizedBox(height: 8),
@@ -696,6 +705,7 @@ class _AddProductSellerScreenState extends State<AddProductSellerScreen> {
                   horizontal: 8,
                 ),
                 isDense: true,
+                filled: true,
               ),
             ),
             const SizedBox(height: 8),

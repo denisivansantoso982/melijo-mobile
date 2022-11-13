@@ -34,6 +34,7 @@ class _DetailProductBuyersScreenState extends State<DetailProductBuyersScreen> {
   late ProductBuyersModel product;
   final List<dynamic> _listOfPicture = [];
   final StreamController streamController = StreamController();
+  String? grouping;
   int quantity = 0;
 
   @override
@@ -280,7 +281,7 @@ class _DetailProductBuyersScreenState extends State<DetailProductBuyersScreen> {
         throw 'Masukkan Kuantitas!';
       }
       LoadingWidget.show(context);
-      await addToCart(product.id, quantity);
+      await addToCart(product.id, quantity, grouping);
       LoadingWidget.close(context);
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -330,7 +331,9 @@ class _DetailProductBuyersScreenState extends State<DetailProductBuyersScreen> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    product = ModalRoute.of(context)!.settings.arguments as ProductBuyersModel;
+    final Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
+    product = arguments['product'];
+    grouping = arguments['grouping'];
     return WillPopScope(
       onWillPop: () async {
         context.read<CartActionBloc>().add(ZeroPointEvent());
@@ -367,7 +370,12 @@ class _DetailProductBuyersScreenState extends State<DetailProductBuyersScreen> {
                     textInputAction: TextInputAction.search,
                     onFieldSubmitted: (value) {
                       SearchModel.product = value;
-                      Navigator.of(context).pushNamed(SearchProductScreen.route);
+                      Navigator.of(context).pushNamed(
+                        SearchProductScreen.route,
+                        arguments: {
+                          'grouping': null,
+                        }
+                      );
                     },
                     decoration: const InputDecoration(
                       border: InputBorder.none,

@@ -159,21 +159,26 @@ class _ProductSellersScreenState extends State<ProductSellersScreen> {
                             backgroundColor: Colors.transparent,
                             context: context,
                             builder: (context) => Container(
-                              padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 28, horizontal: 20),
                               decoration: const BoxDecoration(
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20)),
                                 color: Colours.white,
                               ),
                               child: ModalBottom(
                                 title: 'Apakah anda yakin?',
-                                message: 'Apakah anda yakin untuk menghpus produk ${listProduct[index].product_name}?',
+                                message:
+                                    'Apakah anda yakin untuk menghpus produk ${listProduct[index].product_name}?',
                                 widgets: [
                                   OutlinedButton(
                                     style: OutlinedButton.styleFrom(
-                                      side: const BorderSide(color: Colours.deepGreen, width: 1),
+                                      side: const BorderSide(
+                                          color: Colours.deepGreen, width: 1),
                                       fixedSize: const Size.fromWidth(80),
                                     ),
-                                    onPressed: () => Navigator.of(context).pop(),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
                                     child: const Text(
                                       'Tidak',
                                       style: TextStyle(
@@ -187,10 +192,12 @@ class _ProductSellersScreenState extends State<ProductSellersScreen> {
                                   const SizedBox(width: 8),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
-                                      side: const BorderSide(color: Colours.deepGreen, width: 1),
+                                      side: const BorderSide(
+                                          color: Colours.deepGreen, width: 1),
                                       fixedSize: const Size.fromWidth(80),
                                     ),
-                                    onPressed: () => deleteProduct(context, listProduct[index].id),
+                                    onPressed: () => deleteProduct(
+                                        context, listProduct[index].id),
                                     child: const Text(
                                       'Ya',
                                       style: TextStyle(
@@ -276,6 +283,7 @@ class _ProductSellersScreenState extends State<ProductSellersScreen> {
       await deleteProductSeller(id);
       await getProductsSeller(context);
       LoadingWidget.close(context);
+      Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         backgroundColor: Colours.deepGreen,
         duration: Duration(seconds: 2),

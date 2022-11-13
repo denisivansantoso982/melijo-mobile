@@ -23,6 +23,7 @@ class SearchProductScreen extends StatefulWidget {
 class _SearchProductScreenState extends State<SearchProductScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FocusNode _searchFocus = FocusNode();
+  String? grouping;
 
   @override
   void initState() {
@@ -37,6 +38,7 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
     super.dispose();
   }
 
+  // ! Search Product
   Future<List<ProductBuyersModel>> searchTheProduct() async {
     try {
       final List<ProductBuyersModel> products =
@@ -91,6 +93,8 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
+    final Map arguments = ModalRoute.of(context)!.settings.arguments as Map;
+    grouping = arguments['grouping'];
     return Scaffold(
       appBar: AppBar(
         flexibleSpace: Container(
@@ -118,6 +122,7 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
                 child: TextFormField(
                   controller: _searchController,
                   focusNode: _searchFocus,
+                  readOnly: grouping != null,
                   keyboardType: TextInputType.name,
                   textInputAction: TextInputAction.search,
                   decoration: const InputDecoration(
@@ -184,7 +189,10 @@ class _SearchProductScreenState extends State<SearchProductScreen> {
             itemBuilder: (context, index) => GestureDetector(
               onTap: () => Navigator.of(context).pushNamed(
                 DetailProductBuyersScreen.route,
-                arguments: snapshot.data![index],
+                arguments: {
+                  'product': snapshot.data![index],
+                  'grouping': grouping,
+                },
               ),
               child: Container(
                 decoration: BoxDecoration(
