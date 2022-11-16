@@ -14,6 +14,7 @@ import 'package:melijo/screens/buyers/products/search_product_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/modal_bottom.dart';
+import 'package:melijo/widgets/notification_widget.dart';
 
 class HomeBuyersScreen extends StatefulWidget {
   const HomeBuyersScreen({Key? key}) : super(key: key);
@@ -301,12 +302,8 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () =>
-                Navigator.of(context).pushNamed(NotificationBuyersScreen.route),
-            color: Colours.white,
-            iconSize: 28,
-            icon: const Icon(Icons.notifications_outlined),
+          NotificationWidget(
+            onPress: () => Navigator.of(context).pushNamed(NotificationBuyersScreen.route),
           ),
           IconButton(
             onPressed: () =>

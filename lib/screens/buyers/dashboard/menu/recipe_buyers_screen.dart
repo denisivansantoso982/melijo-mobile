@@ -16,6 +16,7 @@ import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/loading_widget.dart';
 import 'package:melijo/widgets/modal_bottom.dart';
+import 'package:melijo/widgets/notification_widget.dart';
 
 class RecipeBuyersScreen extends StatefulWidget {
   const RecipeBuyersScreen({Key? key}) : super(key: key);
@@ -246,12 +247,8 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () =>
-                Navigator.of(context).pushNamed(NotificationBuyersScreen.route),
-            color: Colours.white,
-            iconSize: 28,
-            icon: const Icon(Icons.notifications_outlined),
+          NotificationWidget(
+            onPress: () => Navigator.of(context).pushNamed(NotificationBuyersScreen.route),
           ),
           IconButton(
             onPressed: () => Navigator.of(context)

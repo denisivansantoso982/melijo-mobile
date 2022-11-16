@@ -8,10 +8,10 @@ import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/modal_bottom.dart';
 
-class NotificationBuyersScreen extends StatelessWidget {
-  const NotificationBuyersScreen({Key? key}) : super(key: key);
+class NotificationSellersScreen extends StatelessWidget {
+  const NotificationSellersScreen({Key? key}) : super(key: key);
 
-  static const String route = '/notification_buyers_screen';
+  static const String route = '/notification_sellers_screen';
 
   Future<void> readNotificationProcess(BuildContext context, NotificationModel notif) async {
     try {
@@ -57,18 +57,7 @@ class NotificationBuyersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment(-1, -1),
-              end: Alignment(0.2, 0.8),
-              colors: [
-                Colours.oliveGreen,
-                Colours.deepGreen,
-              ],
-            ),
-          ),
-        ),
+        backgroundColor: Colours.deepGreen,
         title: const Text(
           'Notifikasi',
           style: TextStyle(

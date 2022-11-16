@@ -7,6 +7,7 @@ import 'package:melijo/bloc/buyers/melijo/melijo_buyer_bloc.dart';
 import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/recipe/recipe_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/recipe_favourite/recipe_favourite_bloc.dart';
+import 'package:melijo/bloc/notification/notification_bloc.dart';
 import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
 import 'package:melijo/bloc/sellers/transactions/transaction_seller_bloc.dart';
 import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
@@ -29,6 +30,7 @@ import 'package:melijo/screens/buyers/transactions/payment_method_screen.dart';
 import 'package:melijo/screens/buyers/transactions/payment_proof_screen.dart';
 import 'package:melijo/screens/buyers/transactions/payment_screen.dart';
 import 'package:melijo/screens/buyers/transactions/promo_screen.dart';
+import 'package:melijo/screens/sellers/communications/notification_sellers_screen.dart';
 import 'package:melijo/screens/sellers/dashboard/dashboard_sellers_screen.dart';
 import 'package:melijo/screens/sellers/login/login_sellers_screen.dart';
 import 'package:melijo/screens/sellers/products/add_product_sellers_screen.dart';
@@ -62,6 +64,7 @@ class MyApp extends StatelessWidget {
         BlocProvider<CartBuyersBloc>(create: (context) => CartBuyersBloc()),
         BlocProvider<CartActionBloc>(create: (context) => CartActionBloc()),
         BlocProvider<RecipeFavouriteBloc>(create: (context) => RecipeFavouriteBloc()),
+        BlocProvider<NotificationBloc>(create: (context) => NotificationBloc()),
       ],
       child: MaterialApp(
         title: 'Melijo.id',
@@ -105,6 +108,8 @@ class MyApp extends StatelessWidget {
               const FavouriteRecipesBuyersScreen(),
           NotificationBuyersScreen.route: (context) =>
               const NotificationBuyersScreen(),
+          NotificationSellersScreen.route: (context) =>
+              const NotificationSellersScreen(),
           ChatBuyersScreen.route: (context) => const ChatBuyersScreen(),
           DetailChatBuyersScreen.route: (context) =>
               const DetailChatBuyersScreen(),

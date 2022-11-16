@@ -8,34 +8,42 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:42376472132:android:94b507ed3f7ff29f923e11",
+        "mobilesdk_app_id": "1:42376472132:android:1ce949b49ed08aa4923e11",
         "android_client_info": {
-          "package_name": "com.example.melijo"
+          "package_name": "com.pasukanlangit.id.melijo"
         }
       },
       "oauth_client": [
         {
-          "client_id": "42376472132-l5hqqakkslti3a9fbhlve9rj44bhliqo.apps.googleusercontent.com",
+          "client_id": "42376472132-6b5o6sebf17mh0ssvu7i7iduq0i4fms6.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.melijo",
+            "package_name": "com.pasukanlangit.id.melijo",
+            "certificate_hash": "bacab07407944fd765eec94dff49ee813c9a8a82"
+          }
+        },
+        {
+          "client_id": "42376472132-6qov1v6l5abjilqbuk63uqf4jif3ki4p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pasukanlangit.id.melijo",
             "certificate_hash": "c47fc63788f866e208cbe5304538cdaa96133c42"
           }
         },
         {
-          "client_id": "42376472132-p1l0knup4smkp2kvgdje7bkslvkjqd4j.apps.googleusercontent.com",
+          "client_id": "42376472132-ki42um3acnpe694hl4j8bkftfnhnmuoq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.melijo",
-            "certificate_hash": "00b3cdab369015accc1cc1c9b0ebc1c22a0debfb"
+            "package_name": "com.pasukanlangit.id.melijo",
+            "certificate_hash": "d03180a9344371eb701c98a5e9f8fc3e1af0ff47"
           }
         },
         {
-          "client_id": "42376472132-v94ik7qndptlj53548gc2i5mgvgvo3h8.apps.googleusercontent.com",
+          "client_id": "42376472132-numqb9qgr99ethlbldbogdn02hiabguf.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.melijo",
-            "certificate_hash": "bacab07407944fd765eec94dff49ee813c9a8a82"
+            "package_name": "com.pasukanlangit.id.melijo",
+            "certificate_hash": "00b3cdab369015accc1cc1c9b0ebc1c22a0debfb"
           }
         },
         {
@@ -45,7 +53,7 @@
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyBErFLponN1KFAVlySNIVF0AoNIkmnsKao"
+          "current_key": "AIzaSyC_ItkkZM7tkmsVvE3E59TkmgUvOHbkjQw"
         }
       ],
       "services": {

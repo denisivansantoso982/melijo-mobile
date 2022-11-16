@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:melijo/configs/functions/action.dart';
+import 'package:melijo/screens/sellers/communications/notification_sellers_screen.dart';
 import 'package:melijo/utils/colours.dart';
+import 'package:melijo/widgets/notification_widget.dart';
 
 class MenuSellersScreen extends StatefulWidget {
   const MenuSellersScreen({Key? key}) : super(key: key);
@@ -42,10 +44,9 @@ class _MenuSellersScreenState extends State<MenuSellersScreen> {
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_outlined),
-          )
+          NotificationWidget(
+            onPress: () => Navigator.of(context).pushNamed(NotificationSellersScreen.route),
+          ),
         ],
       ),
       body: RefreshIndicator(

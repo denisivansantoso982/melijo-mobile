@@ -6,11 +6,13 @@ import 'package:intl/intl.dart';
 import 'package:melijo/bloc/sellers/transactions/transaction_seller_bloc.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/models/sellers/transaction_seller_model.dart';
+import 'package:melijo/screens/sellers/communications/notification_sellers_screen.dart';
 import 'package:melijo/screens/sellers/transaction/detail_transaction_seller_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/loading_widget.dart';
 import 'package:melijo/widgets/modal_bottom.dart';
+import 'package:melijo/widgets/notification_widget.dart';
 
 class TransactionSellersScreen extends StatelessWidget {
   const TransactionSellersScreen({Key? key}) : super(key: key);
@@ -132,9 +134,8 @@ class TransactionSellersScreen extends StatelessWidget {
           ),
         ),
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_outlined),
+          NotificationWidget(
+            onPress: () => Navigator.of(context).pushNamed(NotificationSellersScreen.route),
           ),
         ],
       ),

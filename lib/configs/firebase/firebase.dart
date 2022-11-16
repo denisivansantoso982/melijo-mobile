@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:melijo/models/notification_model.dart';
 
 class FDatabase {
   FDatabase() {
@@ -12,7 +13,7 @@ class FDatabase {
 
   FirebaseDatabase database = FirebaseDatabase.instance;
 
-  static String get firebaseApiKey => 'AIzaSyBErFLponN1KFAVlySNIVF0AoNIkmnsKao';
+  static String get firebaseApiKey => 'AIzaSyC_ItkkZM7tkmsVvE3E59TkmgUvOHbkjQw';
 
   // ? Subscribe to Notification
   Future<void> subscribeTopic() async {
@@ -53,6 +54,77 @@ class FDatabase {
       });
     } catch (error) {
       return Future.error(error);
+    }
+  }
+
+  // ? get Notification Record
+  Stream<List<DataSnapshot>> retrieveNotificationRecord(
+      int detail_id, int role_id) async* {
+    try {
+      List<DataSnapshot> snapshot = [];
+      database
+        .ref('notifications')
+        .orderByChild(role_id == 3 ? 'customer_id' : 'seller_id')
+        .equalTo(detail_id)
+        .onValue.listen((event) {
+          snapshot = event.snapshot.children.toList();
+        });
+      yield snapshot;
+    } catch (error) {
+      Stream.error(error);
+    }
+  }
+
+  // ? read Notification rtdb
+  Future<void> readNotification(NotificationModel notif, int role_id) async {
+    try {
+      await database
+        .ref('notifications')
+        .child(notif.uid).set({
+          role_id == 3 ? 'customer_id' : 'seller_id': notif.user_id,
+          'title': notif.title,
+          'description': notif.description,
+          'isread': true,
+          'send_at': notif.send_at,
+        });
+    } catch (error) {
+      error;
+    }
+  }
+
+  // ? push Notification Record Seller
+  Future<void> pushNotificationToSeller(
+      int seller_id, String title, String description) async {
+    try {
+      await database
+        .ref('notifications')
+        .push().set({
+          'seller_id': seller_id,
+          'title': title,
+          'description': description,
+          'isread': false,
+          'send_at': DateTime.now().millisecondsSinceEpoch,
+        });
+    } catch (error) {
+      error;
+    }
+  }
+
+  // ? push Notification Record Customer
+  Future<void> pushNotificationToCustomer(
+      int customer_id, String title, String description) async {
+    try {
+      await database
+        .ref('notifications')
+        .push().set({
+          'customer_id': customer_id,
+          'title': title,
+          'description': description,
+          'isread': false,
+          'send_at': DateTime.now().millisecondsSinceEpoch,
+        });
+    } catch (error) {
+      error;
     }
   }
 

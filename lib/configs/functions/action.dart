@@ -8,6 +8,7 @@ import 'package:melijo/bloc/buyers/melijo/melijo_buyer_bloc.dart';
 import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/recipe/recipe_buyers_bloc.dart';
 import 'package:melijo/bloc/buyers/recipe_favourite/recipe_favourite_bloc.dart';
+import 'package:melijo/bloc/notification/notification_bloc.dart';
 import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
 import 'package:melijo/bloc/sellers/transactions/transaction_seller_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
@@ -20,6 +21,7 @@ import 'package:melijo/models/buyers/product_recom_model.dart';
 import 'package:melijo/models/buyers/promo_buyers_model.dart';
 import 'package:melijo/models/buyers/recipe_buyers_model.dart';
 import 'package:melijo/models/buyers/recipe_favourite_model.dart';
+import 'package:melijo/models/notification_model.dart';
 import 'package:melijo/models/sellers/product_seller_model.dart';
 import 'package:melijo/models/sellers/transaction_seller_model.dart';
 
@@ -89,17 +91,17 @@ Future<List<dynamic>> retrieveVillages(int id_district) async {
 
 Future<void> login(String user, String password, bool is_seller) async {
   try {
-    final Map response =
-        await api_request.login(user, password);
+    final Map response = await api_request.login(user, password);
     final Map<String, dynamic> user_data = response['user'];
     final Map<String, dynamic> user_detail = response['detail'];
     final Map<String, dynamic> user_address = response['address']['address'];
-    final Map<String, dynamic>? plotting = is_seller ? null : response['plotting'];
     if (is_seller && user_data['role_id'] != 4) {
       throw 'Pengguna tidak ditemukan!';
     } else if (!is_seller && user_data['role_id'] != 3) {
       throw 'Pengguna tidak ditemukan!';
     }
+    final Map<String, dynamic>? plotting =
+        is_seller ? null : response['plotting'];
     final String auth_token = response['token'];
     final String token_type = response['token_type'];
     final String fcm_token = await database.generateFCMToken();
@@ -291,9 +293,10 @@ Future<void> getTransactionSeller(BuildContext context) async {
         total: element['total'],
         operator_id: element['user_operator_id'],
         information: element['information'],
+        transactions_at: DateTime.parse(element['created_at']),
       ));
     }
-    context.read<TransactionSellerBloc>().add(DeleteTransaction());
+    listTransaction.sort((a, b) => b.transactions_at.millisecondsSinceEpoch.compareTo(a.transactions_at.millisecondsSinceEpoch));
     context
         .read<TransactionSellerBloc>()
         .add(FillTransaction(transactionSellerModel: listTransaction));
@@ -370,6 +373,16 @@ Future<void> confirmTransaction(
       operator_id,
       user_data['token_type'],
       user_data['auth_token'],
+    );
+    await database.pushNotificationToSeller(
+      seller_id,
+      'Pesanan dikonfirmasi!',
+      'Pesanan dengan ID $txid telah dikonfirmasi! Tunggu transaksi berikutnya ya!',
+    );
+    await database.pushNotificationToCustomer(
+      customer_id,
+      'Pesanan dikonfirmasi!',
+      'Pesanan dengan ID $txid telah dikonfirmasi oleh Melijo! Ditunggu ya!',
     );
   } catch (error) {
     return Future.error(error);
@@ -654,6 +667,16 @@ Future<void> payment(String txid, XFile file, int pay) async {
       user_data['token_type'],
       user_data['auth_token'],
     );
+    await database.pushNotificationToSeller(
+      user_data['seller_id'],
+      'Pesanan Baru buat kamu!',
+      'Pesanan dengan ID $txid jangan lupa ditindak lanjuti!',
+    );
+    await database.pushNotificationToCustomer(
+      user_data['id_detail'],
+      'Pesanan kamu berhasil dibuat!',
+      'Pesanan dengan ID $txid sudah berhasil dibuat! Tunggu ya kak!',
+    );
   } catch (error) {
     return Future.error(error);
   }
@@ -721,7 +744,8 @@ Future<void> getTransactionCustomer(BuildContext context) async {
   try {
     final Map user_data = await preferences.getUser();
     final List<TransactionSellerModel> listTransaction = [];
-    final List<dynamic> response = await api_request.retrieveTransactionCustomer(
+    final List<dynamic> response =
+        await api_request.retrieveTransactionCustomer(
       user_data['id_detail'],
       user_data['token_type'],
       user_data['auth_token'],
@@ -740,6 +764,7 @@ Future<void> getTransactionCustomer(BuildContext context) async {
         total: element['total'],
         operator_id: element['user_operator_id'],
         information: element['information'],
+        transactions_at: DateTime.parse(element['created_at']),
       ));
     }
     context.read<TransactionSellerBloc>().add(DeleteTransaction());
@@ -758,6 +783,16 @@ Future<void> cancelTransaction(String txid) async {
       txid,
       user_data['token_type'],
       user_data['auth_token'],
+    );
+    await database.pushNotificationToSeller(
+      user_data['seller_id'],
+      'Pesanan dibatalkan!',
+      'Pesanan dengan ID $txid telah dibatalkan oleh konsumen!',
+    );
+    await database.pushNotificationToCustomer(
+      user_data['id_detail'],
+      'Pesanan dibatalkan!',
+      'Pesanan dengan ID $txid telah dibatalkan! Ayo belanja lagi!',
     );
   } catch (error) {
     return Future.error(error);
@@ -821,6 +856,52 @@ Future<List> getCategoryRecipe() async {
       user_data['auth_token'],
     );
     return Future.value(categories);
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> getNotifications(BuildContext context) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    database.database
+        .ref('notifications')
+        .orderByChild(user_data['role'] == 3 ? 'customer_id' : 'seller_id')
+        .equalTo(user_data['id_detail'])
+        .onValue
+        .listen((event) {
+      if (event.snapshot.exists) {
+        final List<NotificationModel> listNotif = <NotificationModel>[];
+        final Map data = event.snapshot.value as Map;
+        data.forEach((key, value) {
+          listNotif.add(NotificationModel(
+            uid: key,
+            user_id: user_data['role'] == 3
+                ? value['customer_id']
+                : value['seller_id'],
+            title: value['title'],
+            description: value['description'],
+            isread: value['isread'],
+            send_at: value['send_at'],
+          ));
+        });
+        listNotif.sort((a, b) => b.send_at.compareTo(a.send_at));
+        context
+            .read<NotificationBloc>()
+            .add(FillNotification(notifications: listNotif));
+      } else {
+        context.read<NotificationBloc>().add(const RemoveNotification());
+      }
+    });
+  } catch (error) {
+    return Future.error(error);
+  }
+}
+
+Future<void> readNotifications(NotificationModel notif) async {
+  try {
+    final Map user_data = await preferences.getUser();
+    await database.readNotification(notif, user_data['role']);
   } catch (error) {
     return Future.error(error);
   }

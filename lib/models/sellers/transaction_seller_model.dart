@@ -16,6 +16,7 @@ class TransactionSellerModel extends Equatable {
     required this.customer_id,
     this.operator_id,
     required this.information,
+    required this.transactions_at,
   });
 
   final String txid;
@@ -30,17 +31,18 @@ class TransactionSellerModel extends Equatable {
   final int seller_id;
   final int customer_id;
   final String information;
+  final DateTime transactions_at;
 
   @override
   List<Object?> get props => [
-    txid,
-    date_order,
-    promo,
-    status,
-    customer_name,
-    seller_name,
-    total,
-    seller_id,
-    customer_id,
-  ];
+        txid,
+        date_order,
+        promo,
+        status,
+        customer_name,
+        seller_name,
+        total,
+        seller_id,
+        customer_id,
+      ];
 }

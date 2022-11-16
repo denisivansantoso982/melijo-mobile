@@ -111,6 +111,7 @@ class TransactionBuyersScreen extends StatelessWidget {
     }
   }
 
+  // ! Change Status to Indonesia
   String translateStatus(String status) {
     if (status == 'canceled') {
       return 'Dibatalkan';

@@ -53,8 +53,8 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBErFLponN1KFAVlySNIVF0AoNIkmnsKao',
-    appId: '1:42376472132:android:94b507ed3f7ff29f923e11',
+    apiKey: 'AIzaSyC_ItkkZM7tkmsVvE3E59TkmgUvOHbkjQw',
+    appId: '1:42376472132:android:1ce949b49ed08aa4923e11',
     messagingSenderId: '42376472132',
     projectId: 'melijo-id',
     databaseURL: 'https://melijo-id-default-rtdb.asia-southeast1.firebasedatabase.app',

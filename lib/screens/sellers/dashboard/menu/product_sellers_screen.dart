@@ -6,12 +6,14 @@ import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/models/sellers/product_seller_model.dart';
+import 'package:melijo/screens/sellers/communications/notification_sellers_screen.dart';
 import 'package:melijo/screens/sellers/products/add_product_sellers_screen.dart';
 import 'package:melijo/screens/sellers/products/edit_product_sellers_screen.dart';
 import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/loading_widget.dart';
 import 'package:melijo/widgets/modal_bottom.dart';
+import 'package:melijo/widgets/notification_widget.dart';
 
 class ProductSellersScreen extends StatefulWidget {
   const ProductSellersScreen({Key? key}) : super(key: key);
@@ -348,9 +350,8 @@ class _ProductSellersScreenState extends State<ProductSellersScreen> {
                 Navigator.of(context).pushNamed(AddProductSellerScreen.route),
             icon: const Icon(Icons.add),
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.notifications_outlined),
+          NotificationWidget(
+            onPress: () => Navigator.of(context).pushNamed(NotificationSellersScreen.route),
           ),
         ],
       ),
