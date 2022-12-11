@@ -43,9 +43,9 @@ class _LoginBuyersScreenState extends State<LoginBuyersScreen> {
         });
         await login(_userController.text, _passwordController.text, false);
         final Map user_info = await getUserInfo();
-        if (user_info['seller_id'] == 0) {
+        if (user_info['seller_id'] == 0 || user_info['seller_id'] == 14) {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            backgroundColor: Colours.deepGreen,
+            backgroundColor: Colours.red,
             content: Text('Untuk saat ini tidak ada Melijo di wilayah anda!'),
           ));
         }

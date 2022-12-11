@@ -14,6 +14,7 @@ import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/detail_chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
 import 'package:melijo/screens/buyers/dashboard/dashboard_buyers_screen.dart';
+import 'package:melijo/screens/buyers/dashboard/menu/recipe_buyers_screen.dart';
 import 'package:melijo/screens/buyers/login/login_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/cart_product_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/detail_product_buyers_screen.dart';
@@ -125,8 +126,10 @@ class MyApp extends StatelessWidget {
           SearchProductScreen.route: (context) => const SearchProductScreen(),
           SearchRecipeScreen.route: (context) => const SearchRecipeScreen(),
           DetailTransactionSellerScreen.route: (context) => const DetailTransactionSellerScreen(),
+          RecipeBuyersScreen.route: (context) => const RecipeBuyersScreen(),
         },
       ),
     );
   }
 }
+

@@ -11,6 +11,7 @@ class RecipeBuyersBloc extends Bloc<RecipeBuyersEvent, RecipeBuyersState> {
   RecipeBuyersBloc() : super(RecipeBuyersLoading()) {
     on<FillRecipe>((event, emit) => _onFillRecipe(event, emit));
     on<DeleteRecipe>((event, emit) => _onDeleteRecipe(event, emit));
+    on<LoadingRecipe>((event, emit) => _onLoadingRecipe(event, emit));
   }
 
   void _onFillRecipe(FillRecipe event, Emitter<RecipeBuyersState> emit) {
@@ -31,5 +32,9 @@ class RecipeBuyersBloc extends Bloc<RecipeBuyersEvent, RecipeBuyersState> {
         const RecipeBuyersInit(recipes: []),
       );
     }
+  }
+
+  void _onLoadingRecipe(LoadingRecipe event, Emitter<RecipeBuyersState> emit) {
+    emit(RecipeBuyersLoading());
   }
 }

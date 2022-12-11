@@ -11,6 +11,7 @@ class TransactionSellerBloc extends Bloc<TransactionSellerEvent, TransactionSell
   TransactionSellerBloc() : super(TransactionSellerLoading()) {
     on<FillTransaction>((event, emit) => _onAddTransaction(event, emit));
     on<DeleteTransaction>((event, emit) => _onDeleteTransaction(event, emit));
+    on<LoadingTransaction>((event, emit) => _onLoadingTransaction(event, emit));
   }
 
   void _onAddTransaction(FillTransaction event, Emitter<TransactionSellerState> emit) {
@@ -31,5 +32,9 @@ class TransactionSellerBloc extends Bloc<TransactionSellerEvent, TransactionSell
         const TransactionSellerInit(transactionSellerModel: []),
       );
     }
+  }
+
+  void _onLoadingTransaction(LoadingTransaction event, Emitter<TransactionSellerState> emit) {
+    emit(TransactionSellerLoading());
   }
 }

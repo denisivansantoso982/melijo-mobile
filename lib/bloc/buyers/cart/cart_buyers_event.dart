@@ -34,6 +34,8 @@ class ToggleCart extends CartBuyersEvent {
 }
 
 class LoadingCart extends CartBuyersEvent {
+  const LoadingCart();
+
   @override
   List<Object> get props => [];
 }

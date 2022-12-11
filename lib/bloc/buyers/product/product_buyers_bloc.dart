@@ -11,6 +11,7 @@ class ProductBuyersBloc extends Bloc<ProductBuyersEvent, ProductBuyersState> {
   ProductBuyersBloc() : super(ProductBuyersLoading()) {
     on<FillProductBuyer>((event, emit) => _onAddProduct(event, emit));
     on<DeleteProductBuyer>((event, emit) => _onDeleteProduct(event, emit));
+    on<LoadingProductBuyer>((event, emit) => _onProductLoading(event, emit));
   }
 
   void _onAddProduct(FillProductBuyer event, Emitter<ProductBuyersState> emit) {
@@ -33,5 +34,9 @@ class ProductBuyersBloc extends Bloc<ProductBuyersEvent, ProductBuyersState> {
         const ProductBuyersInit(listOfProduct: []),
       );
     }
+  }
+
+  void _onProductLoading(LoadingProductBuyer event, Emitter<ProductBuyersState> emit) {
+    emit(ProductBuyersLoading());
   }
 }

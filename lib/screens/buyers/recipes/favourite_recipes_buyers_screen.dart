@@ -133,6 +133,18 @@ class FavouriteRecipesBuyersScreen extends StatelessWidget {
         onRefresh: () => getRecipes(context),
         child: BlocBuilder<RecipeFavouriteBloc, RecipeFavouriteState>(
           builder: (context, favourite) {
+            if (favourite is RecipeFavouriteLoading) {
+              return const Center(
+                child: SizedBox(
+                  width: 56,
+                  height: 56,
+                  child: CircularProgressIndicator(
+                    color: Colours.deepGreen,
+                    strokeWidth: 4,
+                  ),
+                ),
+              );
+            }
             if (favourite is RecipeFavouriteInitial) {
               return BlocBuilder<RecipeBuyersBloc, RecipeBuyersState>(
                 builder: (context, recipe) {

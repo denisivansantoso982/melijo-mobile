@@ -20,3 +20,10 @@ class DeleteRecipe extends RecipeBuyersEvent {
   @override
   List<Object> get props => [];
 }
+
+class LoadingRecipe extends RecipeBuyersEvent {
+  const LoadingRecipe();
+
+  @override
+  List<Object> get props => [];
+}

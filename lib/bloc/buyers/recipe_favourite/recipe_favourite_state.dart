@@ -7,6 +7,8 @@ abstract class RecipeFavouriteState extends Equatable {
   List<Object> get props => [];
 }
 
+class RecipeFavouriteLoading extends RecipeFavouriteState {}
+
 class RecipeFavouriteInitial extends RecipeFavouriteState {
   const RecipeFavouriteInitial({required this.recipeFavs});
 

@@ -767,7 +767,7 @@ Future<void> getTransactionCustomer(BuildContext context) async {
         transactions_at: DateTime.parse(element['created_at']),
       ));
     }
-    context.read<TransactionSellerBloc>().add(DeleteTransaction());
+    context.read<TransactionSellerBloc>().add(const DeleteTransaction());
     context
         .read<TransactionSellerBloc>()
         .add(FillTransaction(transactionSellerModel: listTransaction));

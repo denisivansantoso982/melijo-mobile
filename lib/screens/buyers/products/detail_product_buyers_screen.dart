@@ -486,62 +486,70 @@ class _DetailProductBuyersScreenState extends State<DetailProductBuyersScreen> {
             )
           ],
         ),
-        bottomNavigationBar: Container(
-          padding: const EdgeInsets.all(12),
-          decoration: const BoxDecoration(
-            border: Border(
-              top: BorderSide(color: Colours.lightGray),
-            ),
-          ),
-          child: Row(
-            children: [
-              // *Chat Button
-              Expanded(
-                child: OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Colours.deepGreen),
-                  ),
-                  onPressed: () =>
-                      Navigator.of(context).pushNamed(ChatBuyersScreen.route),
-                  child: const Text(
-                    'Chat',
-                    style: TextStyle(
-                      color: Colours.deepGreen,
-                      fontSize: 14,
-                      fontWeight: FontStyles.regular,
-                      fontFamily: FontStyles.leagueSpartan,
-                    ),
-                  ),
+        bottomNavigationBar: FutureBuilder(
+          future: getUserInfo(),
+          builder: (context, snapshot) {
+            if (snapshot.data!['seller_id'] == 0 || snapshot.data!['seller_id'] == 14) {
+              return const SizedBox();
+            }
+            return Container(
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                border: Border(
+                  top: BorderSide(color: Colours.lightGray),
                 ),
               ),
-              const SizedBox(width: 8),
-              // *Cart Button
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () => doAddToCart(context, product),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(
-                        Icons.add,
-                        size: 16,
-                        color: Colours.white,
+              child: Row(
+                children: [
+                  // *Chat Button
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colours.deepGreen),
                       ),
-                      Text(
-                        'Keranjang',
+                      onPressed: () =>
+                          Navigator.of(context).pushNamed(ChatBuyersScreen.route),
+                      child: const Text(
+                        'Chat',
                         style: TextStyle(
-                          color: Colours.white,
-                          fontSize: 16,
+                          color: Colours.deepGreen,
+                          fontSize: 14,
                           fontWeight: FontStyles.regular,
                           fontFamily: FontStyles.leagueSpartan,
                         ),
-                      )
-                    ],
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  // *Cart Button
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => doAddToCart(context, product),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Icon(
+                            Icons.add,
+                            size: 16,
+                            color: Colours.white,
+                          ),
+                          Text(
+                            'Keranjang',
+                            style: TextStyle(
+                              color: Colours.white,
+                              fontSize: 16,
+                              fontWeight: FontStyles.regular,
+                              fontFamily: FontStyles.leagueSpartan,
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
+            );
+          }
         ),
       ),
     );

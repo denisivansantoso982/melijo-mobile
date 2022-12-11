@@ -9,17 +9,24 @@ part 'recipe_favourite_state.dart';
 
 class RecipeFavouriteBloc
     extends Bloc<RecipeFavouriteEvent, RecipeFavouriteState> {
-  RecipeFavouriteBloc() : super(const RecipeFavouriteInitial(recipeFavs: [])) {
-    on<FillRecipeFav>((event, emit) {
-      final RecipeFavouriteState state = RecipeFavouriteInitial(recipeFavs: event.recipeFavs);
+  RecipeFavouriteBloc() : super(RecipeFavouriteLoading()) {
+    on<FillRecipeFav>((event, emit) => _onFillRecipeFav(event, emit));
+    on<LoadingRecipeFav>((event, emit) => _onLoadingRecipeFav(event, emit));
+  }
 
-      if (state is RecipeFavouriteInitial) {
-        emit(
-          RecipeFavouriteInitial(
-            recipeFavs: state.recipeFavs,
-          ),
-        );
-      }
-    });
+  void _onFillRecipeFav(FillRecipeFav event, Emitter<RecipeFavouriteState> emit) {
+    final RecipeFavouriteState state = RecipeFavouriteInitial(recipeFavs: event.recipeFavs);
+
+    if (state is RecipeFavouriteInitial) {
+      emit(
+        RecipeFavouriteInitial(
+          recipeFavs: state.recipeFavs,
+        ),
+      );
+    }
+  }
+
+  void _onLoadingRecipeFav(LoadingRecipeFav event, Emitter<RecipeFavouriteState> emit) {
+    emit(RecipeFavouriteLoading());
   }
 }

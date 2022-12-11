@@ -21,6 +21,8 @@ import 'package:melijo/widgets/notification_widget.dart';
 class RecipeBuyersScreen extends StatefulWidget {
   const RecipeBuyersScreen({Key? key}) : super(key: key);
 
+  static const String route = '/recipe_buyers_screen';
+
   @override
   _RecipeBuyersScreenState createState() => _RecipeBuyersScreenState();
 }
@@ -345,6 +347,18 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
             // *Recipes Panel
             BlocBuilder<RecipeFavouriteBloc, RecipeFavouriteState>(
               builder: (context, favourite) {
+                if (favourite is RecipeFavouriteLoading) {
+                  const Center(
+                    child: SizedBox(
+                      width: 56,
+                      height: 56,
+                      child: CircularProgressIndicator(
+                        color: Colours.deepGreen,
+                        strokeWidth: 4,
+                      ),
+                    ),
+                  );
+                }
                 if (favourite is RecipeFavouriteInitial) {
                   return BlocBuilder<RecipeBuyersBloc, RecipeBuyersState>(
                     builder: (context, recipe) {
@@ -366,7 +380,7 @@ class _RecipeBuyersScreenState extends State<RecipeBuyersScreen> {
                                 ? recipe.recipes
                                 : recipe.recipes
                                     .where((element) =>
-                                        element.id == recipe_category_id)
+                                        element.category_id == recipe_category_id)
                                     .toList();
                         return GridView.builder(
                           padding: const EdgeInsets.all(20),

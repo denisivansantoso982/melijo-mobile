@@ -53,8 +53,6 @@ class CartBuyersBloc extends Bloc<CartBuyersEvent, CartBuyersState> {
   }
 
   void _onCartLoading(LoadingCart event, Emitter<CartBuyersState> emit) {
-    // final CartBuyersState state = CartBuyersLoading();
-
     emit(
       CartBuyersLoading(),
     );

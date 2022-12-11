@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:melijo/bloc/sellers/products/product_seller_bloc.dart';
+import 'package:melijo/bloc/sellers/transactions/transaction_seller_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/screens/starts/first_screen.dart';
@@ -9,6 +11,7 @@ import 'package:melijo/utils/colours.dart';
 import 'package:melijo/utils/font_styles.dart';
 import 'package:melijo/widgets/loading_widget.dart';
 import 'package:melijo/widgets/modal_bottom.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileSellersScreen extends StatefulWidget {
   const ProfileSellersScreen({Key? key}) : super(key: key);
@@ -59,6 +62,8 @@ class _ProfileSellersScreenState extends State<ProfileSellersScreen> {
     try {
       LoadingWidget.show(context);
       await logout();
+      context.read<TransactionSellerBloc>().add(const LoadingTransaction());
+      context.read<ProductSellerBloc>().add(const RestoreProductSeller());
       Navigator.of(context)
           .pushNamedAndRemoveUntil(FirstScreen.route, (route) => false);
     } catch (error) {
@@ -311,423 +316,427 @@ class _ProfileSellersScreenState extends State<ProfileSellersScreen> {
             fontFamily: 'Lora',
           ),
         ),
-        actions: _loadingProfile ? [] : [
-          IconButton(
-            onPressed: () async {
-              if (_isEditable) {
-                await editUserProfile(context);
-              }
-              setState(() {
-                _isEditable = !_isEditable;
-              });
-            },
-            color: _isEditable ? Colours.deepGreen : Colours.gray,
-            icon:
-                Icon(_isEditable ? Icons.check_outlined : Icons.edit_outlined),
-          ),
-        ],
-      ),
-      body: _loadingProfile ? const Center(
-        child: SizedBox(
-          width: 56,
-          height: 56,
-          child: CircularProgressIndicator(
-            color: Colours.deepGreen,
-            strokeWidth: 4,
-          ),
-        ),
-      ) : RefreshIndicator(
-        onRefresh: () => retrieveProfile(),
-        child: Form(
-          child: ListView(
-            padding: const EdgeInsets.fromLTRB(
-              12,
-              32,
-              12,
-              12,
-            ),
-            children: [
-              // *Avatar
-              Center(
-                child: Stack(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(64)),
-                          boxShadow: [
-                            BoxShadow(
-                              blurRadius: 4,
-                              color: Colours.black.withOpacity(.4),
-                              offset: const Offset(2, 2),
-                            ),
-                          ]),
-                      child: imageUrl != ''
-                          ? ClipRRect(
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(64)),
-                              child: Image(
-                                image: NetworkImage(
-                                    '${ApiRequest.baseStorageUrl}/$imageUrl'),
-                                fit: BoxFit.cover,
-                                width: 120,
-                                height: 120,
-                              ),
-                            )
-                          : const ClipRRect(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(64)),
-                              child: Image(
-                                image:
-                                    AssetImage('lib/assets/images/profile.jpg'),
-                                fit: BoxFit.cover,
-                                width: 120,
-                                height: 120,
-                              ),
-                            ),
-                    ),
-                    Visibility(
-                      visible: _isEditable,
-                      child: Positioned(
-                        bottom: 1,
-                        right: 1,
-                        child: GestureDetector(
-                          onTap: () => pickImage(context),
-                          child: Container(
-                            height: 48,
-                            width: 48,
-                            alignment: Alignment.center,
-                            decoration: const BoxDecoration(
-                              color: Colours.deepGreen,
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(64)),
-                            ),
-                            child: const Icon(
-                              Icons.photo_camera_sharp,
-                              color: Colours.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-              // *Name Field
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Expanded(
-                    flex: 4,
-                    child: Text(
-                      'Nama',
-                      style: TextStyle(
-                        color: Colours.deepGreen,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'League Spartan',
-                      ),
-                      textAlign: TextAlign.right,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    flex: 6,
-                    child: TextFormField(
-                      controller: _nameController,
-                      focusNode: _nameFocus,
-                      readOnly: !_isEditable,
-                      style: const TextStyle(
-                        color: Colours.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'League Spartan',
-                      ),
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(
-                          borderSide: _isEditable
-                              ? const BorderSide(
-                                  width: 2,
-                                  color: Colours.black,
-                                )
-                              : BorderSide.none,
-                        ),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: _isEditable
-                              ? const BorderSide(
-                                  width: 2,
-                                  color: Colours.black,
-                                )
-                              : BorderSide.none,
-                        ),
-                        hintText: 'Nama Lengkap',
-                        isDense: true,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // *Username Field
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Expanded(
-                    flex: 4,
-                    child: Text(
-                      'Username',
-                      style: TextStyle(
-                        color: Colours.deepGreen,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'League Spartan',
-                      ),
-                      textAlign: TextAlign.right,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    flex: 6,
-                    child: TextFormField(
-                      controller: _usernameController,
-                      focusNode: _usernameFocus,
-                      readOnly: !_isEditable,
-                      style: const TextStyle(
-                        color: Colours.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'League Spartan',
-                      ),
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(
-                          borderSide: _isEditable
-                              ? const BorderSide(
-                                  width: 2,
-                                  color: Colours.black,
-                                )
-                              : BorderSide.none,
-                        ),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: _isEditable
-                              ? const BorderSide(
-                                  width: 2,
-                                  color: Colours.black,
-                                )
-                              : BorderSide.none,
-                        ),
-                        hintText: 'Username',
-                        isDense: true,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // *Phone Field
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Expanded(
-                    flex: 4,
-                    child: Text(
-                      'Nomor Telepon',
-                      style: TextStyle(
-                        color: Colours.deepGreen,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'League Spartan',
-                      ),
-                      textAlign: TextAlign.right,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    flex: 6,
-                    child: TextFormField(
-                      controller: _phoneController,
-                      focusNode: _phoneFocus,
-                      readOnly: !_isEditable,
-                      style: const TextStyle(
-                        color: Colours.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'League Spartan',
-                      ),
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(
-                          borderSide: _isEditable
-                              ? const BorderSide(
-                                  width: 2,
-                                  color: Colours.black,
-                                )
-                              : BorderSide.none,
-                        ),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: _isEditable
-                              ? const BorderSide(
-                                  width: 2,
-                                  color: Colours.black,
-                                )
-                              : BorderSide.none,
-                        ),
-                        hintText: 'Nomor Telepon',
-                        isDense: true,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // *Email Field
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Expanded(
-                    flex: 4,
-                    child: Text(
-                      'Email',
-                      style: TextStyle(
-                        color: Colours.deepGreen,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'League Spartan',
-                      ),
-                      textAlign: TextAlign.right,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    flex: 6,
-                    child: TextFormField(
-                      controller: _emailController,
-                      focusNode: _emailFocus,
-                      readOnly: !_isEditable,
-                      style: const TextStyle(
-                        color: Colours.black,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'League Spartan',
-                      ),
-                      decoration: InputDecoration(
-                        border: UnderlineInputBorder(
-                          borderSide: _isEditable
-                              ? const BorderSide(
-                                  width: 2,
-                                  color: Colours.black,
-                                )
-                              : BorderSide.none,
-                        ),
-                        enabledBorder: UnderlineInputBorder(
-                          borderSide: _isEditable
-                              ? const BorderSide(
-                                  width: 2,
-                                  color: Colours.black,
-                                )
-                              : BorderSide.none,
-                        ),
-                        hintText: 'Alamat Email',
-                        isDense: true,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              // *Address Field
-              Visibility(
-                visible: !_isEditable,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Expanded(
-                      flex: 4,
-                      child: Text(
-                        'Alamat',
-                        style: TextStyle(
-                          color: Colours.deepGreen,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          fontFamily: 'League Spartan',
-                        ),
-                        textAlign: TextAlign.right,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      flex: 6,
-                      child: TextFormField(
-                        controller: _addressController,
-                        focusNode: _addressFocus,
-                        readOnly: !_isEditable,
-                        textInputAction: TextInputAction.newline,
-                        maxLength: null,
-                        maxLines: null,
-                        style: const TextStyle(
-                          color: Colours.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400,
-                          fontFamily: 'League Spartan',
-                        ),
-                        decoration: InputDecoration(
-                          border: UnderlineInputBorder(
-                            borderSide: _isEditable
-                                ? const BorderSide(
-                                    width: 2,
-                                    color: Colours.black,
-                                  )
-                                : BorderSide.none,
-                          ),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: _isEditable
-                                ? const BorderSide(
-                                    width: 2,
-                                    color: Colours.black,
-                                  )
-                                : BorderSide.none,
-                          ),
-                          hintText: 'Alamat',
-                          isDense: true,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 48),
-              // *Logout or Cancel
-              Center(
-                child: OutlinedButton(
-                  onPressed: () {
+        actions: _loadingProfile
+            ? []
+            : [
+                IconButton(
+                  onPressed: () async {
                     if (_isEditable) {
-                      setState(() {
-                        _isEditable = !_isEditable;
-                      });
-                    } else {
-                      doLogoutProcess(context);
+                      await editUserProfile(context);
                     }
+                    setState(() {
+                      _isEditable = !_isEditable;
+                    });
                   },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(
-                      color: Colours.deepGreen,
-                      width: 1,
-                    ),
-                  ),
-                  child: Text(
-                    _isEditable ? 'Batal' : 'Keluar Akun',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontStyles.regular,
-                      fontFamily: FontStyles.leagueSpartan,
-                    ),
-                  ),
+                  color: _isEditable ? Colours.deepGreen : Colours.gray,
+                  icon: Icon(
+                      _isEditable ? Icons.check_outlined : Icons.edit_outlined),
+                ),
+              ],
+      ),
+      body: _loadingProfile
+          ? const Center(
+              child: SizedBox(
+                width: 56,
+                height: 56,
+                child: CircularProgressIndicator(
+                  color: Colours.deepGreen,
+                  strokeWidth: 4,
                 ),
               ),
-              const SizedBox(height: 48),
-            ],
-          ),
-        ),
-      ),
+            )
+          : RefreshIndicator(
+              onRefresh: () => retrieveProfile(),
+              child: Form(
+                child: ListView(
+                  padding: const EdgeInsets.fromLTRB(
+                    12,
+                    32,
+                    12,
+                    12,
+                  ),
+                  children: [
+                    // *Avatar
+                    Center(
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(64)),
+                                boxShadow: [
+                                  BoxShadow(
+                                    blurRadius: 4,
+                                    color: Colours.black.withOpacity(.4),
+                                    offset: const Offset(2, 2),
+                                  ),
+                                ]),
+                            child: imageUrl != ''
+                                ? ClipRRect(
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(64)),
+                                    child: Image(
+                                      image: NetworkImage(
+                                          '${ApiRequest.baseStorageUrl}/$imageUrl'),
+                                      fit: BoxFit.cover,
+                                      width: 120,
+                                      height: 120,
+                                    ),
+                                  )
+                                : const ClipRRect(
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(64)),
+                                    child: Image(
+                                      image: AssetImage(
+                                          'lib/assets/images/profile.jpg'),
+                                      fit: BoxFit.cover,
+                                      width: 120,
+                                      height: 120,
+                                    ),
+                                  ),
+                          ),
+                          Visibility(
+                            visible: _isEditable,
+                            child: Positioned(
+                              bottom: 1,
+                              right: 1,
+                              child: GestureDetector(
+                                onTap: () => pickImage(context),
+                                child: Container(
+                                  height: 48,
+                                  width: 48,
+                                  alignment: Alignment.center,
+                                  decoration: const BoxDecoration(
+                                    color: Colours.deepGreen,
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(64)),
+                                  ),
+                                  child: const Icon(
+                                    Icons.photo_camera_sharp,
+                                    color: Colours.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    // *Name Field
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Expanded(
+                          flex: 4,
+                          child: Text(
+                            'Nama',
+                            style: TextStyle(
+                              color: Colours.deepGreen,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'League Spartan',
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 6,
+                          child: TextFormField(
+                            controller: _nameController,
+                            focusNode: _nameFocus,
+                            readOnly: !_isEditable,
+                            style: const TextStyle(
+                              color: Colours.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: 'League Spartan',
+                            ),
+                            decoration: InputDecoration(
+                              border: UnderlineInputBorder(
+                                borderSide: _isEditable
+                                    ? const BorderSide(
+                                        width: 2,
+                                        color: Colours.black,
+                                      )
+                                    : BorderSide.none,
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: _isEditable
+                                    ? const BorderSide(
+                                        width: 2,
+                                        color: Colours.black,
+                                      )
+                                    : BorderSide.none,
+                              ),
+                              hintText: 'Nama Lengkap',
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // *Username Field
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Expanded(
+                          flex: 4,
+                          child: Text(
+                            'Username',
+                            style: TextStyle(
+                              color: Colours.deepGreen,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'League Spartan',
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 6,
+                          child: TextFormField(
+                            controller: _usernameController,
+                            focusNode: _usernameFocus,
+                            readOnly: !_isEditable,
+                            style: const TextStyle(
+                              color: Colours.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: 'League Spartan',
+                            ),
+                            decoration: InputDecoration(
+                              border: UnderlineInputBorder(
+                                borderSide: _isEditable
+                                    ? const BorderSide(
+                                        width: 2,
+                                        color: Colours.black,
+                                      )
+                                    : BorderSide.none,
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: _isEditable
+                                    ? const BorderSide(
+                                        width: 2,
+                                        color: Colours.black,
+                                      )
+                                    : BorderSide.none,
+                              ),
+                              hintText: 'Username',
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // *Phone Field
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Expanded(
+                          flex: 4,
+                          child: Text(
+                            'Nomor Telepon',
+                            style: TextStyle(
+                              color: Colours.deepGreen,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'League Spartan',
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 6,
+                          child: TextFormField(
+                            controller: _phoneController,
+                            focusNode: _phoneFocus,
+                            readOnly: !_isEditable,
+                            style: const TextStyle(
+                              color: Colours.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: 'League Spartan',
+                            ),
+                            decoration: InputDecoration(
+                              border: UnderlineInputBorder(
+                                borderSide: _isEditable
+                                    ? const BorderSide(
+                                        width: 2,
+                                        color: Colours.black,
+                                      )
+                                    : BorderSide.none,
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: _isEditable
+                                    ? const BorderSide(
+                                        width: 2,
+                                        color: Colours.black,
+                                      )
+                                    : BorderSide.none,
+                              ),
+                              hintText: 'Nomor Telepon',
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // *Email Field
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Expanded(
+                          flex: 4,
+                          child: Text(
+                            'Email',
+                            style: TextStyle(
+                              color: Colours.deepGreen,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: 'League Spartan',
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          flex: 6,
+                          child: TextFormField(
+                            controller: _emailController,
+                            focusNode: _emailFocus,
+                            readOnly: !_isEditable,
+                            style: const TextStyle(
+                              color: Colours.black,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: 'League Spartan',
+                            ),
+                            decoration: InputDecoration(
+                              border: UnderlineInputBorder(
+                                borderSide: _isEditable
+                                    ? const BorderSide(
+                                        width: 2,
+                                        color: Colours.black,
+                                      )
+                                    : BorderSide.none,
+                              ),
+                              enabledBorder: UnderlineInputBorder(
+                                borderSide: _isEditable
+                                    ? const BorderSide(
+                                        width: 2,
+                                        color: Colours.black,
+                                      )
+                                    : BorderSide.none,
+                              ),
+                              hintText: 'Alamat Email',
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    // *Address Field
+                    Visibility(
+                      visible: !_isEditable,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Expanded(
+                            flex: 4,
+                            child: Text(
+                              'Alamat',
+                              style: TextStyle(
+                                color: Colours.deepGreen,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                fontFamily: 'League Spartan',
+                              ),
+                              textAlign: TextAlign.right,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 6,
+                            child: TextFormField(
+                              controller: _addressController,
+                              focusNode: _addressFocus,
+                              readOnly: !_isEditable,
+                              textInputAction: TextInputAction.newline,
+                              maxLength: null,
+                              maxLines: null,
+                              style: const TextStyle(
+                                color: Colours.black,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: 'League Spartan',
+                              ),
+                              decoration: InputDecoration(
+                                border: UnderlineInputBorder(
+                                  borderSide: _isEditable
+                                      ? const BorderSide(
+                                          width: 2,
+                                          color: Colours.black,
+                                        )
+                                      : BorderSide.none,
+                                ),
+                                enabledBorder: UnderlineInputBorder(
+                                  borderSide: _isEditable
+                                      ? const BorderSide(
+                                          width: 2,
+                                          color: Colours.black,
+                                        )
+                                      : BorderSide.none,
+                                ),
+                                hintText: 'Alamat',
+                                isDense: true,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+                    // *Logout or Cancel
+                    Center(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          if (_isEditable) {
+                            setState(() {
+                              _isEditable = !_isEditable;
+                            });
+                          } else {
+                            doLogoutProcess(context);
+                          }
+                        },
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(
+                            color: Colours.deepGreen,
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          _isEditable ? 'Batal' : 'Keluar Akun',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontStyles.regular,
+                            fontFamily: FontStyles.leagueSpartan,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 48),
+                  ],
+                ),
+              ),
+            ),
     );
   }
 }

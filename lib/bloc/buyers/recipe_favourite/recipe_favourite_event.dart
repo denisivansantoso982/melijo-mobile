@@ -15,3 +15,10 @@ class FillRecipeFav extends RecipeFavouriteEvent {
   @override
   List<Object> get props => [recipeFavs];
 }
+
+class LoadingRecipeFav extends RecipeFavouriteEvent {
+  const LoadingRecipeFav();
+
+  @override
+  List<Object> get props => [];
+}

@@ -24,6 +24,8 @@ class DeleteProductSeller extends ProductSellerEvent {
 }
 
 class RestoreProductSeller extends ProductSellerEvent {
+  const RestoreProductSeller();
+
   @override
   List<Object> get props => [];
 }

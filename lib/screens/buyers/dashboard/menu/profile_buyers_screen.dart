@@ -1,7 +1,12 @@
 // ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously, non_constant_identifier_names
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:melijo/bloc/buyers/cart/cart_buyers_bloc.dart';
+import 'package:melijo/bloc/buyers/product/product_buyers_bloc.dart';
+import 'package:melijo/bloc/buyers/recipe/recipe_buyers_bloc.dart';
+import 'package:melijo/bloc/sellers/transactions/transaction_seller_bloc.dart';
 import 'package:melijo/configs/api/api_request.dart';
 import 'package:melijo/configs/functions/action.dart';
 import 'package:melijo/screens/starts/first_screen.dart';
@@ -59,6 +64,10 @@ class _ProfileBuyersScreenState extends State<ProfileBuyersScreen> {
     try {
       LoadingWidget.show(context);
       await logout();
+      context.read<CartBuyersBloc>().add(const LoadingCart());
+      context.read<ProductBuyersBloc>().add(const LoadingProductBuyer());
+      context.read<RecipeBuyersBloc>().add(const LoadingRecipe());
+      context.read<TransactionSellerBloc>().add(const LoadingTransaction());
       Navigator.of(context)
           .pushNamedAndRemoveUntil(FirstScreen.route, (route) => false);
     } catch (error) {

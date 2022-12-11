@@ -9,6 +9,7 @@ import 'package:melijo/models/buyers/product_buyers_model.dart';
 import 'package:melijo/models/search_model.dart';
 import 'package:melijo/screens/buyers/communications/chat_buyers_screen.dart';
 import 'package:melijo/screens/buyers/communications/notification_buyers_screen.dart';
+import 'package:melijo/screens/buyers/dashboard/menu/recipe_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/detail_product_buyers_screen.dart';
 import 'package:melijo/screens/buyers/products/search_product_screen.dart';
 import 'package:melijo/utils/colours.dart';
@@ -326,46 +327,47 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
               children: [
                 // *Welcome Panel
                 FutureBuilder(
-                    future: getUserInfo(),
-                    builder: (context, snapshot) {
-                      return Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          horizontal: 20,
+                  future: getUserInfo(),
+                  builder: (context, snapshot) {
+                    return Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 20,
+                      ),
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment(-1, -1),
+                          end: Alignment(-0.1, 0.6),
+                          colors: [
+                            Colours.oliveGreen,
+                            Colours.deepGreen,
+                          ],
                         ),
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment(-1, -1),
-                            end: Alignment(-0.1, 0.6),
-                            colors: [
-                              Colours.oliveGreen,
-                              Colours.deepGreen,
-                            ],
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              height: 56,
-                              width: 56,
-                              padding: const EdgeInsets.all(2),
-                              decoration: const BoxDecoration(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(64)),
-                                color: Colours.white,
-                              ),
-                              child: const ClipRRect(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(64)),
-                                child: Image(
-                                  image:
-                                      AssetImage('lib/assets/images/logo.png'),
-                                  fit: BoxFit.cover,
-                                ),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            height: 56,
+                            width: 56,
+                            padding: const EdgeInsets.all(2),
+                            decoration: const BoxDecoration(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(64)),
+                              color: Colours.white,
+                            ),
+                            child: const ClipRRect(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(64)),
+                              child: Image(
+                                image:
+                                    AssetImage('lib/assets/images/maskot.jpeg'),
+                                fit: BoxFit.cover,
                               ),
                             ),
-                            const SizedBox(width: 8),
-                            Column(
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
@@ -389,11 +391,13 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                                   ),
                                 ),
                               ],
-                            )
-                          ],
-                        ),
-                      );
-                    }),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
                 // *Category Panel
                 SizedBox(
                   height: 120,
@@ -469,45 +473,70 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                   ),
                 ),
                 // *Promo or Ads Panel
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  alignment: Alignment.center,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(8)),
-                    image: DecorationImage(
-                      image: AssetImage('lib/assets/images/recipes/nasgor.jpg'),
-                      fit: BoxFit.fitHeight,
-                    ),
-                  ),
+                GestureDetector(
+                  onTap: () => Navigator.of(context).pushNamed(RecipeBuyersScreen.route),
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 20,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(8)),
-                      gradient: LinearGradient(
-                        begin: const Alignment(-1, -1),
-                        end: const Alignment(0.2, 0.8),
-                        colors: [
-                          Colours.oliveGreen.withOpacity(.8),
-                          Colours.deepGreen.withOpacity(.8),
-                        ],
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(8)),
+                      image: DecorationImage(
+                        image: AssetImage('lib/assets/images/recipes/nasgor.jpg'),
+                        fit: BoxFit.fitHeight,
                       ),
                     ),
-                    child: const Text(
-                      'Temukan berbagai resep sehat di sini 🤩',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colours.white,
-                        fontSize: 20,
-                        fontWeight: FontStyles.bold,
-                        fontFamily: FontStyles.lora,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 20,
+                      ),
+                      decoration: BoxDecoration(
+                        borderRadius: const BorderRadius.all(Radius.circular(8)),
+                        gradient: LinearGradient(
+                          begin: const Alignment(-1, -1),
+                          end: const Alignment(0.2, 0.8),
+                          colors: [
+                            Colours.oliveGreen.withOpacity(.8),
+                            Colours.deepGreen.withOpacity(.8),
+                          ],
+                        ),
+                      ),
+                      child: const Text(
+                        'Temukan berbagai resep sehat di sini 🤩',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colours.white,
+                          fontSize: 20,
+                          fontWeight: FontStyles.bold,
+                          fontFamily: FontStyles.lora,
+                        ),
                       ),
                     ),
                   ),
                 ),
-                const SizedBox(height: 12),
+                // *Note if there is no Melijo (Seller)
+                FutureBuilder(
+                  future: getUserInfo(),
+                  builder: (context, snapshot) {
+                    if (snapshot.data!['seller_id'] != 0 && snapshot.data!['seller_id'] != 14) {
+                      return const SizedBox(height: 16);
+                    }
+                    return const Flexible(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                        child: Text(
+                          'Untuk saat ini tidak ada Melijo yang beroperasi diwilayah anda!',
+                          style: TextStyle(
+                            color: Colours.red,
+                            fontSize: 16,
+                            fontFamily: FontStyles.leagueSpartan,
+                            fontWeight: FontStyles.regular,
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                ),
                 // *Products Panel
                 renderGridProducts(context, state, screenSize),
               ],

@@ -46,10 +46,11 @@ class _DashboardBuyersScreenState extends State<DashboardBuyersScreen> {
         currentIndex: _navIndex,
         selectedItemColor: Colours.deepGreen,
         unselectedItemColor: Colours.gray,
+        type: BottomNavigationBarType.fixed,
         iconSize: 30,
         showUnselectedLabels: true,
         selectedFontSize: 16,
-        unselectedFontSize: 16,
+        unselectedFontSize: 14,
         selectedLabelStyle: const TextStyle(
             fontFamily: 'League Spartan', fontWeight: FontWeight.w600),
         unselectedLabelStyle: const TextStyle(
@@ -89,36 +90,31 @@ class _DashboardBuyersScreenState extends State<DashboardBuyersScreen> {
       ),
       floatingActionButtonLocation:
           FloatingActionButtonLocation.miniCenterDocked,
-      floatingActionButton: SizedBox(
-        width: 80,
-        height: 80,
-        child: RawMaterialButton(
-          onPressed: () =>
-              Navigator.of(context).pushNamed(CartProductBuyersScreen.route),
-          shape: const CircleBorder(),
-          elevation: 0,
-          fillColor: Colours.deepGreen,
-          padding: const EdgeInsets.all(8),
-          child: Center(
-            child: Column(
-              children: const [
-                Icon(
-                  Icons.shopping_cart_outlined,
-                  size: 32,
+      floatingActionButton: FloatingActionButton.large(
+        onPressed: () => Navigator.of(context).pushNamed(CartProductBuyersScreen.route),
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Spacer(),
+              Icon(
+                Icons.shopping_cart_outlined,
+                size: 32,
+                color: Colours.white,
+              ),
+              SizedBox(height: 2),
+              Text(
+                'Keranjang',
+                textAlign: TextAlign.center,
+                style: TextStyle(
                   color: Colours.white,
+                  fontSize: 14,
+                  fontWeight: FontStyles.regular,
+                  fontFamily: FontStyles.leagueSpartan,
                 ),
-                SizedBox(height: 2),
-                Text(
-                  'Keranjang',
-                  style: TextStyle(
-                    color: Colours.white,
-                    fontSize: 16,
-                    fontWeight: FontStyles.regular,
-                    fontFamily: FontStyles.leagueSpartan,
-                  ),
-                )
-              ],
-            ),
+              ),
+              Spacer(flex: 2),
+            ],
           ),
         ),
       ),

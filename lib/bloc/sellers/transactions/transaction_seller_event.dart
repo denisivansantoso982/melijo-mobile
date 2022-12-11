@@ -17,6 +17,15 @@ class FillTransaction extends TransactionSellerEvent {
 }
 
 class DeleteTransaction extends TransactionSellerEvent {
+  const DeleteTransaction();
+
+  @override
+  List<Object> get props => [];
+}
+
+class LoadingTransaction extends TransactionSellerEvent {
+  const LoadingTransaction();
+
   @override
   List<Object> get props => [];
 }

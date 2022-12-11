@@ -22,3 +22,10 @@ class DeleteProductBuyer extends ProductBuyersEvent {
   @override
   List<Object> get props => [];
 }
+
+class LoadingProductBuyer extends ProductBuyersEvent {
+  const LoadingProductBuyer();
+
+  @override
+  List<Object> get props => [];
+}
