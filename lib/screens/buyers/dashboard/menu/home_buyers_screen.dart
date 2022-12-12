@@ -518,14 +518,12 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                 FutureBuilder(
                   future: getUserInfo(),
                   builder: (context, snapshot) {
-                    if (snapshot.data!['seller_id'] != 0 && snapshot.data!['seller_id'] != 14) {
-                      return const SizedBox(height: 16);
-                    }
-                    return const Flexible(
-                      child: Padding(
+                    if (snapshot.data!['seller_id'] == 0 || snapshot.data!['seller_id'] == 14) {
+                      return const Padding(
                         padding: EdgeInsets.symmetric(vertical: 8, horizontal: 20),
                         child: Text(
                           'Untuk saat ini tidak ada Melijo yang beroperasi diwilayah anda!',
+                          softWrap: true,
                           style: TextStyle(
                             color: Colours.red,
                             fontSize: 16,
@@ -533,8 +531,9 @@ class _HomeBuyersScreenState extends State<HomeBuyersScreen> {
                             fontWeight: FontStyles.regular,
                           ),
                         ),
-                      ),
-                    );
+                      );
+                    }
+                    return const SizedBox(height: 12);
                   }
                 ),
                 // *Products Panel
