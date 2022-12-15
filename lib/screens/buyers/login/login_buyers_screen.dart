@@ -43,14 +43,48 @@ class _LoginBuyersScreenState extends State<LoginBuyersScreen> {
         });
         await login(_userController.text, _passwordController.text, false);
         final Map user_info = await getUserInfo();
-        if (user_info['seller_id'] == 0 || user_info['seller_id'] == 14) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-            backgroundColor: Colours.red,
-            content: Text('Untuk saat ini tidak ada Melijo di wilayah anda!'),
-          ));
-        }
         Navigator.of(context).pushNamedAndRemoveUntil(
             DashboardBuyersScreen.route, (route) => false);
+        if (user_info['seller_id'] == 0 || user_info['seller_id'] == 14) {
+          // ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          //   backgroundColor: Colours.red,
+          //   content: Text('Untuk saat ini tidak ada Melijo di wilayah anda!'),
+          // ));
+          showModalBottomSheet(
+            backgroundColor: Colors.transparent,
+            context: context,
+            builder: (context) => Container(
+              padding: const EdgeInsets.symmetric(vertical: 28, horizontal: 20),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                color: Colours.white,
+              ),
+              child: ModalBottom(
+                title: 'Pemberitahuan!',
+                message: 'Untuk saat ini tidak ada Melijo di wilayah anda!',
+                widgets: [
+                  SizedBox(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colours.deepGreen, width: 1),
+                      ),
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: const Text(
+                        'Oke, Saya Mengerti',
+                        style: TextStyle(
+                          color: Colours.deepGreen,
+                          fontSize: 18,
+                          fontWeight: FontStyles.regular,
+                          fontFamily: FontStyles.leagueSpartan,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
       }
     } catch (error) {
       setState(() {
